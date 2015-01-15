@@ -1,0 +1,177 @@
+
+#ifndef UltraSolver_search_database_h
+#define UltraSolver_search_database_h
+
+#include <core/complex_vector.h>
+#include <core/complex_hashset.h>
+#include <utility>
+#include <unordered_set>
+#include <type_traits>
+#include <atomic>
+
+template<typename T, typename H = std::hash<T>, typename... Args>
+class simple_search_database
+{
+	typedef T state_t;
+public:
+	template<typename... Args>
+	simple_search_database(Args... args)
+	{}
+
+	bool contains(const state_t & state) const
+	{
+		return (m_discoveredStates.find(state) != m_discoveredStates.end());
+	}
+
+	bool add(const state_t & state)
+	{
+		auto res = m_discoveredStates.insert(state);
+		return res.second;
+	}
+
+private:
+	std::unordered_set<state_t, H> m_discoveredStates;
+};
+
+
+template<typename T, typename H = std::hash<T>, bool ExtMemory = false, int StorageCount = 1>
+class search_database
+{
+	typedef T state_t;
+	typedef H hash_t;
+	typedef std::tuple<size_t, state_t> record_t;
+	//typedef std::unordered_set<state_t> hash_map_t;
+	typedef complex_hashset<state_t, hash_t, !ExtMemory> hash_map_t;
+	const int storage_count = StorageCount;
+
+	
+
+	template<typename S>
+	struct storage_factory
+	{
+		template<typename... Args>
+		S create_storage(Args... args) const
+		{
+			return S(args...);
+			//return S();
+		}
+	};
+
+	template<>
+	struct storage_factory<std::unordered_set<state_t>>
+	{
+		template<typename... Args>
+		std::unordered_set<state_t> create_storage(Args... args) const
+		{
+			return std::unordered_set<state_t>();
+		}
+	};
+
+public:
+	//Id + parent search node id + state + init->current path length
+	typedef std::tuple<size_t, size_t, state_t, int> search_node_t;
+
+
+	template<typename SerFun, typename DesFun>
+	search_database(int serialized_state_size, SerFun s_fun, DesFun d_fun)
+		:	m_storages(storage_count, storage_factory<hash_map_t>().create_storage(serialized_state_size, s_fun, d_fun)),
+			m_nodeSerializeFun([=](void * dst, const search_node_t & node){
+				char * cur_ptr = (char*)dst;
+				memcpy(cur_ptr, &get<0>(node), sizeof(size_t));
+				memcpy(cur_ptr + sizeof(size_t), &get<1>(node), sizeof(size_t));
+				memcpy(cur_ptr + 2 * sizeof(size_t), &get<3>(node), sizeof(int));
+				s_fun(cur_ptr + 2 * sizeof(size_t)+sizeof(int), get<2>(node));
+			}), m_nodeDeserializeFun([=](const void * src, search_node_t & node){
+				const char * cur_ptr = (const char*)src;
+				memcpy(&get<0>(node), cur_ptr, sizeof(size_t));
+				memcpy(&get<1>(node), cur_ptr + sizeof(size_t), sizeof(size_t));
+				memcpy(&get<3>(node), cur_ptr + 2 * sizeof(size_t), sizeof(int));
+				d_fun(cur_ptr + 2 * sizeof(size_t)+sizeof(int), get<2>(node));
+			}),
+		m_searchNodes(serialized_state_size + sizeof(size_t)*2 + sizeof(int), m_nodeSerializeFun, m_nodeDeserializeFun), m_nodeCount(0)
+	{
+		for (auto & storage : m_storages)
+			storage.init();
+	}
+
+	bool contains(const state_t & state) const
+	{
+		size_t hash_val = m_hasher(state);
+		auto & storage = m_storages[hash_val % storage_count];
+		return (storage.find(state) != storage.end());
+	}
+
+	bool add(const state_t & state)
+	{
+		size_t hash_val = m_hasher(state);
+		auto & storage = m_storages[hash_val % storage_count];
+		auto res = storage.insert(state, hash_val);
+		
+		if(res.second)
+			++m_nodeCount;
+
+		return res.second;
+	}
+
+	template<typename KeyPart>
+	void compress_keys_less(KeyPart key_part)
+	{
+		cout << "Compressing database (" << m_storages.size() << ") storages..." << std::endl;
+	}
+
+	search_node_t create_node(const state_t & state, size_t parent_id)
+	{
+		int path_len = m_searchNodes.empty() ? 0 : get<3>(m_searchNodes[parent_id]) + 1;
+		return create_node(state, parent_id, path_len);
+	}
+
+	//Faster, if we know path length in advance
+	search_node_t create_node(const state_t & state, size_t parent_id, int path_len)
+	{
+		search_node_t new_node(m_searchNodes.size(), parent_id, state, path_len);
+		m_searchNodes.push_back(new_node);
+		return std::move(new_node);
+	}
+
+	search_node_t parent_node(const search_node_t & node) const
+	{
+		return m_searchNodes[get<1>(node)];
+	}
+
+	size_t state_count() const
+	{
+		return m_nodeCount.load();
+	}
+
+	size_t block_count() const
+	{
+		size_t res(0);
+		for (auto & storage : m_storages)
+			res += storage.block_count();
+		return res;
+	}
+
+	float density() const
+	{
+		float res(0.0f);
+		for (auto & storage : m_storages)
+			res += storage.bucket_factor();
+		return res / m_storages.size();
+	}
+public:
+	std::function<void(void*, const search_node_t&)> m_nodeSerializeFun;
+	std::function<void(const void*, search_node_t&)> m_nodeDeserializeFun;
+private:
+	
+	//complex_vector<record_t> m_data;
+	hash_t m_hasher;
+
+	std::vector<hash_map_t> m_storages;
+	//std::array<hash_map_t, StorageCount> m_storages;
+
+	complex_vector<search_node_t, ExtMemory> m_searchNodes;
+
+	std::atomic<size_t> m_nodeCount;
+};
+
+#endif

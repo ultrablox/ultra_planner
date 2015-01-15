@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommandArguments>D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\transport-strips\p01-domain.pddl D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\transport-strips\p01.pddl</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>
