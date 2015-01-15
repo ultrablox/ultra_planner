@@ -1,0 +1,362 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		16C6677418EB12B200F72953 /* common_objects.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6675718EB12B200F72953 /* common_objects.h */; };
+		16C6677518EB12B200F72953 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6675818EB12B200F72953 /* config.h */; };
+		16C6677618EB12B200F72953 /* common_objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6675A18EB12B200F72953 /* common_objects.cpp */; };
+		16C6677718EB12B200F72953 /* common_objects.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6675B18EB12B200F72953 /* common_objects.h */; };
+		16C6677818EB12B200F72953 /* UGrammar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6675C18EB12B200F72953 /* UGrammar.cpp */; };
+		16C6677918EB12B200F72953 /* UGrammar.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6675D18EB12B200F72953 /* UGrammar.h */; };
+		16C6677A18EB12B200F72953 /* ULexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6675E18EB12B200F72953 /* ULexer.cpp */; };
+		16C6677B18EB12B200F72953 /* ULexer.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6675F18EB12B200F72953 /* ULexer.h */; };
+		16C6677C18EB12B200F72953 /* UParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676018EB12B200F72953 /* UParser.cpp */; };
+		16C6677D18EB12B200F72953 /* UParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676118EB12B200F72953 /* UParser.h */; };
+		16C6677E18EB12B200F72953 /* ULanguage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676218EB12B200F72953 /* ULanguage.cpp */; };
+		16C6677F18EB12B200F72953 /* ULanguage.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676318EB12B200F72953 /* ULanguage.h */; };
+		16C6678018EB12B200F72953 /* UPDDLAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676418EB12B200F72953 /* UPDDLAction.cpp */; };
+		16C6678118EB12B200F72953 /* UPDDLAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676518EB12B200F72953 /* UPDDLAction.h */; };
+		16C6678218EB12B200F72953 /* UPDDLDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676618EB12B200F72953 /* UPDDLDomain.cpp */; };
+		16C6678318EB12B200F72953 /* UPDDLDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676718EB12B200F72953 /* UPDDLDomain.h */; };
+		16C6678418EB12B200F72953 /* UPDDLFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676818EB12B200F72953 /* UPDDLFunction.cpp */; };
+		16C6678518EB12B200F72953 /* UPDDLFunction.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676918EB12B200F72953 /* UPDDLFunction.h */; };
+		16C6678618EB12B200F72953 /* UPDDLGrammar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676A18EB12B200F72953 /* UPDDLGrammar.cpp */; };
+		16C6678718EB12B200F72953 /* UPDDLGrammar.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676B18EB12B200F72953 /* UPDDLGrammar.h */; };
+		16C6678818EB12B200F72953 /* UPDDLNamedObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676C18EB12B200F72953 /* UPDDLNamedObject.cpp */; };
+		16C6678918EB12B200F72953 /* UPDDLNamedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676D18EB12B200F72953 /* UPDDLNamedObject.h */; };
+		16C6678A18EB12B200F72953 /* UPDDLParametrizedObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6676E18EB12B200F72953 /* UPDDLParametrizedObject.cpp */; };
+		16C6678B18EB12B200F72953 /* UPDDLParametrizedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6676F18EB12B200F72953 /* UPDDLParametrizedObject.h */; };
+		16C6678C18EB12B200F72953 /* UPDDLPredicates.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6677018EB12B200F72953 /* UPDDLPredicates.cpp */; };
+		16C6678D18EB12B200F72953 /* UPDDLPredicates.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6677118EB12B200F72953 /* UPDDLPredicates.h */; };
+		16C6678E18EB12B200F72953 /* UPDDLTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6677218EB12B200F72953 /* UPDDLTypes.cpp */; };
+		16C6678F18EB12B200F72953 /* UPDDLTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6677318EB12B200F72953 /* UPDDLTypes.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		16C6674918EB129900F72953 /* libUPDDL.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libUPDDL.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		16C6675718EB12B200F72953 /* common_objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common_objects.h; path = ../../../../src/pddl/common_objects.h; sourceTree = "<group>"; };
+		16C6675818EB12B200F72953 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../../../src/pddl/config.h; sourceTree = "<group>"; };
+		16C6675A18EB12B200F72953 /* common_objects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_objects.cpp; sourceTree = "<group>"; };
+		16C6675B18EB12B200F72953 /* common_objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common_objects.h; sourceTree = "<group>"; };
+		16C6675C18EB12B200F72953 /* UGrammar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UGrammar.cpp; sourceTree = "<group>"; };
+		16C6675D18EB12B200F72953 /* UGrammar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UGrammar.h; sourceTree = "<group>"; };
+		16C6675E18EB12B200F72953 /* ULexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ULexer.cpp; sourceTree = "<group>"; };
+		16C6675F18EB12B200F72953 /* ULexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ULexer.h; sourceTree = "<group>"; };
+		16C6676018EB12B200F72953 /* UParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UParser.cpp; sourceTree = "<group>"; };
+		16C6676118EB12B200F72953 /* UParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UParser.h; sourceTree = "<group>"; };
+		16C6676218EB12B200F72953 /* ULanguage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ULanguage.cpp; path = ../../../../src/pddl/ULanguage.cpp; sourceTree = "<group>"; };
+		16C6676318EB12B200F72953 /* ULanguage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ULanguage.h; path = ../../../../src/pddl/ULanguage.h; sourceTree = "<group>"; };
+		16C6676418EB12B200F72953 /* UPDDLAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLAction.cpp; path = ../../../../src/pddl/UPDDLAction.cpp; sourceTree = "<group>"; };
+		16C6676518EB12B200F72953 /* UPDDLAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLAction.h; path = ../../../../src/pddl/UPDDLAction.h; sourceTree = "<group>"; };
+		16C6676618EB12B200F72953 /* UPDDLDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLDomain.cpp; path = ../../../../src/pddl/UPDDLDomain.cpp; sourceTree = "<group>"; };
+		16C6676718EB12B200F72953 /* UPDDLDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLDomain.h; path = ../../../../src/pddl/UPDDLDomain.h; sourceTree = "<group>"; };
+		16C6676818EB12B200F72953 /* UPDDLFunction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLFunction.cpp; path = ../../../../src/pddl/UPDDLFunction.cpp; sourceTree = "<group>"; };
+		16C6676918EB12B200F72953 /* UPDDLFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLFunction.h; path = ../../../../src/pddl/UPDDLFunction.h; sourceTree = "<group>"; };
+		16C6676A18EB12B200F72953 /* UPDDLGrammar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLGrammar.cpp; path = ../../../../src/pddl/UPDDLGrammar.cpp; sourceTree = "<group>"; };
+		16C6676B18EB12B200F72953 /* UPDDLGrammar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLGrammar.h; path = ../../../../src/pddl/UPDDLGrammar.h; sourceTree = "<group>"; };
+		16C6676C18EB12B200F72953 /* UPDDLNamedObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLNamedObject.cpp; path = ../../../../src/pddl/UPDDLNamedObject.cpp; sourceTree = "<group>"; };
+		16C6676D18EB12B200F72953 /* UPDDLNamedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLNamedObject.h; path = ../../../../src/pddl/UPDDLNamedObject.h; sourceTree = "<group>"; };
+		16C6676E18EB12B200F72953 /* UPDDLParametrizedObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLParametrizedObject.cpp; path = ../../../../src/pddl/UPDDLParametrizedObject.cpp; sourceTree = "<group>"; };
+		16C6676F18EB12B200F72953 /* UPDDLParametrizedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLParametrizedObject.h; path = ../../../../src/pddl/UPDDLParametrizedObject.h; sourceTree = "<group>"; };
+		16C6677018EB12B200F72953 /* UPDDLPredicates.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLPredicates.cpp; path = ../../../../src/pddl/UPDDLPredicates.cpp; sourceTree = "<group>"; };
+		16C6677118EB12B200F72953 /* UPDDLPredicates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLPredicates.h; path = ../../../../src/pddl/UPDDLPredicates.h; sourceTree = "<group>"; };
+		16C6677218EB12B200F72953 /* UPDDLTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPDDLTypes.cpp; path = ../../../../src/pddl/UPDDLTypes.cpp; sourceTree = "<group>"; };
+		16C6677318EB12B200F72953 /* UPDDLTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPDDLTypes.h; path = ../../../../src/pddl/UPDDLTypes.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		16C6674618EB129900F72953 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		16C6674018EB129900F72953 = {
+			isa = PBXGroup;
+			children = (
+				16C6675618EB129F00F72953 /* src */,
+				16C6674A18EB129900F72953 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		16C6674A18EB129900F72953 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				16C6674918EB129900F72953 /* libUPDDL.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		16C6675618EB129F00F72953 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				16C6675918EB12B200F72953 /* translator */,
+				16C6675718EB12B200F72953 /* common_objects.h */,
+				16C6675818EB12B200F72953 /* config.h */,
+				16C6676218EB12B200F72953 /* ULanguage.cpp */,
+				16C6676318EB12B200F72953 /* ULanguage.h */,
+				16C6676418EB12B200F72953 /* UPDDLAction.cpp */,
+				16C6676518EB12B200F72953 /* UPDDLAction.h */,
+				16C6676618EB12B200F72953 /* UPDDLDomain.cpp */,
+				16C6676718EB12B200F72953 /* UPDDLDomain.h */,
+				16C6676818EB12B200F72953 /* UPDDLFunction.cpp */,
+				16C6676918EB12B200F72953 /* UPDDLFunction.h */,
+				16C6676A18EB12B200F72953 /* UPDDLGrammar.cpp */,
+				16C6676B18EB12B200F72953 /* UPDDLGrammar.h */,
+				16C6676C18EB12B200F72953 /* UPDDLNamedObject.cpp */,
+				16C6676D18EB12B200F72953 /* UPDDLNamedObject.h */,
+				16C6676E18EB12B200F72953 /* UPDDLParametrizedObject.cpp */,
+				16C6676F18EB12B200F72953 /* UPDDLParametrizedObject.h */,
+				16C6677018EB12B200F72953 /* UPDDLPredicates.cpp */,
+				16C6677118EB12B200F72953 /* UPDDLPredicates.h */,
+				16C6677218EB12B200F72953 /* UPDDLTypes.cpp */,
+				16C6677318EB12B200F72953 /* UPDDLTypes.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		16C6675918EB12B200F72953 /* translator */ = {
+			isa = PBXGroup;
+			children = (
+				16C6675A18EB12B200F72953 /* common_objects.cpp */,
+				16C6675B18EB12B200F72953 /* common_objects.h */,
+				16C6675C18EB12B200F72953 /* UGrammar.cpp */,
+				16C6675D18EB12B200F72953 /* UGrammar.h */,
+				16C6675E18EB12B200F72953 /* ULexer.cpp */,
+				16C6675F18EB12B200F72953 /* ULexer.h */,
+				16C6676018EB12B200F72953 /* UParser.cpp */,
+				16C6676118EB12B200F72953 /* UParser.h */,
+			);
+			name = translator;
+			path = ../../../../src/pddl/translator;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		16C6674718EB129900F72953 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16C6677918EB12B200F72953 /* UGrammar.h in Headers */,
+				16C6678918EB12B200F72953 /* UPDDLNamedObject.h in Headers */,
+				16C6678B18EB12B200F72953 /* UPDDLParametrizedObject.h in Headers */,
+				16C6677F18EB12B200F72953 /* ULanguage.h in Headers */,
+				16C6678118EB12B200F72953 /* UPDDLAction.h in Headers */,
+				16C6677518EB12B200F72953 /* config.h in Headers */,
+				16C6678718EB12B200F72953 /* UPDDLGrammar.h in Headers */,
+				16C6677718EB12B200F72953 /* common_objects.h in Headers */,
+				16C6678D18EB12B200F72953 /* UPDDLPredicates.h in Headers */,
+				16C6678F18EB12B200F72953 /* UPDDLTypes.h in Headers */,
+				16C6677418EB12B200F72953 /* common_objects.h in Headers */,
+				16C6678318EB12B200F72953 /* UPDDLDomain.h in Headers */,
+				16C6677B18EB12B200F72953 /* ULexer.h in Headers */,
+				16C6678518EB12B200F72953 /* UPDDLFunction.h in Headers */,
+				16C6677D18EB12B200F72953 /* UParser.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		16C6674818EB129900F72953 /* UPDDL */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16C6674D18EB129900F72953 /* Build configuration list for PBXNativeTarget "UPDDL" */;
+			buildPhases = (
+				16C6674518EB129900F72953 /* Sources */,
+				16C6674618EB129900F72953 /* Frameworks */,
+				16C6674718EB129900F72953 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UPDDL;
+			productName = UPDDL;
+			productReference = 16C6674918EB129900F72953 /* libUPDDL.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		16C6674118EB129900F72953 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Yuri Blokhin";
+			};
+			buildConfigurationList = 16C6674418EB129900F72953 /* Build configuration list for PBXProject "UPDDL" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 16C6674018EB129900F72953;
+			productRefGroup = 16C6674A18EB129900F72953 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				16C6674818EB129900F72953 /* UPDDL */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		16C6674518EB129900F72953 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16C6678818EB12B200F72953 /* UPDDLNamedObject.cpp in Sources */,
+				16C6678C18EB12B200F72953 /* UPDDLPredicates.cpp in Sources */,
+				16C6678218EB12B200F72953 /* UPDDLDomain.cpp in Sources */,
+				16C6678418EB12B200F72953 /* UPDDLFunction.cpp in Sources */,
+				16C6677E18EB12B200F72953 /* ULanguage.cpp in Sources */,
+				16C6678618EB12B200F72953 /* UPDDLGrammar.cpp in Sources */,
+				16C6677618EB12B200F72953 /* common_objects.cpp in Sources */,
+				16C6677A18EB12B200F72953 /* ULexer.cpp in Sources */,
+				16C6677C18EB12B200F72953 /* UParser.cpp in Sources */,
+				16C6678E18EB12B200F72953 /* UPDDLTypes.cpp in Sources */,
+				16C6678A18EB12B200F72953 /* UPDDLParametrizedObject.cpp in Sources */,
+				16C6677818EB12B200F72953 /* UGrammar.cpp in Sources */,
+				16C6678018EB12B200F72953 /* UPDDLAction.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		16C6674B18EB129900F72953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../../../src,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		16C6674C18EB129900F72953 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../../../src,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		16C6674E18EB129900F72953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		16C6674F18EB129900F72953 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		16C6674418EB129900F72953 /* Build configuration list for PBXProject "UPDDL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16C6674B18EB129900F72953 /* Debug */,
+				16C6674C18EB129900F72953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		16C6674D18EB129900F72953 /* Build configuration list for PBXNativeTarget "UPDDL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16C6674E18EB129900F72953 /* Debug */,
+				16C6674F18EB129900F72953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 16C6674118EB129900F72953 /* Project object */;
+}

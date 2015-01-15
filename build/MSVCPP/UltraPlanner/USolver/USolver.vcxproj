@@ -1,0 +1,360 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugStatic|Win32">
+      <Configuration>DebugStatic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugStatic|x64">
+      <Configuration>DebugStatic</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseStatic|Win32">
+      <Configuration>ReleaseStatic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseStatic|x64">
+      <Configuration>ReleaseStatic</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4E5E705D-5C01-44B3-8667-346CECFF7A3E}</ProjectGuid>
+    <RootNamespace>USolver</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
+    <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ULTRA_SOLVER_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>stxxld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../lib/x86</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64;_LARGE_FILES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>stxxld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../lib/x86</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>../../../../lib/x86;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>stxxld.lib;</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ULTRA_SOLVER_EXPORT;WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64;_LARGE_FILES;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>stxxld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64;_LARGE_FILES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>stxxld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>stxxld.lib;</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ULTRA_SOLVER_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>stxxl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../lib/x86</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ULTRA_SOLVER_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>stxxl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../lib/x86</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ULTRA_SOLVER_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>stxxl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_LARGEFILE_SOURCE;_FILE_OFFSET_BITS=64;_LARGE_FILES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>stxxl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>stxxl.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchDatabase.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeFactory.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeReference.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateFactory.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateReference.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UGoalCountHeuristic.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraph.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraphHeuristic.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\UExternalMemoryController.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\USolverBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\UHeuristic.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\UInstantiator.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\UMetric.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\UNodeEstimator.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\UOutputMerger.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\USearchEngine.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\USearchNode.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\USolver.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\search_database.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchDatabase.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeFactory.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeReference.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateFactory.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateReference.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UGoalCountHeuristic.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraph.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraphHeuristic.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\astar_engine.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\batched_engine.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\bfs_engine.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\dfs_engine.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\queued_engine.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\UExternalMemoryController.h" />
+    <ClInclude Include="..\..\..\..\src\solver\config.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\greedy_bfs_engine.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\search_engine_base.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_queue.h" />
+    <ClInclude Include="..\..\..\..\src\solver\UHeuristic.h" />
+    <ClInclude Include="..\..\..\..\src\solver\UInstantiator.h" />
+    <ClInclude Include="..\..\..\..\src\solver\UMetric.h" />
+    <ClInclude Include="..\..\..\..\src\solver\UNodeEstimator.h" />
+    <ClInclude Include="..\..\..\..\src\solver\UOutputMerger.h" />
+    <ClInclude Include="..\..\..\..\src\solver\USearchEngine.h" />
+    <ClInclude Include="..\..\..\..\src\solver\USearchNode.h" />
+    <ClInclude Include="..\..\..\..\src\solver\USolver.h" />
+    <ClInclude Include="..\..\..\..\src\solver\USolverBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UCore\UCore.vcxproj">
+      <Project>{5fce4390-3dbd-4bb6-86fd-266a2bb90a44}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

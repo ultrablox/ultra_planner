@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\AbstractGraph.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Action.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Agents.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Analyser.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Cascader.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\CausalGraph.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\CommitmentTracker.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\DebugWriteController.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\DYNATranslator.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Environment.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Evaluator.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Events.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Exceptions.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\FastEnvironment.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\FlexLexer.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\FuncAnalysis.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\FuncExp.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\GoalHypSpace.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\graphconstruct.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\HowAnalyser.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\instantiation.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\instantiationIP.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\InstPropLinker.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\LaTeXSupport.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\LPGPTranslator.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\macros.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\main.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\oldCausalGraph.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\oldFlexLexer.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\OptInterface.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Ownership.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\parse_error.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\PartialPlan.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Partitions.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\PinguPlanGenerator.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Plan.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\PlanExecutionTracker.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Polynomial.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\PrettyPrinter.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Proposition.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\ptree.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\random.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\RelaxTranslator.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\RepairAdvice.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\RobustAnalyse.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\SASActions.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\SearchSpace.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\SimpleEval.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\sStack.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\State.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\StateObserver.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\tDistribution.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\TIM.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\TimSupport.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\TIMUtilities.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\ToFunction.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\TrajectoryConstraints.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\typecheck.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\TypedAnalyser.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\TypeStripWC.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Utils.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\Validator.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\VisitController.h" />
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\include\WriteController.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Action.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\DebugWriteController.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Environment.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Events.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\FuncExp.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\LaTeXSupport.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\main.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Ownership.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\pddl+.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Plan.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Polynomial.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\PrettyPrinter.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Proposition.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\ptree.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\random.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\RepairAdvice.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\RobustAnalyse.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\State.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\TrajectoryConstraints.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\typecheck.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Utils.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\Validator.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3E775718-2278-4390-AE0A-552D560493AC}</ProjectGuid>
+    <RootNamespace>VAL</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>../../../../dependencies/VAL/include;../../../../include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;YY_NO_UNISTD_H;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;YY_NO_UNISTD_H;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../../dependencies/VAL/include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

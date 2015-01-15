@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{6c327adf-11af-4370-a378-cb891e5aa612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{2f56499e-cecb-4c79-9a15-ec53bded8165}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\transition_system">
+      <UniqueIdentifier>{8ea3d03c-6a3d-449a-a07c-c5a2bef6c413}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\solver">
+      <UniqueIdentifier>{4b2db11e-b599-4b44-a62a-eb01b23cb0c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\algorithm">
+      <UniqueIdentifier>{c6eb6334-1f9e-4015-b3e1-3ad0772fa9fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\expression">
+      <UniqueIdentifier>{dae2f150-2898-4a6a-aede-a6e235f379b0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\transition_system\UTransitionSystem.cpp">
+      <Filter>src\transition_system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\UError.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\UBitset.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\transition_system\UState.cpp">
+      <Filter>src\transition_system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\transition_system\UTransition.cpp">
+      <Filter>src\transition_system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\UMatrix.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\expression\UNumericExpression.cpp">
+      <Filter>src\expression</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\core\utils\helpers.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\transition_system\UTransitionSystem.h">
+      <Filter>src\transition_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\config.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\UBitset.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\UError.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\transition_system\UState.h">
+      <Filter>src\transition_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\transition_system\UTransition.h">
+      <Filter>src\transition_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\algorithm\sort.h">
+      <Filter>src\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\UMatrix.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\expression\UNumericExpression.h">
+      <Filter>src\expression</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h">
+      <Filter>src\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\transition_system\transition_system.h">
+      <Filter>src\transition_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\complex_vector.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h">
+      <Filter>src\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\algorithm\math.h">
+      <Filter>src\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\data_file.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\cache.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\cached_file.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

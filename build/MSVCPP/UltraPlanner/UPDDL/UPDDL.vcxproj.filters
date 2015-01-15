@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{47f26a46-1baf-4321-97ad-ed28a3e0c085}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\translator">
+      <UniqueIdentifier>{25806a82-fe06-48f1-9b0c-aaef7e59e706}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\VAL">
+      <UniqueIdentifier>{60631360-acbf-4db2-a30a-8743d283806e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\pddl\common_objects.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\ULanguage.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLAction.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLDomain.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLFunction.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLGrammar.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLNamedObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLParametrizedObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLPredicates.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UPDDLTypes.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\translator\common_objects.h">
+      <Filter>src\translator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\translator\UGrammar.h">
+      <Filter>src\translator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\translator\ULexer.h">
+      <Filter>src\translator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\translator\UParser.h">
+      <Filter>src\translator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\config.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UTaskGenerator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UBoolTask.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\pddl\UMultivalueTask.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UInvariantGenerator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\pddl\ULanguage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLAction.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLDomain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLFunction.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLGrammar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLNamedObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLParametrizedObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLPredicates.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UPDDLTypes.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\translator\common_objects.cpp">
+      <Filter>src\translator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\translator\UGrammar.cpp">
+      <Filter>src\translator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\translator\ULexer.cpp">
+      <Filter>src\translator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\translator\UParser.cpp">
+      <Filter>src\translator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\pddl+.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\ptree.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\DebugWriteController.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UTaskGenerator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\TypedAnalyser.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\typecheck.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\TIM.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\TimSupport.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\FuncAnalysis.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\instantiation.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\SimpleEval.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\SASActions.cpp">
+      <Filter>src\VAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UBoolTask.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\pddl\UMultivalueTask.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UInvariantGenerator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

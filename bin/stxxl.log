@@ -1,0 +1,10 @@
+[STXXL-MSG] STXXL v1.4.99 (prerelease/) (git c92521a91aedb950d57cd7e0f596cc622f2e67c8)
+[STXXL-MSG] Disk 'tmp/stxxl_0.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=0
+[STXXL-MSG] Disk 'tmp/stxxl_1.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=1
+[STXXL-MSG] Disk 'tmp/stxxl_2.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=2
+[STXXL-MSG] Disk 'tmp/stxxl_3.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=3
+[STXXL-MSG] Disk 'tmp/stxxl_4.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=4
+[STXXL-MSG] Disk 'tmp/stxxl_5.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=5
+[STXXL-MSG] Disk 'tmp/stxxl_6.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=6
+[STXXL-MSG] Disk 'tmp/stxxl_7.tmp' is allocated, space: 4096 MiB, I/O implementation: syscall queue=7
+[STXXL-MSG] In total 8 disks are allocated, space: 32768 MiB

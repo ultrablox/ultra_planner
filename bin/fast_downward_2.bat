@@ -1,0 +1,3 @@
+python ..\..\LementPlanner\planners\fast-downward\translate\translate.py D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p03-domain.pddl D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p03.pddl --force
+..\..\LementPlanner\planners\fast-downward\preprocess.exe < output.sas
+..\..\LementPlanner\planners\fast-downward\downward-1.exe --search Astar(blind) < output

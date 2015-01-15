@@ -1,0 +1,311 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1640272D19339761005B0AA6 /* UTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640272B19339761005B0AA6 /* UTransition.cpp */; };
+		1640272E19339761005B0AA6 /* UTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640272C19339761005B0AA6 /* UTransition.h */; };
+		16C6673518EB11D000F72953 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6672818EB11D000F72953 /* config.h */; };
+		16C6673618EB11D000F72953 /* UState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6672A18EB11D000F72953 /* UState.cpp */; };
+		16C6673718EB11D000F72953 /* UState.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6672B18EB11D000F72953 /* UState.h */; };
+		16C6673818EB11D000F72953 /* UTransitionSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6672C18EB11D000F72953 /* UTransitionSystem.cpp */; };
+		16C6673918EB11D000F72953 /* UTransitionSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6672D18EB11D000F72953 /* UTransitionSystem.h */; };
+		16C6673A18EB11D000F72953 /* UBitset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6672E18EB11D000F72953 /* UBitset.cpp */; };
+		16C6673B18EB11D000F72953 /* UBitset.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6672F18EB11D000F72953 /* UBitset.h */; };
+		16C6673C18EB11D000F72953 /* UError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6673018EB11D000F72953 /* UError.cpp */; };
+		16C6673D18EB11D000F72953 /* UError.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6673118EB11D000F72953 /* UError.h */; };
+		16C6673E18EB11D000F72953 /* helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C6673318EB11D000F72953 /* helpers.cpp */; };
+		16C6673F18EB11D000F72953 /* helpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 16C6673418EB11D000F72953 /* helpers.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1640272B19339761005B0AA6 /* UTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UTransition.cpp; sourceTree = "<group>"; };
+		1640272C19339761005B0AA6 /* UTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTransition.h; sourceTree = "<group>"; };
+		16C6671A18EB11B200F72953 /* libUCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libUCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		16C6672818EB11D000F72953 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../../../src/core/config.h; sourceTree = "<group>"; };
+		16C6672A18EB11D000F72953 /* UState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UState.cpp; sourceTree = "<group>"; };
+		16C6672B18EB11D000F72953 /* UState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UState.h; sourceTree = "<group>"; };
+		16C6672C18EB11D000F72953 /* UTransitionSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UTransitionSystem.cpp; sourceTree = "<group>"; };
+		16C6672D18EB11D000F72953 /* UTransitionSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTransitionSystem.h; sourceTree = "<group>"; };
+		16C6672E18EB11D000F72953 /* UBitset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UBitset.cpp; path = ../../../../src/core/UBitset.cpp; sourceTree = "<group>"; };
+		16C6672F18EB11D000F72953 /* UBitset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UBitset.h; path = ../../../../src/core/UBitset.h; sourceTree = "<group>"; };
+		16C6673018EB11D000F72953 /* UError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UError.cpp; path = ../../../../src/core/UError.cpp; sourceTree = "<group>"; };
+		16C6673118EB11D000F72953 /* UError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UError.h; path = ../../../../src/core/UError.h; sourceTree = "<group>"; };
+		16C6673318EB11D000F72953 /* helpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helpers.cpp; sourceTree = "<group>"; };
+		16C6673418EB11D000F72953 /* helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helpers.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		16C6671718EB11B200F72953 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		16C6671118EB11B200F72953 = {
+			isa = PBXGroup;
+			children = (
+				16C6672718EB11C100F72953 /* src */,
+				16C6671B18EB11B200F72953 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		16C6671B18EB11B200F72953 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				16C6671A18EB11B200F72953 /* libUCore.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		16C6672718EB11C100F72953 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				16C6673218EB11D000F72953 /* utils */,
+				16C6672918EB11D000F72953 /* transition_system */,
+				16C6672818EB11D000F72953 /* config.h */,
+				16C6672E18EB11D000F72953 /* UBitset.cpp */,
+				16C6672F18EB11D000F72953 /* UBitset.h */,
+				16C6673018EB11D000F72953 /* UError.cpp */,
+				16C6673118EB11D000F72953 /* UError.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		16C6672918EB11D000F72953 /* transition_system */ = {
+			isa = PBXGroup;
+			children = (
+				1640272B19339761005B0AA6 /* UTransition.cpp */,
+				1640272C19339761005B0AA6 /* UTransition.h */,
+				16C6672A18EB11D000F72953 /* UState.cpp */,
+				16C6672B18EB11D000F72953 /* UState.h */,
+				16C6672C18EB11D000F72953 /* UTransitionSystem.cpp */,
+				16C6672D18EB11D000F72953 /* UTransitionSystem.h */,
+			);
+			name = transition_system;
+			path = ../../../../src/core/transition_system;
+			sourceTree = "<group>";
+		};
+		16C6673218EB11D000F72953 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				16C6673318EB11D000F72953 /* helpers.cpp */,
+				16C6673418EB11D000F72953 /* helpers.h */,
+			);
+			name = utils;
+			path = ../../../../src/core/utils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		16C6671818EB11B200F72953 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16C6673718EB11D000F72953 /* UState.h in Headers */,
+				1640272E19339761005B0AA6 /* UTransition.h in Headers */,
+				16C6673918EB11D000F72953 /* UTransitionSystem.h in Headers */,
+				16C6673518EB11D000F72953 /* config.h in Headers */,
+				16C6673B18EB11D000F72953 /* UBitset.h in Headers */,
+				16C6673F18EB11D000F72953 /* helpers.h in Headers */,
+				16C6673D18EB11D000F72953 /* UError.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		16C6671918EB11B200F72953 /* UCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16C6671E18EB11B200F72953 /* Build configuration list for PBXNativeTarget "UCore" */;
+			buildPhases = (
+				16C6671618EB11B200F72953 /* Sources */,
+				16C6671718EB11B200F72953 /* Frameworks */,
+				16C6671818EB11B200F72953 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UCore;
+			productName = UCore;
+			productReference = 16C6671A18EB11B200F72953 /* libUCore.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		16C6671218EB11B200F72953 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Yuri Blokhin";
+			};
+			buildConfigurationList = 16C6671518EB11B200F72953 /* Build configuration list for PBXProject "UCore" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 16C6671118EB11B200F72953;
+			productRefGroup = 16C6671B18EB11B200F72953 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				16C6671918EB11B200F72953 /* UCore */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		16C6671618EB11B200F72953 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16C6673618EB11D000F72953 /* UState.cpp in Sources */,
+				16C6673818EB11D000F72953 /* UTransitionSystem.cpp in Sources */,
+				16C6673C18EB11D000F72953 /* UError.cpp in Sources */,
+				16C6673E18EB11D000F72953 /* helpers.cpp in Sources */,
+				1640272D19339761005B0AA6 /* UTransition.cpp in Sources */,
+				16C6673A18EB11D000F72953 /* UBitset.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		16C6671C18EB11B200F72953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		16C6671D18EB11B200F72953 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		16C6671F18EB11B200F72953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../../include,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		16C6672018EB11B200F72953 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../../include,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		16C6671518EB11B200F72953 /* Build configuration list for PBXProject "UCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16C6671C18EB11B200F72953 /* Debug */,
+				16C6671D18EB11B200F72953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		16C6671E18EB11B200F72953 /* Build configuration list for PBXNativeTarget "UCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16C6671F18EB11B200F72953 /* Debug */,
+				16C6672018EB11B200F72953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 16C6671218EB11B200F72953 /* Project object */;
+}

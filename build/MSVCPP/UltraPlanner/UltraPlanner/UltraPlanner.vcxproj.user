@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\elevators-strips\p01-domain.pddl D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\elevators-strips\p01.pddl</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\elevators-strips\p01-domain.pddl D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\elevators-strips\p01.pddl</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p01-domain.pddl D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p01.pddl st</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p04-domain.pddl D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p04.pddl st</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
+    <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--solver_type mt --optimal 0 --solver_max_ouput_size 45000 "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01.pddl"</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
+    <LocalDebuggerCommandArguments>--solver_type mt --solver_max_ouput_size 45000 "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01.pddl"</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'">
+    <LocalDebuggerCommandArguments>D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p01-domain.pddl D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p01.pddl st</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+</Project>

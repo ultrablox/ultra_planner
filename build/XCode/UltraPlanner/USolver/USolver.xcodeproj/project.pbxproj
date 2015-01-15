@@ -1,0 +1,424 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		164026EB193384EE005B0AA6 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026D6193384EE005B0AA6 /* config.h */; };
+		164026EC193384EE005B0AA6 /* UExternalMemoryController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026D7193384EE005B0AA6 /* UExternalMemoryController.cpp */; };
+		164026ED193384EE005B0AA6 /* UExternalMemoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026D8193384EE005B0AA6 /* UExternalMemoryController.h */; };
+		164026EE193384EE005B0AA6 /* UHeuristic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026D9193384EE005B0AA6 /* UHeuristic.cpp */; };
+		164026EF193384EE005B0AA6 /* UHeuristic.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026DA193384EE005B0AA6 /* UHeuristic.h */; };
+		164026F0193384EE005B0AA6 /* UInstantiator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026DB193384EE005B0AA6 /* UInstantiator.cpp */; };
+		164026F1193384EE005B0AA6 /* UInstantiator.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026DC193384EE005B0AA6 /* UInstantiator.h */; };
+		164026F2193384EE005B0AA6 /* UMetric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026DD193384EE005B0AA6 /* UMetric.cpp */; };
+		164026F3193384EE005B0AA6 /* UMetric.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026DE193384EE005B0AA6 /* UMetric.h */; };
+		164026F4193384EE005B0AA6 /* UNodeEstimator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026DF193384EE005B0AA6 /* UNodeEstimator.cpp */; };
+		164026F5193384EE005B0AA6 /* UNodeEstimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026E0193384EE005B0AA6 /* UNodeEstimator.h */; };
+		164026F6193384EE005B0AA6 /* UOutputMerger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026E1193384EE005B0AA6 /* UOutputMerger.cpp */; };
+		164026F7193384EE005B0AA6 /* UOutputMerger.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026E2193384EE005B0AA6 /* UOutputMerger.h */; };
+		164026F8193384EE005B0AA6 /* USearchEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026E3193384EE005B0AA6 /* USearchEngine.cpp */; };
+		164026F9193384EE005B0AA6 /* USearchEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026E4193384EE005B0AA6 /* USearchEngine.h */; };
+		164026FA193384EE005B0AA6 /* USearchNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026E5193384EE005B0AA6 /* USearchNode.cpp */; };
+		164026FB193384EE005B0AA6 /* USearchNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026E6193384EE005B0AA6 /* USearchNode.h */; };
+		164026FC193384EE005B0AA6 /* USolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026E7193384EE005B0AA6 /* USolver.cpp */; };
+		164026FD193384EE005B0AA6 /* USolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026E8193384EE005B0AA6 /* USolver.h */; };
+		164026FE193384EE005B0AA6 /* USolverBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 164026E9193384EE005B0AA6 /* USolverBase.cpp */; };
+		164026FF193384EE005B0AA6 /* USolverBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 164026EA193384EE005B0AA6 /* USolverBase.h */; };
+		1640270819338502005B0AA6 /* UGoalCountHeuristic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640270219338502005B0AA6 /* UGoalCountHeuristic.cpp */; };
+		1640270919338502005B0AA6 /* UGoalCountHeuristic.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640270319338502005B0AA6 /* UGoalCountHeuristic.h */; };
+		1640270A19338502005B0AA6 /* UPlanningGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640270419338502005B0AA6 /* UPlanningGraph.cpp */; };
+		1640270B19338502005B0AA6 /* UPlanningGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640270519338502005B0AA6 /* UPlanningGraph.h */; };
+		1640270C19338502005B0AA6 /* UPlanningGraphHeuristic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640270619338502005B0AA6 /* UPlanningGraphHeuristic.cpp */; };
+		1640270D19338502005B0AA6 /* UPlanningGraphHeuristic.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640270719338502005B0AA6 /* UPlanningGraphHeuristic.h */; };
+		1640271819338509005B0AA6 /* USearchDatabase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640270E19338509005B0AA6 /* USearchDatabase.cpp */; };
+		1640271919338509005B0AA6 /* USearchDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640270F19338509005B0AA6 /* USearchDatabase.h */; };
+		1640271A19338509005B0AA6 /* USearchNodeFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640271019338509005B0AA6 /* USearchNodeFactory.cpp */; };
+		1640271B19338509005B0AA6 /* USearchNodeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640271119338509005B0AA6 /* USearchNodeFactory.h */; };
+		1640271C19338509005B0AA6 /* USearchNodeReference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640271219338509005B0AA6 /* USearchNodeReference.cpp */; };
+		1640271D19338509005B0AA6 /* USearchNodeReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640271319338509005B0AA6 /* USearchNodeReference.h */; };
+		1640271E19338509005B0AA6 /* UStateFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640271419338509005B0AA6 /* UStateFactory.cpp */; };
+		1640271F19338509005B0AA6 /* UStateFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640271519338509005B0AA6 /* UStateFactory.h */; };
+		1640272019338509005B0AA6 /* UStateReference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1640271619338509005B0AA6 /* UStateReference.cpp */; };
+		1640272119338509005B0AA6 /* UStateReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 1640271719338509005B0AA6 /* UStateReference.h */; };
+		164027231933934F005B0AA6 /* libUCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 164027221933934F005B0AA6 /* libUCore.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		164026C8193384C8005B0AA6 /* libUSolver.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libUSolver.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		164026D6193384EE005B0AA6 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../../../src/solver/config.h; sourceTree = "<group>"; };
+		164026D7193384EE005B0AA6 /* UExternalMemoryController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UExternalMemoryController.cpp; path = ../../../../src/solver/UExternalMemoryController.cpp; sourceTree = "<group>"; };
+		164026D8193384EE005B0AA6 /* UExternalMemoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UExternalMemoryController.h; path = ../../../../src/solver/UExternalMemoryController.h; sourceTree = "<group>"; };
+		164026D9193384EE005B0AA6 /* UHeuristic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UHeuristic.cpp; path = ../../../../src/solver/UHeuristic.cpp; sourceTree = "<group>"; };
+		164026DA193384EE005B0AA6 /* UHeuristic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UHeuristic.h; path = ../../../../src/solver/UHeuristic.h; sourceTree = "<group>"; };
+		164026DB193384EE005B0AA6 /* UInstantiator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UInstantiator.cpp; path = ../../../../src/solver/UInstantiator.cpp; sourceTree = "<group>"; };
+		164026DC193384EE005B0AA6 /* UInstantiator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UInstantiator.h; path = ../../../../src/solver/UInstantiator.h; sourceTree = "<group>"; };
+		164026DD193384EE005B0AA6 /* UMetric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UMetric.cpp; path = ../../../../src/solver/UMetric.cpp; sourceTree = "<group>"; };
+		164026DE193384EE005B0AA6 /* UMetric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UMetric.h; path = ../../../../src/solver/UMetric.h; sourceTree = "<group>"; };
+		164026DF193384EE005B0AA6 /* UNodeEstimator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UNodeEstimator.cpp; path = ../../../../src/solver/UNodeEstimator.cpp; sourceTree = "<group>"; };
+		164026E0193384EE005B0AA6 /* UNodeEstimator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UNodeEstimator.h; path = ../../../../src/solver/UNodeEstimator.h; sourceTree = "<group>"; };
+		164026E1193384EE005B0AA6 /* UOutputMerger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UOutputMerger.cpp; path = ../../../../src/solver/UOutputMerger.cpp; sourceTree = "<group>"; };
+		164026E2193384EE005B0AA6 /* UOutputMerger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UOutputMerger.h; path = ../../../../src/solver/UOutputMerger.h; sourceTree = "<group>"; };
+		164026E3193384EE005B0AA6 /* USearchEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = USearchEngine.cpp; path = ../../../../src/solver/USearchEngine.cpp; sourceTree = "<group>"; };
+		164026E4193384EE005B0AA6 /* USearchEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = USearchEngine.h; path = ../../../../src/solver/USearchEngine.h; sourceTree = "<group>"; };
+		164026E5193384EE005B0AA6 /* USearchNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = USearchNode.cpp; path = ../../../../src/solver/USearchNode.cpp; sourceTree = "<group>"; };
+		164026E6193384EE005B0AA6 /* USearchNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = USearchNode.h; path = ../../../../src/solver/USearchNode.h; sourceTree = "<group>"; };
+		164026E7193384EE005B0AA6 /* USolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = USolver.cpp; path = ../../../../src/solver/USolver.cpp; sourceTree = "<group>"; };
+		164026E8193384EE005B0AA6 /* USolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = USolver.h; path = ../../../../src/solver/USolver.h; sourceTree = "<group>"; };
+		164026E9193384EE005B0AA6 /* USolverBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = USolverBase.cpp; path = ../../../../src/solver/USolverBase.cpp; sourceTree = "<group>"; };
+		164026EA193384EE005B0AA6 /* USolverBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = USolverBase.h; path = ../../../../src/solver/USolverBase.h; sourceTree = "<group>"; };
+		1640270219338502005B0AA6 /* UGoalCountHeuristic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UGoalCountHeuristic.cpp; path = ../../../../src/solver/heuristics/UGoalCountHeuristic.cpp; sourceTree = "<group>"; };
+		1640270319338502005B0AA6 /* UGoalCountHeuristic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UGoalCountHeuristic.h; path = ../../../../src/solver/heuristics/UGoalCountHeuristic.h; sourceTree = "<group>"; };
+		1640270419338502005B0AA6 /* UPlanningGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPlanningGraph.cpp; path = ../../../../src/solver/heuristics/UPlanningGraph.cpp; sourceTree = "<group>"; };
+		1640270519338502005B0AA6 /* UPlanningGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPlanningGraph.h; path = ../../../../src/solver/heuristics/UPlanningGraph.h; sourceTree = "<group>"; };
+		1640270619338502005B0AA6 /* UPlanningGraphHeuristic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UPlanningGraphHeuristic.cpp; path = ../../../../src/solver/heuristics/UPlanningGraphHeuristic.cpp; sourceTree = "<group>"; };
+		1640270719338502005B0AA6 /* UPlanningGraphHeuristic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UPlanningGraphHeuristic.h; path = ../../../../src/solver/heuristics/UPlanningGraphHeuristic.h; sourceTree = "<group>"; };
+		1640270E19338509005B0AA6 /* USearchDatabase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = USearchDatabase.cpp; path = ../../../../src/solver/database/USearchDatabase.cpp; sourceTree = "<group>"; };
+		1640270F19338509005B0AA6 /* USearchDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = USearchDatabase.h; path = ../../../../src/solver/database/USearchDatabase.h; sourceTree = "<group>"; };
+		1640271019338509005B0AA6 /* USearchNodeFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = USearchNodeFactory.cpp; path = ../../../../src/solver/database/USearchNodeFactory.cpp; sourceTree = "<group>"; };
+		1640271119338509005B0AA6 /* USearchNodeFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = USearchNodeFactory.h; path = ../../../../src/solver/database/USearchNodeFactory.h; sourceTree = "<group>"; };
+		1640271219338509005B0AA6 /* USearchNodeReference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = USearchNodeReference.cpp; path = ../../../../src/solver/database/USearchNodeReference.cpp; sourceTree = "<group>"; };
+		1640271319338509005B0AA6 /* USearchNodeReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = USearchNodeReference.h; path = ../../../../src/solver/database/USearchNodeReference.h; sourceTree = "<group>"; };
+		1640271419338509005B0AA6 /* UStateFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UStateFactory.cpp; path = ../../../../src/solver/database/UStateFactory.cpp; sourceTree = "<group>"; };
+		1640271519338509005B0AA6 /* UStateFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UStateFactory.h; path = ../../../../src/solver/database/UStateFactory.h; sourceTree = "<group>"; };
+		1640271619338509005B0AA6 /* UStateReference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UStateReference.cpp; path = ../../../../src/solver/database/UStateReference.cpp; sourceTree = "<group>"; };
+		1640271719338509005B0AA6 /* UStateReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UStateReference.h; path = ../../../../src/solver/database/UStateReference.h; sourceTree = "<group>"; };
+		164027221933934F005B0AA6 /* libUCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libUCore.a; path = "../../../../../../../../../Users/ultrablox/Library/Developer/Xcode/DerivedData/UltraPlanner-bhhzsmanwldtukamxtbemtkavaam/Build/Products/Debug/libUCore.a"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		164026C5193384C8005B0AA6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				164027231933934F005B0AA6 /* libUCore.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		164026BF193384C8005B0AA6 = {
+			isa = PBXGroup;
+			children = (
+				164027221933934F005B0AA6 /* libUCore.a */,
+				164026D5193384D0005B0AA6 /* src */,
+				164026C9193384C8005B0AA6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		164026C9193384C8005B0AA6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				164026C8193384C8005B0AA6 /* libUSolver.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		164026D5193384D0005B0AA6 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				16402701193384FC005B0AA6 /* heuristics */,
+				16402700193384F4005B0AA6 /* database */,
+				164026D6193384EE005B0AA6 /* config.h */,
+				164026D7193384EE005B0AA6 /* UExternalMemoryController.cpp */,
+				164026D8193384EE005B0AA6 /* UExternalMemoryController.h */,
+				164026D9193384EE005B0AA6 /* UHeuristic.cpp */,
+				164026DA193384EE005B0AA6 /* UHeuristic.h */,
+				164026DB193384EE005B0AA6 /* UInstantiator.cpp */,
+				164026DC193384EE005B0AA6 /* UInstantiator.h */,
+				164026DD193384EE005B0AA6 /* UMetric.cpp */,
+				164026DE193384EE005B0AA6 /* UMetric.h */,
+				164026DF193384EE005B0AA6 /* UNodeEstimator.cpp */,
+				164026E0193384EE005B0AA6 /* UNodeEstimator.h */,
+				164026E1193384EE005B0AA6 /* UOutputMerger.cpp */,
+				164026E2193384EE005B0AA6 /* UOutputMerger.h */,
+				164026E3193384EE005B0AA6 /* USearchEngine.cpp */,
+				164026E4193384EE005B0AA6 /* USearchEngine.h */,
+				164026E5193384EE005B0AA6 /* USearchNode.cpp */,
+				164026E6193384EE005B0AA6 /* USearchNode.h */,
+				164026E7193384EE005B0AA6 /* USolver.cpp */,
+				164026E8193384EE005B0AA6 /* USolver.h */,
+				164026E9193384EE005B0AA6 /* USolverBase.cpp */,
+				164026EA193384EE005B0AA6 /* USolverBase.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		16402700193384F4005B0AA6 /* database */ = {
+			isa = PBXGroup;
+			children = (
+				1640270E19338509005B0AA6 /* USearchDatabase.cpp */,
+				1640270F19338509005B0AA6 /* USearchDatabase.h */,
+				1640271019338509005B0AA6 /* USearchNodeFactory.cpp */,
+				1640271119338509005B0AA6 /* USearchNodeFactory.h */,
+				1640271219338509005B0AA6 /* USearchNodeReference.cpp */,
+				1640271319338509005B0AA6 /* USearchNodeReference.h */,
+				1640271419338509005B0AA6 /* UStateFactory.cpp */,
+				1640271519338509005B0AA6 /* UStateFactory.h */,
+				1640271619338509005B0AA6 /* UStateReference.cpp */,
+				1640271719338509005B0AA6 /* UStateReference.h */,
+			);
+			name = database;
+			sourceTree = "<group>";
+		};
+		16402701193384FC005B0AA6 /* heuristics */ = {
+			isa = PBXGroup;
+			children = (
+				1640270219338502005B0AA6 /* UGoalCountHeuristic.cpp */,
+				1640270319338502005B0AA6 /* UGoalCountHeuristic.h */,
+				1640270419338502005B0AA6 /* UPlanningGraph.cpp */,
+				1640270519338502005B0AA6 /* UPlanningGraph.h */,
+				1640270619338502005B0AA6 /* UPlanningGraphHeuristic.cpp */,
+				1640270719338502005B0AA6 /* UPlanningGraphHeuristic.h */,
+			);
+			name = heuristics;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		164026C6193384C8005B0AA6 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				164026FF193384EE005B0AA6 /* USolverBase.h in Headers */,
+				164026F7193384EE005B0AA6 /* UOutputMerger.h in Headers */,
+				1640271D19338509005B0AA6 /* USearchNodeReference.h in Headers */,
+				164026ED193384EE005B0AA6 /* UExternalMemoryController.h in Headers */,
+				1640271B19338509005B0AA6 /* USearchNodeFactory.h in Headers */,
+				1640271F19338509005B0AA6 /* UStateFactory.h in Headers */,
+				164026F5193384EE005B0AA6 /* UNodeEstimator.h in Headers */,
+				1640270B19338502005B0AA6 /* UPlanningGraph.h in Headers */,
+				164026FD193384EE005B0AA6 /* USolver.h in Headers */,
+				164026EB193384EE005B0AA6 /* config.h in Headers */,
+				1640271919338509005B0AA6 /* USearchDatabase.h in Headers */,
+				164026F3193384EE005B0AA6 /* UMetric.h in Headers */,
+				164026F1193384EE005B0AA6 /* UInstantiator.h in Headers */,
+				1640270919338502005B0AA6 /* UGoalCountHeuristic.h in Headers */,
+				164026F9193384EE005B0AA6 /* USearchEngine.h in Headers */,
+				1640270D19338502005B0AA6 /* UPlanningGraphHeuristic.h in Headers */,
+				164026FB193384EE005B0AA6 /* USearchNode.h in Headers */,
+				1640272119338509005B0AA6 /* UStateReference.h in Headers */,
+				164026EF193384EE005B0AA6 /* UHeuristic.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		164026C7193384C8005B0AA6 /* USolver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 164026CC193384C8005B0AA6 /* Build configuration list for PBXNativeTarget "USolver" */;
+			buildPhases = (
+				164026C4193384C8005B0AA6 /* Sources */,
+				164026C5193384C8005B0AA6 /* Frameworks */,
+				164026C6193384C8005B0AA6 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = USolver;
+			productName = USolver;
+			productReference = 164026C8193384C8005B0AA6 /* libUSolver.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		164026C0193384C8005B0AA6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Yuri Blokhin";
+			};
+			buildConfigurationList = 164026C3193384C8005B0AA6 /* Build configuration list for PBXProject "USolver" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 164026BF193384C8005B0AA6;
+			productRefGroup = 164026C9193384C8005B0AA6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				164026C7193384C8005B0AA6 /* USolver */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		164026C4193384C8005B0AA6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				164026F6193384EE005B0AA6 /* UOutputMerger.cpp in Sources */,
+				164026FA193384EE005B0AA6 /* USearchNode.cpp in Sources */,
+				164026EE193384EE005B0AA6 /* UHeuristic.cpp in Sources */,
+				164026F2193384EE005B0AA6 /* UMetric.cpp in Sources */,
+				164026F0193384EE005B0AA6 /* UInstantiator.cpp in Sources */,
+				1640270A19338502005B0AA6 /* UPlanningGraph.cpp in Sources */,
+				164026FE193384EE005B0AA6 /* USolverBase.cpp in Sources */,
+				1640271E19338509005B0AA6 /* UStateFactory.cpp in Sources */,
+				164026F8193384EE005B0AA6 /* USearchEngine.cpp in Sources */,
+				1640271A19338509005B0AA6 /* USearchNodeFactory.cpp in Sources */,
+				1640271C19338509005B0AA6 /* USearchNodeReference.cpp in Sources */,
+				1640271819338509005B0AA6 /* USearchDatabase.cpp in Sources */,
+				164026FC193384EE005B0AA6 /* USolver.cpp in Sources */,
+				1640272019338509005B0AA6 /* UStateReference.cpp in Sources */,
+				164026EC193384EE005B0AA6 /* UExternalMemoryController.cpp in Sources */,
+				1640270819338502005B0AA6 /* UGoalCountHeuristic.cpp in Sources */,
+				1640270C19338502005B0AA6 /* UPlanningGraphHeuristic.cpp in Sources */,
+				164026F4193384EE005B0AA6 /* UNodeEstimator.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		164026CA193384C8005B0AA6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		164026CB193384C8005B0AA6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		164026CD193384C8005B0AA6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../../../include,
+					../../../../src,
+					../../../../include/osx,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/UltraPlanner-bhhzsmanwldtukamxtbemtkavaam/Build/Products/Debug",
+				);
+				OTHER_CPLUSPLUSFLAGS = "-ftemplate-depth=512";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		164026CE193384C8005B0AA6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../../../include,
+					../../../../src,
+					../../../../include/osx,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/UltraPlanner-bhhzsmanwldtukamxtbemtkavaam/Build/Products/Debug",
+				);
+				OTHER_CPLUSPLUSFLAGS = "-ftemplate-depth=512";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		164026C3193384C8005B0AA6 /* Build configuration list for PBXProject "USolver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				164026CA193384C8005B0AA6 /* Debug */,
+				164026CB193384C8005B0AA6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		164026CC193384C8005B0AA6 /* Build configuration list for PBXNativeTarget "USolver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				164026CD193384C8005B0AA6 /* Debug */,
+				164026CE193384C8005B0AA6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 164026C0193384C8005B0AA6 /* Project object */;
+}
