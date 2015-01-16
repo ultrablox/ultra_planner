@@ -3,6 +3,7 @@
 #define UltraCore_merge_h
 
 #include <functional>
+#include <iostream>
 
 namespace UltraCore
 {
@@ -92,8 +93,10 @@ namespace UltraCore
 
 			//Determine external group with same keys
 			auto ext_group_end_it = ext_it;
+			//while (key == extKeyGetter(*ext_group_end_it))
 			while ((ext_group_end_it != ext_cont.end()) && (key == extKeyGetter(*ext_group_end_it)))
-				++ext_group_end_it;
+				++ext_group_end_it;	
+				
 
 			//Iterate each element in main container with same key
 			bool is_duplication;
@@ -140,7 +143,7 @@ namespace UltraCore
 			if(dest_it == rDestEnd) //We are in the end - just stop
 				break;
 
-			//cout << "D:" << *dest_it << ", S:" << *src_it << ", src_dist=" << std::distance(src_it, rSrcEnd) << ", dst_dist=" << std::distance(dest_it, rDestEnd) << "\n";
+			cout << "D:" << *dest_it << ", S:" << *src_it << ", src_dist=" << std::distance(src_it, rSrcEnd) << ", dst_dist=" << std::distance(dest_it, rDestEnd) << "\n";
 			if(cmp(*dest_it, *src_it))
 			{
 				*result++ = std::move(*src_it++);

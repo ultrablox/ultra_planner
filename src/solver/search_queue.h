@@ -50,7 +50,7 @@ public:
 		return combined_value_t(it->first, *it->second.rbegin());
 	}
 
-	const size_t top(std::vector<value_t> & dest, size_t max_count, bool more_than_one_group = false) const
+	const size_t top(std::vector<value_t> & dest, size_t max_count, bool more_than_one_group = false, priority_component_t * first_node_data = nullptr) const
 	{
 		size_t requested = max_count;
 		auto group_it = m_primaryData.begin();
@@ -67,6 +67,9 @@ public:
 				break;
 		}
 
+		if (first_node_data && (requested != max_count))
+			*first_node_data = m_primaryData.begin()->first;
+			
 		return requested - max_count;
 	}
 

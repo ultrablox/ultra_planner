@@ -79,7 +79,7 @@ private:
 	{
 		res.reserve(max_count);
 
-		size_t picked_count = m_searchQueue.top(res, max_count, false);
+		size_t picked_count = m_searchQueue.top(res, max_count, false, first_node_data);
 		m_searchQueue.pop(picked_count);
 	}
 
@@ -90,7 +90,11 @@ private:
 	
 		for(auto it = begin; it != end; ++it)
 		{
-			forall_adj_vertices<true>(graph, get<2>(*it), [&](const state_t & state){
+			/*forall_adj_vertices<true>(graph, get<2>(*it), [&](const state_t & state){
+				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1), -1.0f));
+			});*/
+
+			graph.forall_adj_verts(get<2>(*it), [&](const state_t & state){
 				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1), -1.0f));
 			});
 		}

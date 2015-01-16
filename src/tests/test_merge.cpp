@@ -41,26 +41,50 @@ void test_merge()
 		assert_test(xres == main_cont, "unique(2 containers)");
 	}
 
+	{
+		vector<int> ext_cont;
+		ext_cont.push_back(74);
+
+		vector<int> main_cont;
+		main_cont.push_back(74);
+		main_cont.push_back(74);
+		main_cont.push_back(74);
+		main_cont.push_back(120);
+
+		vector<int> xres;
+		xres.push_back(74);
+		xres.push_back(74);
+		xres.push_back(74);
+		xres.push_back(120);
+
+		auto keyer = [](const int & val){ return val; };
+		auto equaler = [](const int v1, const int v2){ return false; };
+		auto last_it = UltraCore::unique(ext_cont, main_cont.begin(), main_cont.end(), keyer, keyer, equaler);
+		main_cont.erase(last_it, main_cont.end());
+
+		assert_test(xres == main_cont, "unique(2 containers)");
+	}
+
 	//Unique with one container
 	{
-	vector<int> ext_cont, good_cont;
-	for (int i = 0; i < 10; i += 2)
-	for (int j = 0; j < i / 2; ++j)
-		ext_cont.push_back(i);
+		vector<int> ext_cont, good_cont;
+		for (int i = 0; i < 10; i += 2)
+		for (int j = 0; j < i / 2; ++j)
+			ext_cont.push_back(i);
 
-	good_cont.push_back(2);
-	good_cont.push_back(4);
-	good_cont.push_back(6);
-	good_cont.push_back(8);
+		good_cont.push_back(2);
+		good_cont.push_back(4);
+		good_cont.push_back(6);
+		good_cont.push_back(8);
 
-	auto keyer = [](const int & val){ return val; };
-	auto equaler = [](const int v1, const int v2){ return v1 == v2; };
+		auto keyer = [](const int & val){ return val; };
+		auto equaler = [](const int v1, const int v2){ return v1 == v2; };
 
-	auto last_it = UltraCore::unique(ext_cont.begin(), ext_cont.end(), keyer, equaler);
-	ext_cont.erase(last_it, ext_cont.end());
+		auto last_it = UltraCore::unique(ext_cont.begin(), ext_cont.end(), keyer, equaler);
+		ext_cont.erase(last_it, ext_cont.end());
 
-	assert_test(ext_cont == good_cont, "unique(1 container)");
-}
+		assert_test(ext_cont == good_cont, "unique(1 container)");
+	}
 
 	//Merge
 	{
@@ -78,6 +102,34 @@ void test_merge()
 		dest.resize(dest.size() + src.size());
 
 		UltraCore::merge(dest.rbegin(), dest.rbegin() + src.size(), dest.rend(), src.rbegin(), src.rend(), cmp);
+
+		assert_test(dest == correct_res, "merge");
+	}
+
+	{
+		std::vector<int> src, dest;
+		src.push_back(74);
+		src.push_back(74);
+		src.push_back(74);
+		src.push_back(54);
+
+		dest.push_back(74);
+		
+
+
+		auto cmp = [](int e1, int e2){return e1 < e2; };
+
+		vector<int> correct_res;
+		correct_res.push_back(74);
+		correct_res.push_back(74);
+		correct_res.push_back(74);
+		correct_res.push_back(74);
+		correct_res.push_back(54);
+
+		dest.resize(dest.size() + src.size());
+
+		//UltraCore::merge(dest.rbegin(), dest.rbegin() + src.size(), dest.rend(), src.rbegin(), src.rend(), cmp);
+
 
 		assert_test(dest == correct_res, "merge");
 	}

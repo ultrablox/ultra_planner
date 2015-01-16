@@ -245,7 +245,7 @@ public:
 	{
 		size_t total_count = std::distance(begin, end);
 
-		cout << "Inserting " << total_count << " elements into hashset" << std::endl;
+		//cout << "Inserting " << total_count << " elements into hashset" << std::endl;
 
 		//Get ordered seqeunce of blocks
 		typedef std::tuple<size_t, bool, int, int> block_descr_t; //Block id + create new? + first_element_index + (last_element_index+1)
@@ -271,18 +271,32 @@ public:
 			//Others should be added to their equal ranges
 
 			while (it != end)
-			{			
+			{
 				auto cur_range = m_indicesTree.equal_range(get<0>(*it));
-				block_descr_t block_descr(cur_range.first->second, false, cur_id, 0);
-
-				size_t max_hash = (cur_range.second == m_indicesTree.end()) ? std::numeric_limits<size_t>::max() : cur_range.second->first;
-				while ((it != end) && (get<0>(*it) < max_hash))
+				if (cur_range.second == m_indicesTree.end()) //There is no elements greater then current
 				{
-					++it;
-					++cur_id;
+					block_descr_t block_descr(0, true, cur_id, 0);
+					while (it != end)
+					{
+						++it;
+						++cur_id;
+					}
+					get<3>(block_descr) = cur_id;
+					block_descrs.push_back(std::move(block_descr));
 				}
-				get<3>(block_descr) = cur_id;
-				block_descrs.push_back(std::move(block_descr));
+				else
+				{
+					block_descr_t block_descr(cur_range.first->second, false, cur_id, 0);
+
+					size_t max_hash = (cur_range.second == m_indicesTree.end()) ? std::numeric_limits<size_t>::max() : cur_range.second->first;
+					while ((it != end) && (get<0>(*it) < max_hash))
+					{
+						++it;
+						++cur_id;
+					}
+					get<3>(block_descr) = cur_id;
+					block_descrs.push_back(std::move(block_descr));
+				}
 			}
 		}
 
@@ -295,6 +309,9 @@ public:
 				return get<1>(lhs);
 		});
 
+		typedef std::pair<size_t, block_t> new_block_t;
+		std::vector<new_block_t> new_blocks;
+
 		//Now process the blocks
 		for (auto & block_descr : block_descrs)
 		{
@@ -306,6 +323,7 @@ public:
 				{
 					auto it = begin + i;
 					append_to_block(new_block, get<0>(*it), get<2>(*it));
+					++m_size;
 					fun(*it);
 				}
 
@@ -316,7 +334,7 @@ public:
 			{
 				block_t & block = m_blocks[get<0>(block_descr)];
 
-				std::vector<combined_value_t> old_vals, new_vals;
+				std::vector<combined_value_t> old_vals;
 				
 				//Deserialize old values
 				for (int i = 0; i < block.item_count; ++i)
@@ -351,24 +369,78 @@ public:
 				}, [](const combined_value_t & old_val, const temp_val_t & new_val){
 					return old_val.second == new_val.first.second;
 				});
+
+				size_t old_vals_count = old_vals.size();
 				for (auto it = candidate_new_vals.begin(); it != last_it; ++it)
 				{
-					new_vals.push_back(it->first);
+					old_vals.push_back(it->first);
 					fun(*(begin + it->second));
+					++m_size;
 				}
 
 
 				//Merge with old data
-				int old_vals_count = old_vals.size();
-				old_vals.resize(old_vals_count + new_vals.size());
-				UltraCore::merge(old_vals.begin(), old_vals.begin() + old_vals_count, old_vals.end(), new_vals.begin(), new_vals.end(), [](const combined_value_t & left, const combined_value_t & right){
+				auto cmp = [](const combined_value_t & left, const combined_value_t & right){
 					return left.first < right.first;
-				});
+				};
+
+				std::inplace_merge(old_vals.begin(), old_vals.begin() + old_vals_count, old_vals.end(), cmp);
 
 				//Write result data back to block
 				block.item_count = 0;
-				for (auto & val : old_vals)
-					append_to_block(block, val.first, val.second);
+
+				size_t max_items = block_t::DataSize / m_serializedElementSize;
+
+				if (old_vals.size() > max_items)
+				{
+					//Get number of blocks to fill all the items
+					int num_new_blocks = integer_ceil(old_vals.size(), max_items);
+					int step = old_vals.size() / num_new_blocks;
+
+					//cout << "Creating " << num_new_blocks << " new blocks" << std::endl;
+					vector<int> block_limits(num_new_blocks + 1, old_vals.size());
+					block_limits[0] = 0;
+					for (int i = 1; i < num_new_blocks; ++i)
+					{
+						//Find "middle" element
+						auto middle_it = std::lower_bound(old_vals.begin(), old_vals.end(), old_vals[step*i].first, [](const combined_value_t & val, size_t middle_has){
+							return val.first < middle_has;
+						});
+
+						block_limits[i] = std::distance(old_vals.begin(), middle_it);
+					}
+
+					//if (num_new_blocks > 2)
+					//	throw runtime_error("Not implemented");
+
+					//Fill old block
+					for (auto it = old_vals.begin(); it != old_vals.begin() + block_limits[1]; ++it)
+						append_to_block(block, it->first, it->second);
+
+					for (int i = 1; i < num_new_blocks; ++i)
+					{
+						block_t new_block;
+						for (auto it = old_vals.begin() + block_limits[i]; it != old_vals.begin() + block_limits[i+1]; ++it)
+							append_to_block(new_block, it->first, it->second);
+
+						new_blocks.push_back(new_block_t((old_vals.begin() + block_limits[i])->first, std::move(new_block)));
+					}
+					
+				}
+				else
+				{
+					for (auto & val : old_vals)
+						append_to_block(block, val.first, val.second);
+				}
+				
+			}
+
+			//Add new blocks
+			for (auto & nb : new_blocks)
+			{
+				size_t new_block_index = m_blocks.size();
+				m_blocks.push_back(std::move(nb.second));
+				m_indicesTree.insert(make_pair(nb.first, new_block_index)); //First element hash -> new block_id
 			}
 		}		
 	}

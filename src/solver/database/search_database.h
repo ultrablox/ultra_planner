@@ -34,7 +34,7 @@ private:
 };
 
 
-template<typename T, typename H = std::hash<T>, bool ExtMemory = false, int StorageCount = 7>
+template<typename T, typename H = std::hash<T>, bool ExtMemory = false, int StorageCount = 1>
 class search_database
 {
 	typedef T state_t;
@@ -129,7 +129,7 @@ public:
 	void add_range(It begin, It end, CallbackFun call_fun)
 	{
 		size_t total_count = std::distance(begin, end);
-		cout << "Adding range of " << total_count << " elements do database." << std::endl;
+		//cout << "Adding range of " << total_count << " elements do database." << std::endl;
 		size_t storage_count = m_storages.size();
 
 		//Sort elements by storage + by hash inside each group
@@ -201,7 +201,10 @@ public:
 
 	size_t state_count() const
 	{
-		return m_nodeCount.load();
+		size_t res(0);
+		for (auto & storage : m_storages)
+			res += storage.size();
+		return res;
 	}
 
 	size_t block_count() const
