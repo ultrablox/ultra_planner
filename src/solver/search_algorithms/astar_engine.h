@@ -35,12 +35,12 @@ public:
 		:_Base(graph)
 	{}
 
-	template<typename GraphT>
-	bool operator()(GraphT & graph, state_t init_node, state_t goal_state, std::vector<state_t> & solution_path)
+	template<typename GraphT, typename IsGoalFun>
+	bool operator()(GraphT & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
 	{
 		heuristic_t h_fun(graph.transition_system());
 
-		enqueue(create_node(init_node, 0), std::numeric_limits<float>::max());
+		enqueue(is_goal_fun, create_node(init_state, 0), std::numeric_limits<float>::max());
 
 		float best_data = std::numeric_limits<float>::max();
 		comparison_t current_data;
@@ -58,19 +58,13 @@ public:
 			}
 
 
-			graph.forall_adj_verts(get<2>(cur_node), [&](const state_t & state){
-
+			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
-				auto res = m_database.add(state);
-				if (res)
-				{
-					//search_node_t new_node = create_node(state, get<0>(cur_node));
-					search_node_t new_node = m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
-					if (state == goal_state)
-						m_goalNodes.push_back(new_node);
-					else
-						enqueue(new_node, h_fun(state));
-				}
+				m_database.add(state, [=](const state_t & state){
+					search_node_t new_node = m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) + 1);
+					enqueue(is_goal_fun, new_node, h_fun(state));
+				});
+				
 			});
 		}
 

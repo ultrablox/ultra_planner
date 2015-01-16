@@ -272,7 +272,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\expression\UNumericExpression.cpp" />
+    <ClCompile Include="..\..\..\..\src\core\expression\UNumericExpression.cpp" />
     <ClCompile Include="..\..\..\..\src\core\transition_system\UState.cpp" />
     <ClCompile Include="..\..\..\..\src\core\transition_system\UTransition.cpp" />
     <ClCompile Include="..\..\..\..\src\core\transition_system\UTransitionSystem.cpp" />
@@ -282,11 +282,12 @@
     <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\complex_vector.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\expression\UNumericExpression.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_vector.h" />
+    <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\math.h" />
+    <ClInclude Include="..\..\..\..\src\core\algorithm\merge.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\sort.h" />
     <ClInclude Include="..\..\..\..\src\core\cache.h" />
     <ClInclude Include="..\..\..\..\src\core\cached_file.h" />

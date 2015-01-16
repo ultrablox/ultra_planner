@@ -162,6 +162,14 @@ public:
 	{
 		return m_secondaryData.size();
 	}
+
+	size_t top_layer_size() const
+	{
+		if (m_primaryData.empty())
+			return 0;
+		else
+			return m_primaryData.begin()->second.size();
+	}
 private:
 	void extract_secondary_data()
 	{

@@ -110,7 +110,9 @@ private:
 
 		auto start_tp = high_resolution_clock::now();
 
-		bool found = eng(graph, puzzle.state(), puzzle.default_state(), path);
+		bool found = eng(graph, puzzle.state(), [&](const puzzle_t::state_t & state){
+			return puzzle.is_solved(state);
+		}, path);
 
 		auto plan = puzzle.build_transition_path(path.begin(), path.end());
 

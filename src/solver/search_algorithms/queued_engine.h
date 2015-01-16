@@ -69,10 +69,16 @@ protected:
 	typedef search_queue<open_list_el_t, Cmp<comparison_t>> open_list_t;
 
 protected:
-	std::pair<bool, comparison_t> enqueue(search_node_t node, element_meta_t meta_data)
+	template<typename IsGoalFun>
+	std::pair<bool, comparison_t> enqueue(IsGoalFun is_goal, search_node_t node, element_meta_t meta_data)
 	{
-		//cout << meta_data << std::endl;
-		return m_searchQueue.push(open_list_el_t(comparison_t(meta_data, get<3>(node)), node));	
+		if (is_goal(get<2>(node)))
+		{
+			m_goalNodes.push_back(node);
+			return make_pair(false, comparison_t());
+		}
+		else
+			return m_searchQueue.push(open_list_el_t(comparison_t(meta_data, get<3>(node)), node));	
 	}
 
 	search_node_t dequeue(comparison_t * meta_data = nullptr)

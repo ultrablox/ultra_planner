@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
-    <LocalDebuggerCommandArguments>--command solve --algorithm A* --heuristic PDB --storage ext puzzle.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--command solve --algorithm BA* --heuristic PDB --storage int puzzle.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">

@@ -75,10 +75,10 @@ public:
 		return res;
 	}
 
-	bool is_solved() const
+	/*bool is_solved() const
 	{
 		return _Base::is_solved(m_state);
-	}
+	}*/
 
 	void apply(const transition_t & transition)
 	{

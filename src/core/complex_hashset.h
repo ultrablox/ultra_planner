@@ -15,6 +15,7 @@ class complex_hashset
 {
 	typedef T value_type;
 	typedef H hasher_t;
+	typedef std::pair<size_t, value_type> combined_value_t;
 	typedef std::function<void(const void*, value_type &)> deserialize_fun_type;
 	typedef std::function<void(void*, const value_type &)> serialize_fun_type;
 	typedef std::map<size_t, size_t> map_t;
@@ -235,6 +236,143 @@ public:
 		return res;
 	}
 
+	/*
+	Inserts range of new elements into hashset. Calls callback for each sucess
+	insertion.
+	*/
+	template<typename It, typename CallbackFun>
+	void insert(It begin, It end, CallbackFun fun)
+	{
+		size_t total_count = std::distance(begin, end);
+
+		cout << "Inserting " << total_count << " elements into hashset" << std::endl;
+
+		//Get ordered seqeunce of blocks
+		typedef std::tuple<size_t, bool, int, int> block_descr_t; //Block id + create new? + first_element_index + (last_element_index+1)
+		vector<block_descr_t> block_descrs;
+
+		if (m_indicesTree.empty())
+			block_descrs.push_back(block_descr_t(0, true, 0, total_count));
+		else
+		{
+			int cur_id(0);
+			auto it = begin;
+
+			//Create new block for all elements less then min value
+			while (get<0>(*it) < m_indicesTree.begin()->first)
+			{
+				++it;
+				++cur_id;
+			}
+
+			if (cur_id > 0)
+				block_descrs.push_back(block_descr_t(0, true, 0, cur_id));
+
+			//Others should be added to their equal ranges
+
+			while (it != end)
+			{			
+				auto cur_range = m_indicesTree.equal_range(get<0>(*it));
+				block_descr_t block_descr(cur_range.first->second, false, cur_id, 0);
+
+				size_t max_hash = (cur_range.second == m_indicesTree.end()) ? std::numeric_limits<size_t>::max() : cur_range.second->first;
+				while ((it != end) && (get<0>(*it) < max_hash))
+				{
+					++it;
+					++cur_id;
+				}
+				get<3>(block_descr) = cur_id;
+				block_descrs.push_back(std::move(block_descr));
+			}
+		}
+
+
+		//Sort blocks by their ordering
+		std::sort(block_descrs.begin(), block_descrs.end(), [](const block_descr_t & lhs, const block_descr_t & rhs){
+			if (get<1>(lhs) == get<1>(rhs))
+				return get<0>(lhs) < get<0>(rhs);
+			else
+				return get<1>(lhs);
+		});
+
+		//Now process the blocks
+		for (auto & block_descr : block_descrs)
+		{
+			if (get<1>(block_descr)) //Create new
+			{
+				block_t new_block;
+
+				for (int i = get<2>(block_descr); i < get<3>(block_descr); ++i)
+				{
+					auto it = begin + i;
+					append_to_block(new_block, get<0>(*it), get<2>(*it));
+					fun(*it);
+				}
+
+				m_indicesTree.insert(make_pair(get<0>(*(begin + get<2>(block_descr))), m_blocks.size())); //First element hash -> new block_id
+				m_blocks.push_back(new_block);
+			}
+			else
+			{
+				block_t & block = m_blocks[get<0>(block_descr)];
+
+				std::vector<combined_value_t> old_vals, new_vals;
+				
+				//Deserialize old values
+				for (int i = 0; i < block.item_count; ++i)
+				{
+					combined_value_t cur_val;
+					char * base_ptr = block.data + i * m_serializedElementSize;
+					cur_val.first = *((size_t*)base_ptr);
+					m_deserializeFun(base_ptr + sizeof(size_t), cur_val.second);
+					old_vals.push_back(std::move(cur_val));
+				}
+
+				//Add new ones
+				typedef std::pair<combined_value_t, int> temp_val_t; //Combined value + (is_new ? new_item_index : -1)
+				std::vector<temp_val_t> candidate_new_vals;
+
+				for (int i = get<2>(block_descr); i < get<3>(block_descr); ++i)
+				{
+					auto it = begin + i;
+
+					temp_val_t cur_val;
+					cur_val.second = i;
+					cur_val.first.first = get<0>(*it);
+					cur_val.first.second = get<2>(get<1>(*it));
+					candidate_new_vals.push_back(std::move(cur_val));
+				}
+
+				//Remove duplication amongst new tail
+				auto last_it = UltraCore::unique(old_vals, candidate_new_vals.begin(), candidate_new_vals.end(), [](const combined_value_t & val){
+					return val.first;
+				}, [](const temp_val_t & val){
+					return val.first.first;
+				}, [](const combined_value_t & old_val, const temp_val_t & new_val){
+					return old_val.second == new_val.first.second;
+				});
+				for (auto it = candidate_new_vals.begin(); it != last_it; ++it)
+				{
+					new_vals.push_back(it->first);
+					fun(*(begin + it->second));
+				}
+
+
+				//Merge with old data
+				int old_vals_count = old_vals.size();
+				old_vals.resize(old_vals_count + new_vals.size());
+				UltraCore::merge(old_vals.begin(), old_vals.begin() + old_vals_count, old_vals.end(), new_vals.begin(), new_vals.end(), [](const combined_value_t & left, const combined_value_t & right){
+					return left.first < right.first;
+				});
+
+				//Write result data back to block
+				block.item_count = 0;
+				for (auto & val : old_vals)
+					append_to_block(block, val.first, val.second);
+			}
+		}		
+	}
+
 	size_t size() const
 	{
 		/*size_t res(0);
@@ -394,6 +532,16 @@ private:
 
 		//return iterator(block_id, item_index);
 		return iterator(block_id, item_index);
+	}
+
+	void append_to_block(block_t & block, size_t hash_val, const value_type & val)
+	{
+		m_serializeFun(&m_elementCache[0], val);
+
+		char * base_ptr = block.data + block.item_count * m_serializedElementSize;
+		*((size_t*)base_ptr) = hash_val;	//Hash
+		memcpy(base_ptr + sizeof(size_t), &m_elementCache[0], m_serializedValueSize);	//Value
+		++block.item_count;
 	}
 
 	void print_block(const block_t & block) const

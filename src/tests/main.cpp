@@ -37,13 +37,16 @@ void test_puzzle_core();
 void test_complex_vector();
 void test_complex_hashmap();
 void test_cached_file();
+void test_merge();
 
 int main()
 {
 	test_bitset();
+	test_merge();
 	test_cached_file();
 	test_complex_vector();
 	test_complex_hashmap();
+	
 
 	//test_matrix();
 

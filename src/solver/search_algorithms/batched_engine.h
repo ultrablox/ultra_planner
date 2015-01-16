@@ -3,6 +3,7 @@
 #define UltraSolver_batched_engine_h
 
 #include "queued_engine.h"
+#include <core/algorithm/merge.h>
 #include <thread>
 #include <future>
 
@@ -26,7 +27,7 @@ class batched_engine : public queued_search_engine<N, float, batched_priority_cm
 	typedef H heuristic_t;
 	typedef typename _Base::state_t state_t;
 
-	typedef std::pair<size_t, search_node_t> expanded_node_t;
+	typedef std::tuple<size_t, search_node_t, estimation_t> expanded_node_t;
 	typedef std::vector<expanded_node_t> expanded_nodes_container_t;
 public:
 	template<typename Tr>
@@ -34,12 +35,12 @@ public:
 		:_Base(transition_system), m_batchSize(batch_size)
 	{}
 
-	template<typename GraphT>
-	bool operator()(GraphT & graph, state_t init_node, state_t goal_state, std::vector<state_t> & solution_path)
+	template<typename GraphT, typename IsGoalFun>
+	bool operator()(GraphT & graph, state_t init_node, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
 	{
 		heuristic_t h_fun(graph.transition_system());
 
-		enqueue(create_node(init_node, 0), std::numeric_limits<float>::max());
+		enqueue(is_goal_fun, create_node(init_node, 0), std::numeric_limits<float>::max());
 
 		float best_estimation = std::numeric_limits<float>::max();
 		comparison_t current_data;
@@ -62,7 +63,7 @@ public:
 				return h_fun(state);
 			});
 
-			merge(goal_state);
+			merge(is_goal_fun);
 		}
 
 		m_finished = true;
@@ -90,7 +91,7 @@ private:
 		for(auto it = begin; it != end; ++it)
 		{
 			forall_adj_vertices<true>(graph, get<2>(*it), [&](const state_t & state){
-				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1)));
+				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1), -1.0f));
 			});
 		}
 
@@ -135,27 +136,31 @@ private:
 
 		//Sort (parallel) by hash
 		std::sort(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & n1, const expanded_node_t & n2){
-			return n1.first < n2.first;
+			return get<0>(n1) < get<0>(n2);
 		});
 		
 		//Apply internal merge
+		auto last_it = UltraCore::unique(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & node){
+			return get<1>(node);
+		});
+		m_expandBuffer.erase(last_it, m_expandBuffer.end());
+
 	}
 
-	template<typename EstFun, typename NodeIt, typename EstIt>
-	void estimate_node_range(EstFun e_fun, NodeIt n_begin, NodeIt n_end, EstIt e_begin, EstIt e_end)
+	template<typename EstFun, typename NodeIt>
+	void estimate_node_range(EstFun e_fun, NodeIt n_begin, NodeIt n_end)
 	{
-		auto e_it = e_begin;
-		for(auto n_it = n_begin; n_it != n_end; ++n_it, ++e_it)
-			*e_it = e_fun(get<2>((*n_it).second));
+		for(auto n_it = n_begin; n_it != n_end; ++n_it)
+			get<2>(*n_it) = e_fun(get<2>(get<1>(*n_it)));
 	}
 
 	template<typename EstFun>
 	void estimate_expand_buffer(EstFun e_fun)
 	{
-		m_estimationBuffer.resize(m_expandBuffer.size(), -1.0f);
+//		m_estimationBuffer.resize(m_expandBuffer.size(), -1.0f);
 
 		if(m_expandBuffer.size() < 20)
-			estimate_node_range(e_fun, m_expandBuffer.begin(), m_expandBuffer.end(), m_estimationBuffer.begin(), m_estimationBuffer.end());
+			estimate_node_range(e_fun, m_expandBuffer.begin(), m_expandBuffer.end());
 		else
 		{
 			int grain_count = std::thread::hardware_concurrency();
@@ -168,12 +173,12 @@ private:
 			{
 				estimations.push_back(async(launch::async, [=](){
 						//cout << "Estimating for " << std::distance(m_expandBuffer.begin(), node_it) << "-" << std::distance(m_expandBuffer.begin(), node_it + grain_size) << std::endl;
-						return estimate_node_range(e_fun, m_expandBuffer.begin() + i * grain_size, m_expandBuffer.begin() + (i+1) * grain_size, m_estimationBuffer.begin() + i * grain_size, m_estimationBuffer.begin() + (i+1) * grain_size);
+						return estimate_node_range(e_fun, m_expandBuffer.begin() + i * grain_size, m_expandBuffer.begin() + (i+1) * grain_size);
 					}));
 			}
 
 			estimations.push_back(async(launch::async, [=](){
-					return estimate_node_range(e_fun, m_expandBuffer.begin() + (grain_count - 1) * grain_size, m_expandBuffer.end(), m_estimationBuffer.begin() + (grain_count - 1) * grain_size, m_estimationBuffer.end());
+					return estimate_node_range(e_fun, m_expandBuffer.begin() + (grain_count - 1) * grain_size, m_expandBuffer.end());
 				}));
 
 			for(auto & est : estimations)
@@ -181,33 +186,22 @@ private:
 		}
 	}
 
-	void merge(const state_t & goal_state)
-	{
-		int len = m_expandBuffer.size();
-
-		for(int i = 0; i < len; ++i)
+	
+		template<typename IsGoalFun>
+		void merge(IsGoalFun is_goal)
 		{
-			auto res = m_database.add(get<2>(m_expandBuffer[i].second));
-			if (res)
-			{
-				m_expandBuffer[i].second = create_node(get<2>(m_expandBuffer[i].second), get<1>(m_expandBuffer[i].second));
+			m_database.add_range(m_expandBuffer.begin(), m_expandBuffer.end(), [=](const expanded_node_t & expanded_node){
+				search_node_t new_node = create_node(get<2>(get<1>(expanded_node)), get<1>(get<1>(expanded_node)));
+				enqueue(is_goal, new_node, get<2>(expanded_node));
+			});
 
-				if (get<2>(m_expandBuffer[i].second) == goal_state)
-					m_goalNodes.push_back(m_expandBuffer[i].second);
-				else
-					enqueue(m_expandBuffer[i].second, m_estimationBuffer[i]);
-			}
+			m_expandBuffer.clear();
 		}
-
-		m_expandBuffer.clear();
-		m_estimationBuffer.clear();
-	}
 
 private:
 	size_t m_batchSize;
 	std::vector<search_node_t> m_inBuffer;
 	expanded_nodes_container_t m_expandBuffer; //Node + hash
-	std::vector<float> m_estimationBuffer;
 
 	std::hash<state_t> m_hasher;
 };

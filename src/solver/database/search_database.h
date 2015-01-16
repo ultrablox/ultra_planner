@@ -34,7 +34,7 @@ private:
 };
 
 
-template<typename T, typename H = std::hash<T>, bool ExtMemory = false, int StorageCount = 1>
+template<typename T, typename H = std::hash<T>, bool ExtMemory = false, int StorageCount = 7>
 class search_database
 {
 	typedef T state_t;
@@ -111,6 +111,67 @@ public:
 			++m_nodeCount;
 
 		return res.second;
+	}
+
+	template<typename CallbackFun>
+	void add(const state_t & state, CallbackFun call_fun)
+	{
+		auto res = add(state);
+		if (res)
+			call_fun(state);
+	}
+
+	/*
+	Adds unsorted sequence of new states to database. Callback is called
+	for each successfully added state.
+	*/
+	template<typename It, typename CallbackFun>
+	void add_range(It begin, It end, CallbackFun call_fun)
+	{
+		size_t total_count = std::distance(begin, end);
+		cout << "Adding range of " << total_count << " elements do database." << std::endl;
+		size_t storage_count = m_storages.size();
+
+		//Sort elements by storage + by hash inside each group
+		std::sort(begin, end, [=](const typename It::value_type & lhs, const typename It::value_type & rhs){
+			if ((get<0>(lhs) % storage_count) == (get<0>(rhs) % storage_count))
+				return get<0>(lhs) < get<0>(rhs);
+			else
+				return (get<0>(lhs) % storage_count) < (get<0>(rhs) % storage_count);
+		});
+
+
+		//Determine group ranges
+		std::vector<int> group_start(storage_count + 1, total_count);
+
+		int cur_id = get<0>(*begin) % storage_count;
+		for (int i = 0; i <= cur_id; ++i)
+			group_start[i] = 0;
+
+		int last_id = cur_id;
+
+		for (auto it = begin; it != end; ++it)
+		{
+			cur_id = get<0>(*it) % storage_count;
+
+			if (cur_id != last_id)
+			{
+				int val = std::distance(begin, it);
+				for (int i = last_id; i <= cur_id; ++i)
+					group_start[i] = val;
+				last_id = cur_id;
+			}
+		}
+
+		//Call each storage with its group
+		for (int i = 0; i < storage_count; ++i)
+		{
+			auto gr_begin = begin + group_start[i],
+				gr_end = begin + group_start[i+1];
+
+			if (gr_begin != gr_end)
+				m_storages[i].insert(gr_begin, gr_end, call_fun);
+		}
 	}
 
 	template<typename KeyPart>

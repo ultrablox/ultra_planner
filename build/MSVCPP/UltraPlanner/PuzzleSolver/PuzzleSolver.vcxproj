@@ -249,10 +249,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\sliding_puzzle\main.cpp" />
+    <ClCompile Include="..\..\..\..\src\sliding_puzzle\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\sliding_puzzle\sliding_puzzle.h" />
+    <ClInclude Include="..\..\..\..\src\sliding_puzzle\sliding_puzzle.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UCore\UCore.vcxproj">

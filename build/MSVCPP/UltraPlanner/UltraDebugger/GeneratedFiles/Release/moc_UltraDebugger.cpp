@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../../../../../../../../Dropbox (Andrey Shakhramanyan)/Projects/UltraPlanner/src/debugger/UltraDebugger.h"
+#include "../../../../../../../../Dropbox (Andrey Shakhramanyan)/Projects/UltraPlanner/src/debugger/UltraDebugger.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)

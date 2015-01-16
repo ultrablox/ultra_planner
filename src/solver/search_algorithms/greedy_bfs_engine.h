@@ -27,12 +27,12 @@ public:
 		:_Base(graph)
 	{}
 
-	template<typename GraphT>
-	bool operator()(GraphT & graph, state_t init_node, state_t goal_state, std::vector<state_t> & solution_path)
+	template<typename GraphT, typename IsGoalFun>
+	bool operator()(GraphT & graph, state_t init_node, IsGoalFun is_goal, std::vector<state_t> & solution_path)
 	{
 		heuristic_t h_fun(graph.transition_system());
 
-		enqueue(create_node(init_node, 0), std::numeric_limits<float>::max());
+		enqueue(is_goal, create_node(init_node, 0), std::numeric_limits<float>::max());
 
 		float best_data = std::numeric_limits<float>::max();
 		comparison_t current_data;
@@ -58,15 +58,9 @@ public:
 				{
 					//search_node_t new_node = create_node(state, get<0>(cur_node));
 					search_node_t new_node = m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
-					if (state == goal_state)
-						m_goalNodes.push_back(new_node);
-					else
-					{
-						auto res = enqueue(new_node, h_fun(state));
-						if (res.first)
-							m_database.compress_keys_less(res.second);
-					}
-						
+					auto res = enqueue(is_goal, new_node, h_fun(state));
+					if (res.first)
+						m_database.compress_keys_less(res.second);
 				}
 			});
 		}

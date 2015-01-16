@@ -116,5 +116,8 @@
     <ClInclude Include="..\..\..\..\src\core\cached_file.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\algorithm\merge.h">
+      <Filter>src\algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

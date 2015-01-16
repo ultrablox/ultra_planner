@@ -300,16 +300,16 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchDatabase.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeFactory.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeReference.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateFactory.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateReference.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UGoalCountHeuristic.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraph.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraphHeuristic.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\UExternalMemoryController.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\USolverBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\database\USearchDatabase.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeFactory.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeReference.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\database\UStateFactory.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\database\UStateReference.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\UExternalMemoryController.cpp" />
+    <ClCompile Include="..\..\..\..\src\solver\USolverBase.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\UHeuristic.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\UInstantiator.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\UMetric.cpp" />
@@ -320,21 +320,21 @@
     <ClCompile Include="..\..\..\..\src\solver\USolver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\search_database.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchDatabase.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeFactory.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeReference.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateFactory.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateReference.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UGoalCountHeuristic.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraph.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraphHeuristic.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\astar_engine.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\batched_engine.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\bfs_engine.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\dfs_engine.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\queued_engine.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\UExternalMemoryController.h" />
+    <ClInclude Include="..\..\..\..\src\solver\database\search_database.h" />
+    <ClInclude Include="..\..\..\..\src\solver\database\USearchDatabase.h" />
+    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeFactory.h" />
+    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeReference.h" />
+    <ClInclude Include="..\..\..\..\src\solver\database\UStateFactory.h" />
+    <ClInclude Include="..\..\..\..\src\solver\database\UStateReference.h" />
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.h" />
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.h" />
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\astar_engine.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\batched_engine.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\bfs_engine.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\dfs_engine.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\queued_engine.h" />
+    <ClInclude Include="..\..\..\..\src\solver\UExternalMemoryController.h" />
     <ClInclude Include="..\..\..\..\src\solver\config.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\greedy_bfs_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\search_engine_base.h" />

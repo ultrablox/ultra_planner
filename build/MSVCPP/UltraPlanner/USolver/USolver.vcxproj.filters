@@ -48,35 +48,35 @@
     <ClCompile Include="..\..\..\..\src\solver\UNodeEstimator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\USolverBase.cpp">
+    <ClCompile Include="..\..\..\..\src\solver\database\USearchDatabase.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraph.cpp">
-      <Filter>src\heuristics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraphHeuristic.cpp">
-      <Filter>src\heuristics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UGoalCountHeuristic.cpp">
-      <Filter>src\heuristics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\UExternalMemoryController.cpp">
+    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeFactory.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchDatabase.cpp">
-      <Filter>src\database</Filter>
+    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeReference.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeFactory.cpp">
-      <Filter>src\database</Filter>
+    <ClCompile Include="..\..\..\..\src\solver\database\UStateFactory.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateFactory.cpp">
-      <Filter>src\database</Filter>
+    <ClCompile Include="..\..\..\..\src\solver\database\UStateReference.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeReference.cpp">
-      <Filter>src\database</Filter>
+    <ClCompile Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateReference.cpp">
-      <Filter>src\database</Filter>
+    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\solver\UExternalMemoryController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\solver\USolverBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.cpp">
+      <Filter>src\heuristics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,51 +110,6 @@
     <ClInclude Include="..\..\..\..\src\solver\UNodeEstimator.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraph.h">
-      <Filter>src\heuristics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UPlanningGraphHeuristic.h">
-      <Filter>src\heuristics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\heuristics\UGoalCountHeuristic.h">
-      <Filter>src\heuristics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\UExternalMemoryController.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchDatabase.h">
-      <Filter>src\database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeFactory.h">
-      <Filter>src\database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateFactory.h">
-      <Filter>src\database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\USearchNodeReference.h">
-      <Filter>src\database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\UStateReference.h">
-      <Filter>src\database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\bfs_engine.h">
-      <Filter>src\search_algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\astar_engine.h">
-      <Filter>src\search_algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\dfs_engine.h">
-      <Filter>src\search_algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\queued_engine.h">
-      <Filter>src\search_algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\search_algorithms\batched_engine.h">
-      <Filter>src\search_algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\solver\database\search_database.h">
-      <Filter>src\database</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\search_engine_base.h">
       <Filter>src\search_algorithms</Filter>
     </ClInclude>
@@ -163,6 +118,51 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\greedy_bfs_engine.h">
       <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\astar_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\batched_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\bfs_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\dfs_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\queued_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\database\search_database.h">
+      <Filter>src\database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\UExternalMemoryController.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\database\USearchDatabase.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeFactory.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeReference.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\database\UStateFactory.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\database\UStateReference.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.h">
+      <Filter>src\heuristics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

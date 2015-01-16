@@ -41,9 +41,9 @@ public:
 	Returns true, if found.
 	*/
 	template<typename GraphT>
-	bool operator()(GraphT & graph, state_t init_node, std::function<bool(state_t node)> goal_check_fun, std::vector<state_t> & solution_path)
+	bool operator()(GraphT & graph, state_t init_node, std::function<bool(const state_t & node)> goal_check_fun, std::vector<state_t> & solution_path)
 	{
-		enqueue(create_node(init_node, 0), 0);
+		enqueue(goal_check_fun, create_node(init_node, 0), 0);
 
 		int step = 0;
 		while((!m_searchQueue.empty()) && m_goalNodes.empty())
@@ -56,7 +56,7 @@ public:
 				if(goal_check_fun(state))
 					m_goalNodes.push_back(new_node);
 				else
-					enqueue(new_node, step);
+					enqueue(goal_check_fun, new_node, step);
 			});
 			++step;
 		}
