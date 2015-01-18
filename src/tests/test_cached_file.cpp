@@ -32,6 +32,7 @@ void test_cached_file()
 	}
 
 	cached_file<sample_block_t, 10> test_file("test_file.dat");
+	test_file.open("test_file.dat");
 
 	//Test push_back operator
 	for (int i = 0; i < correct_data.size(); ++i)

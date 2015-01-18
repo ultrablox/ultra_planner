@@ -14,7 +14,11 @@ struct batched_priority_cmp
 
 	bool operator()(const element_t & lhs, const element_t & rhs) const
 	{
-		return (get<1>(lhs) + get<0>(lhs)) < (get<1>(rhs) + get<0>(rhs));
+		//return (get<1>(lhs) + get<0>(lhs)) < (get<1>(rhs) + get<0>(rhs));
+
+		float sum1 = get<1>(lhs) +get<0>(lhs),
+			sum2 = get<1>(rhs) +get<0>(rhs);
+		return sum1 < sum2;
 	}
 };
 
@@ -105,10 +109,8 @@ private:
 	template<typename GraphT>
 	void expand_best_nodes(GraphT & graph)
 	{
-		//cout << "(" << m_inBuffer.size() << " nodes)... " << std::endl;
-
 		//If node count < 20 - do it single-thread to avoid ping-pong effect
-		if(m_inBuffer.size() < 20)
+		/*if(m_inBuffer.size() < 20)
 			m_expandBuffer = std::move(expand_node_range(graph, m_inBuffer.begin(), m_inBuffer.end()));
 		else
 		{
@@ -132,7 +134,8 @@ private:
 				auto gr = ng.get();
 				m_expandBuffer.insert(m_expandBuffer.end(), gr.begin(), gr.end());
 			}
-		}
+		}*/
+		m_expandBuffer = std::move(expand_node_range(graph, m_inBuffer.begin(), m_inBuffer.end()));
 
 		m_inBuffer.clear();
 
@@ -163,7 +166,7 @@ private:
 	{
 //		m_estimationBuffer.resize(m_expandBuffer.size(), -1.0f);
 
-		if(m_expandBuffer.size() < 20)
+		/*if(m_expandBuffer.size() < 20)
 			estimate_node_range(e_fun, m_expandBuffer.begin(), m_expandBuffer.end());
 		else
 		{
@@ -187,14 +190,19 @@ private:
 
 			for(auto & est : estimations)
 				est.get();
-		}
+		}*/
+		estimate_node_range(e_fun, m_expandBuffer.begin(), m_expandBuffer.end());
 	}
 
 	
 		template<typename IsGoalFun>
 		void merge(IsGoalFun is_goal)
 		{
-			m_database.add_range(m_expandBuffer.begin(), m_expandBuffer.end(), [=](const expanded_node_t & expanded_node){
+			m_database.add_range(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & exp_node){
+				return get<0>(exp_node);
+			}, [](const expanded_node_t & exp_node){
+				return get<2>(get<1>(exp_node));
+			}, [=](const expanded_node_t & expanded_node){
 				search_node_t new_node = create_node(get<2>(get<1>(expanded_node)), get<1>(get<1>(expanded_node)));
 				enqueue(is_goal, new_node, get<2>(expanded_node));
 			});

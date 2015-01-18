@@ -15,7 +15,7 @@ struct dfs_node_priority_cmp
 
 	bool operator()(const element_t & lhs, const element_t & rhs) const
 	{
-		return get<1>(lhs) > get<1>(rhs);
+		return get<1>(lhs) < get<1>(rhs);
 	}
 };
 
@@ -44,13 +44,17 @@ public:
 			//Pop node for expansion and mark as expanded
 			search_node_t cur_node = dequeue();
 
-			forall_adj_vertices<true>(graph, get<2>(cur_node), [&](state_t state){
+			/*forall_adj_vertices<true>(graph, get<2>(cur_node), [&](state_t state){
 				search_node_t new_node = create_node(state, get<0>(cur_node));
-				if(goal_check_fun(state))
-					m_goalNodes.push_back(new_node);
-				else
-					enqueue(goal_check_fun, new_node, step);
+				enqueue(goal_check_fun, new_node, step);
 				//cout << "Enqueueing:" << node << std::endl;
+			});*/
+			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
+				//Check that node is not expanded or discovered by trying to add
+				m_database.add(state, [=](const state_t & state){
+					search_node_t new_node = m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
+					enqueue(goal_check_fun, new_node, step);
+				});
 			});
 			++step;
 		}

@@ -84,6 +84,7 @@ public:
 
 			//Read data from file, if it exists
 			m_extReadFun(m_cachedArray[res.first].data, index);
+			++m_cachedArray[res.first].use_count;
 
 			return m_cachedArray[res.first].data;
 		}

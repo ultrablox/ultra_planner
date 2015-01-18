@@ -87,7 +87,7 @@ void test_merge()
 	}
 
 	//Merge
-	{
+	/*{
 		std::vector<int> src, dest;
 		fill_vector(dest, 20, 0, 100);
 		fill_vector(src, 10, 0, 100);
@@ -114,7 +114,7 @@ void test_merge()
 		src.push_back(54);
 
 		dest.push_back(74);
-		
+
 
 
 		auto cmp = [](int e1, int e2){return e1 < e2; };
@@ -132,5 +132,37 @@ void test_merge()
 
 
 		assert_test(dest == correct_res, "merge");
+	}*/
+
+
+	//Group end
+	{
+		std::vector<int> src;
+		src.push_back(1);
+		src.push_back(2);
+		src.push_back(2);
+		src.push_back(2);
+		src.push_back(3);
+		src.push_back(3);
+		src.push_back(4);
+		src.push_back(4);
+		src.push_back(4);
+		src.push_back(8);
+
+		{
+			auto it1 = UltraCore::find_group_end(src.begin(), src.end(), 2, [](const int val){return val; });
+			assert_test(std::distance(src.begin(), it1) == 1, "find_group_end");
+		}
+
+		{
+			auto it1 = UltraCore::find_group_end(src.begin(), src.end(), 3, [](const int val){return val; });
+			assert_test(std::distance(src.begin(), it1) == 1, "find_group_end");
+		}
+
+		{
+			auto it1 = UltraCore::find_group_end(src.begin(), src.end(), 4, [](const int val){return val; });
+			assert_test(std::distance(src.begin(), it1) == 4, "find_group_end");
+		}
 	}
+	
 }

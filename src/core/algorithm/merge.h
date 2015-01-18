@@ -127,7 +127,7 @@ namespace UltraCore
 	Analogue of std::merge, but works in reverse. It merges in-place src container
 	data into dest container, using allocated part of dst container.
 	*/
-	template<typename InputIter1, typename InputIter2, typename KeyLess>
+	/*template<typename InputIter1, typename InputIter2, typename KeyLess>
 	void merge(InputIter1 rDestBegin, InputIter1 rDestDataBegin, InputIter1 rDestEnd, InputIter2 rSrcBegin, InputIter2 rSrcEnd, KeyLess cmp)
 	{
 
@@ -156,6 +156,33 @@ namespace UltraCore
 			//cout <<  << "\n";
 		}
 	}
+	*/
+	/*
+	Returns iterator to the ith element: e[i] != e[i-1], where i is the most value
+	i <= max_size. Or it can return the end of first equal group, if its size is
+	more than max_size.
+	*/
+	template<typename It, typename Pred>
+	It find_group_end(It begin, It end, int max_size, Pred pred)
+	{
+		It last_change = begin;
+		
+		for (It prev_it = begin, it = begin + 1; (it != end) && (max_size > 0); ++it, ++prev_it, --max_size)
+		{
+			if (pred(*prev_it) != pred(*it))	//We found change
+				last_change = it;
+		}
+
+		if (last_change == begin)
+		{
+			last_change = std::find_if(begin, end, [=](const typename It::value_type & val){
+				return pred(*begin) != pred(val);
+			});
+		}
+		
+		return last_change;
+	}
+
 };
 
 #endif

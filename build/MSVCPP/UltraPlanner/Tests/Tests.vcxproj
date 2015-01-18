@@ -270,12 +270,14 @@
     <ClCompile Include="..\..\..\..\src\tests\test_complex_vector.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_merge.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_puzzle.cpp" />
+    <ClCompile Include="..\..\..\..\src\tests\test_rubik.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_search.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_sort.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\main.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_cached_file.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\rubik\rubiks_cube.h" />
     <ClInclude Include="..\..\..\..\src\sliding_puzzle\sliding_puzzle.h" />
     <ClInclude Include="..\..\..\..\src\tests\helpers.h" />
     <ClInclude Include="..\..\..\..\src\tests\test_sort.h" />

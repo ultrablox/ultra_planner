@@ -182,52 +182,95 @@ void test_complex_hashmap()
 {
 	test_algorithm();
 
-	std::unordered_set<complex_element> correct_set;
+	auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
 
-	complex_hashset<complex_element> hset(sizeof(int)* 3,
+	{
+		std::unordered_set<complex_element> correct_set;
+
+		complex_hashset<complex_element> hset(sizeof(int)* 3,
 			[](void * dst, const complex_element & el){
 			memcpy(dst, &el.m_data[0], sizeof(int)* 3);
 		},
 			[](const void * src, complex_element & el){
 			memcpy(&el.m_data[0], src, sizeof(int)* 3);
 		}
-	);
+		);
 
-	auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
-
-	int count = 0;
-	//Insertion test
-	for (int i = 0; i < 2000; ++i)
-	{
-		int val = gen();
-		//cout << "Inserting " << val << std::endl;
-
-		auto r2 = correct_set.insert(val);
-
-		if (val == 157)
-			++count;
-		if (count = 7)
-			int x = 0;
-
-		auto r1 = hset.insert(val);
 		
-		
-		assert_test(r1.second == r2.second, "Complex hashset insertion");
+
+		int count = 0;
+		//Insertion test
+		for (int i = 0; i < 2000; ++i)
+		{
+			int val = gen();
+			//cout << "Inserting " << val << std::endl;
+
+			auto r2 = correct_set.insert(val);
+
+			if (val == 157)
+				++count;
+			if (count = 7)
+				int x = 0;
+
+			auto r1 = hset.insert(val);
+
+
+			assert_test(r1.second == r2.second, "Complex hashset insertion");
+			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
+		}
+
 		assert_test(hset.size() == correct_set.size(), "Complex hashset size");
+
+		//Find test
+		for (int i = 0; i < 2000; ++i)
+		{
+			int val = gen();
+			auto it1 = correct_set.find(val);
+			auto it2 = hset.find(val);
+
+			bool r1 = (it1 == correct_set.end());
+			bool r2 = (it2 == hset.end());
+
+			assert_test(r1 == r2, "Complex hashset find");
+		}
 	}
-
-	assert_test(hset.size() == correct_set.size(), "Complex hashset size");
-
-	//Find test
-	for (int i = 0; i < 2000; ++i)
+	//Test add_range
 	{
-		int val = gen();
-		auto it1 = correct_set.find(val);
-		auto it2 = hset.find(val);
+		complex_hashset<complex_element, std::hash<complex_element>, true, 256U> hset(sizeof(int)* 3,
+			[](void * dst, const complex_element & el){
+			memcpy(dst, &el.m_data[0], sizeof(int)* 3);
+		},
+			[](const void * src, complex_element & el){
+			memcpy(&el.m_data[0], src, sizeof(int)* 3);
+		});
 
-		bool r1 = (it1 == correct_set.end());
-		bool r2 = (it2 == hset.end());
+		std::unordered_set<complex_element> correct_set;
 
-		assert_test(r1 == r2, "Complex hashset find");
+		vector<int> ins_data;
+
+		for (int i = 0; i < 999; ++i)
+			ins_data.push_back(i);
+		//random_shuffle(ins_data.begin(), ins_data.end());
+
+		std::hash<complex_element> hasher;
+
+		for (int j = 1; j < 3; ++j)
+		{
+			for (int i = 0; i < 9; ++i)
+			{
+				auto begin_it = ins_data.begin() + i * 100, end_it = ins_data.begin() + i * 100 + 90;
+
+				hset.insert(begin_it, end_it, [=](const complex_element & el){
+					return hasher(el);
+				}, [](const complex_element & el){
+					return el;
+				}, [](const complex_element & el){});
+
+				correct_set.insert(begin_it, end_it);
+			}
+		}
+
+		assert_test(hset.size() == correct_set.size(), "Complex hashset insert range");
+		
 	}
 }

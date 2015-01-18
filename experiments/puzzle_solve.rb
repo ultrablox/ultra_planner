@@ -21,7 +21,7 @@ def prepare_external_storage
 end
 
 def solve(problem_name, algorithm_name)
-	call_cmd = SOLVER_PATH + ' --command solve --algorithm ' + algorithm_name + ' --heuristic PDB --storage int "' + problem_name + '"'
+	call_cmd = SOLVER_PATH + ' --command solve --algorithm ' + algorithm_name + ' --heuristic PDB --storage ext "' + problem_name + '"'
 	puts "Running: " + call_cmd
 	system(call_cmd)
 	
@@ -37,7 +37,7 @@ def solve(problem_name, algorithm_name)
 	return stats
 end
 
-algs = ["A*", "GBFS"] #"BA*", ,, 
+algs = ["A*", "GBFS", "BA*"] #, ,, 
 columns = ["wall_time", "plan_length"]
 
 if(File.file?("results.csv"))

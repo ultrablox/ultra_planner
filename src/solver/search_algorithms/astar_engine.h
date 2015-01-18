@@ -57,14 +57,12 @@ public:
 				/*graph.transition_system().serialize_state(cout, get<2>(cur_node));*/
 			}
 
-
 			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
 				m_database.add(state, [=](const state_t & state){
 					search_node_t new_node = m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) + 1);
 					enqueue(is_goal_fun, new_node, h_fun(state));
 				});
-				
 			});
 		}
 

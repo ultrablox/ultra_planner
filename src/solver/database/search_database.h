@@ -119,14 +119,22 @@ public:
 		auto res = add(state);
 		if (res)
 			call_fun(state);
+
+		/*size_t hash_val = m_hasher(state);
+		std::vector<state_t> tmp_vec(1, state);
+		add_range(tmp_vec.begin(), tmp_vec.end(), [=](const state_t &){
+			return hash_val;
+		}, [=](const state_t & state){
+			return state;
+		}, call_fun);*/
 	}
 
 	/*
 	Adds unsorted sequence of new states to database. Callback is called
 	for each successfully added state.
 	*/
-	template<typename It, typename CallbackFun>
-	void add_range(It begin, It end, CallbackFun call_fun)
+	template<typename It, typename HashFun, typename ValFun, typename CallbackFun>
+	void add_range(It begin, It end, HashFun hash_fun, ValFun val_fun, CallbackFun call_fun)
 	{
 		size_t total_count = std::distance(begin, end);
 		//cout << "Adding range of " << total_count << " elements do database." << std::endl;
@@ -134,17 +142,17 @@ public:
 
 		//Sort elements by storage + by hash inside each group
 		std::sort(begin, end, [=](const typename It::value_type & lhs, const typename It::value_type & rhs){
-			if ((get<0>(lhs) % storage_count) == (get<0>(rhs) % storage_count))
-				return get<0>(lhs) < get<0>(rhs);
+			if ((hash_fun(lhs) % storage_count) == (hash_fun(rhs) % storage_count))
+				return hash_fun(lhs) < hash_fun(rhs);
 			else
-				return (get<0>(lhs) % storage_count) < (get<0>(rhs) % storage_count);
+				return (hash_fun(lhs) % storage_count) < (hash_fun(rhs) % storage_count);
 		});
 
 
 		//Determine group ranges
 		std::vector<int> group_start(storage_count + 1, total_count);
 
-		int cur_id = get<0>(*begin) % storage_count;
+		int cur_id = hash_fun(*begin) % storage_count;
 		for (int i = 0; i <= cur_id; ++i)
 			group_start[i] = 0;
 
@@ -152,7 +160,7 @@ public:
 
 		for (auto it = begin; it != end; ++it)
 		{
-			cur_id = get<0>(*it) % storage_count;
+			cur_id = hash_fun(*it) % storage_count;
 
 			if (cur_id != last_id)
 			{
@@ -170,7 +178,7 @@ public:
 				gr_end = begin + group_start[i+1];
 
 			if (gr_begin != gr_end)
-				m_storages[i].insert(gr_begin, gr_end, call_fun);
+				m_storages[i].insert(gr_begin, gr_end, hash_fun, val_fun, call_fun);
 		}
 	}
 

@@ -4,6 +4,7 @@
 
 #include "utils/helpers.h"
 #include "algorithm/algorithm.h"
+#include "algorithm/merge.h"
 #include <functional>
 #include <map>
 #include <stxxl.h>
@@ -106,10 +107,10 @@ class complex_hashset
 	struct block_t
 	{
 		static const size_t Size = BlockSize;
-		static const size_t DataSize = Size - 2*sizeof(size_t)-sizeof(int);
+		static const size_t DataSize = Size - 3*sizeof(size_t)-sizeof(int);
 
 		block_t()
-			:item_count(0), next(numeric_limits<size_t>::max())
+			:item_count(0), next(numeric_limits<size_t>::max()), prev(numeric_limits<size_t>::max())
 		{
 		}
 
@@ -148,14 +149,19 @@ class complex_hashset
 			return m_it;
 		}
 
-		size_t next, prev;
+		size_t first_hash() const
+		{
+			return *((const size_t*)data);
+		}
+
+		size_t id, next, prev;
 		int item_count;
 		char data[DataSize];
 
 	};
 
 	typedef typename stxxl::VECTOR_GENERATOR<block_t, 1U, 131072U, BlockSize, stxxl::FR, stxxl::random>::result stxxl_paged_vector_t; //131072U //262144U //65536U
-	typedef cached_file<block_t, 131072U> cached_paged_vector_t;
+	typedef cached_file<block_t, 65536U> cached_paged_vector_t;
 	typedef stxxl_paged_vector_t ext_paged_vector_t;
 	typedef std::vector<block_t> int_paged_vector_t;
 	typedef typename std::conditional<UseIntMemory, int_paged_vector_t, ext_paged_vector_t>::type paged_vector_t;
@@ -186,12 +192,12 @@ public:
 
 	template<typename SerFun, typename DesFun>
 	complex_hashset(int serialized_element_size, SerFun s_fun, DesFun d_fun)
-		:m_serializeFun(s_fun), m_deserializeFun(d_fun), m_serializedValueSize(serialized_element_size), m_serializedElementSize(serialized_element_size + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(serialized_element_size), m_size(0)
+		:m_serializeFun(s_fun), m_deserializeFun(d_fun), m_serializedValueSize(serialized_element_size), m_serializedElementSize(serialized_element_size + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(serialized_element_size), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0)
 	{
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");
 
-		cout << "Hashset page can store " << block_t::DataSize / m_serializedElementSize << " elements." << std::endl;	
+		cout << "Hashset page can store " << m_maxItemsInBlock << " elements." << std::endl;
 	}
 
 	void init()
@@ -236,213 +242,164 @@ public:
 		return res;
 	}
 
+
 	/*
 	Inserts range of new elements into hashset. Calls callback for each sucess
 	insertion.
 	*/
-	template<typename It, typename CallbackFun>
-	void insert(It begin, It end, CallbackFun fun)
+	typedef std::tuple<size_t, int, int> block_descr_t; //Block id + first_element_index + (last_element_index+1)
+
+	template<typename It, typename HashFun, typename ValFun, typename CallbackFun>
+	void insert(It begin, It end, HashFun hash_fun, ValFun val_fun, CallbackFun fun)
 	{
+		auto success_fun = [&](const typename It::value_type & el){
+			++m_size;
+			fun(el);
+		};
+
 		size_t total_count = std::distance(begin, end);
 
-		//cout << "Inserting " << total_count << " elements into hashset" << std::endl;
+		//if (total_count == 253)
+		cout << "Inserting " << total_count << " elements into hashset" << std::endl;
 
 		//Get ordered seqeunce of blocks
-		typedef std::tuple<size_t, bool, int, int> block_descr_t; //Block id + create new? + first_element_index + (last_element_index+1)
 		vector<block_descr_t> block_descrs;
+		std::vector<block_t> write_queue;
 
-		if (m_indicesTree.empty())
-			block_descrs.push_back(block_descr_t(0, true, 0, total_count));
-		else
+		//Create new blocks for all elements with hash less then min value (or all - if empty)
+		auto it = m_indicesTree.empty() ? end : std::lower_bound(begin, end, m_indicesTree.begin()->first, [=](const typename It::value_type & val1, size_t max_val){
+			return hash_fun(val1) < max_val;
+		});
+		create_chained_blocks(begin, it, write_queue, [=](const typename It::value_type & val){
+			return hash_fun(val);
+		}, val_fun);
+		for_each(begin, it, success_fun);
+
+		if (!m_indicesTree.empty())
 		{
-			int cur_id(0);
-			auto it = begin;
-
-			//Create new block for all elements less then min value
-			while (get<0>(*it) < m_indicesTree.begin()->first)
-			{
-				++it;
-				++cur_id;
-			}
-
-			if (cur_id > 0)
-				block_descrs.push_back(block_descr_t(0, true, 0, cur_id));
-
+			//Element >= max index should be added to highest block
+			auto last_it = std::upper_bound(it, end, m_indicesTree.rbegin()->first, [=](size_t min_val, const typename It::value_type & val1){
+				return min_val < hash_fun(val1) + 1;
+			});
+			if (last_it != end)
+				block_descrs.push_back(block_descr_t(m_indicesTree.rbegin()->second, std::distance(begin, last_it), std::distance(begin, end)));
+			
 			//Others should be added to their equal ranges
-
-			while (it != end)
+			while (it != last_it)
 			{
-				auto cur_range = m_indicesTree.equal_range(get<0>(*it));
-				if (cur_range.second == m_indicesTree.end()) //There is no elements greater then current
-				{
-					block_descr_t block_descr(0, true, cur_id, 0);
-					while (it != end)
-					{
-						++it;
-						++cur_id;
-					}
-					get<3>(block_descr) = cur_id;
-					block_descrs.push_back(std::move(block_descr));
-				}
-				else
-				{
-					block_descr_t block_descr(cur_range.first->second, false, cur_id, 0);
+				auto lb = m_indicesTree.upper_bound(hash_fun(*it));
+				
+				if (lb == m_indicesTree.end())
+					throw runtime_error("Impossible");
 
-					size_t max_hash = (cur_range.second == m_indicesTree.end()) ? std::numeric_limits<size_t>::max() : cur_range.second->first;
-					while ((it != end) && (get<0>(*it) < max_hash))
-					{
-						++it;
-						++cur_id;
-					}
-					get<3>(block_descr) = cur_id;
-					block_descrs.push_back(std::move(block_descr));
-				}
+				size_t max_hash = lb->first;
+
+				--lb;
+				size_t block_id = lb->second;
+				
+				block_descr_t block_descr(block_id, std::distance(begin, it), 0);
+
+				while ((it != last_it) && (hash_fun(*it) < max_hash))
+					++it;
+
+				get<2>(block_descr) = std::distance(begin, it);
+				block_descrs.push_back(std::move(block_descr));
 			}
 		}
 
-
 		//Sort blocks by their ordering
 		std::sort(block_descrs.begin(), block_descrs.end(), [](const block_descr_t & lhs, const block_descr_t & rhs){
-			if (get<1>(lhs) == get<1>(rhs))
-				return get<0>(lhs) < get<0>(rhs);
-			else
-				return get<1>(lhs);
+			return get<0>(lhs) < get<0>(rhs);
 		});
 
-		typedef std::pair<size_t, block_t> new_block_t;
-		std::vector<new_block_t> new_blocks;
 
 		//Now process the blocks
 		for (auto & block_descr : block_descrs)
 		{
-			if (get<1>(block_descr)) //Create new
+			insert_into_chain(get<0>(block_descr));
+
+			std::vector<combined_value_t> old_vals;
+
+			//Deserialize old values from chain
+			size_t cur_block_index = get<0>(block_descr);
+			while (cur_block_index != std::numeric_limits<size_t>::max())
 			{
-				block_t new_block;
-
-				for (int i = get<2>(block_descr); i < get<3>(block_descr); ++i)
-				{
-					auto it = begin + i;
-					append_to_block(new_block, get<0>(*it), get<2>(*it));
-					++m_size;
-					fun(*it);
-				}
-
-				m_indicesTree.insert(make_pair(get<0>(*(begin + get<2>(block_descr))), m_blocks.size())); //First element hash -> new block_id
-				m_blocks.push_back(new_block);
-			}
-			else
-			{
-				block_t & block = m_blocks[get<0>(block_descr)];
-
-				std::vector<combined_value_t> old_vals;
+				block_t & block = m_blocks[cur_block_index];
 				
-				//Deserialize old values
+				size_t last_size = old_vals.size();
+				old_vals.resize(last_size + block.item_count);
+
 				for (int i = 0; i < block.item_count; ++i)
 				{
 					combined_value_t cur_val;
 					char * base_ptr = block.data + i * m_serializedElementSize;
-					cur_val.first = *((size_t*)base_ptr);
-					m_deserializeFun(base_ptr + sizeof(size_t), cur_val.second);
-					old_vals.push_back(std::move(cur_val));
+					old_vals[last_size + i].first = *((size_t*)base_ptr);
+					m_deserializeFun(base_ptr + sizeof(size_t), old_vals[last_size + i].second);
 				}
 
-				//Add new ones
-				typedef std::pair<combined_value_t, int> temp_val_t; //Combined value + (is_new ? new_item_index : -1)
-				std::vector<temp_val_t> candidate_new_vals;
-
-				for (int i = get<2>(block_descr); i < get<3>(block_descr); ++i)
-				{
-					auto it = begin + i;
-
-					temp_val_t cur_val;
-					cur_val.second = i;
-					cur_val.first.first = get<0>(*it);
-					cur_val.first.second = get<2>(get<1>(*it));
-					candidate_new_vals.push_back(std::move(cur_val));
-				}
-
-				//Remove duplication amongst new tail
-				auto last_it = UltraCore::unique(old_vals, candidate_new_vals.begin(), candidate_new_vals.end(), [](const combined_value_t & val){
-					return val.first;
-				}, [](const temp_val_t & val){
-					return val.first.first;
-				}, [](const combined_value_t & old_val, const temp_val_t & new_val){
-					return old_val.second == new_val.first.second;
-				});
-
-				size_t old_vals_count = old_vals.size();
-				for (auto it = candidate_new_vals.begin(); it != last_it; ++it)
-				{
-					old_vals.push_back(it->first);
-					fun(*(begin + it->second));
-					++m_size;
-				}
-
-
-				//Merge with old data
-				auto cmp = [](const combined_value_t & left, const combined_value_t & right){
-					return left.first < right.first;
-				};
-
-				std::inplace_merge(old_vals.begin(), old_vals.begin() + old_vals_count, old_vals.end(), cmp);
-
-				//Write result data back to block
-				block.item_count = 0;
-
-				size_t max_items = block_t::DataSize / m_serializedElementSize;
-
-				if (old_vals.size() > max_items)
-				{
-					//Get number of blocks to fill all the items
-					int num_new_blocks = integer_ceil(old_vals.size(), max_items);
-					int step = old_vals.size() / num_new_blocks;
-
-					//cout << "Creating " << num_new_blocks << " new blocks" << std::endl;
-					vector<int> block_limits(num_new_blocks + 1, old_vals.size());
-					block_limits[0] = 0;
-					for (int i = 1; i < num_new_blocks; ++i)
-					{
-						//Find "middle" element
-						auto middle_it = std::lower_bound(old_vals.begin(), old_vals.end(), old_vals[step*i].first, [](const combined_value_t & val, size_t middle_has){
-							return val.first < middle_has;
-						});
-
-						block_limits[i] = std::distance(old_vals.begin(), middle_it);
-					}
-
-					//if (num_new_blocks > 2)
-					//	throw runtime_error("Not implemented");
-
-					//Fill old block
-					for (auto it = old_vals.begin(); it != old_vals.begin() + block_limits[1]; ++it)
-						append_to_block(block, it->first, it->second);
-
-					for (int i = 1; i < num_new_blocks; ++i)
-					{
-						block_t new_block;
-						for (auto it = old_vals.begin() + block_limits[i]; it != old_vals.begin() + block_limits[i+1]; ++it)
-							append_to_block(new_block, it->first, it->second);
-
-						new_blocks.push_back(new_block_t((old_vals.begin() + block_limits[i])->first, std::move(new_block)));
-					}
-					
-				}
-				else
-				{
-					for (auto & val : old_vals)
-						append_to_block(block, val.first, val.second);
-				}
-				
+				m_freedBlocks.push(cur_block_index);
+				m_indicesTree.erase(block.first_hash());
+				cur_block_index = block.next;
 			}
 
-			//Add new blocks
-			for (auto & nb : new_blocks)
+			//Add new ones
+			typedef std::pair<combined_value_t, int> temp_val_t; //Combined value + (is_new ? new_item_index : -1)
+			std::vector<temp_val_t> candidate_new_vals;
+
+			for (int i = get<1>(block_descr); i < get<2>(block_descr); ++i)
 			{
-				size_t new_block_index = m_blocks.size();
-				m_blocks.push_back(std::move(nb.second));
-				m_indicesTree.insert(make_pair(nb.first, new_block_index)); //First element hash -> new block_id
+				auto it = begin + i;
+
+				temp_val_t cur_val;
+				cur_val.second = i;
+				cur_val.first.first = hash_fun(*it);
+				cur_val.first.second = val_fun(*it);
+				candidate_new_vals.push_back(std::move(cur_val));
 			}
-		}		
+
+			//Remove duplication amongst new tail
+			auto last_it = UltraCore::unique(old_vals, candidate_new_vals.begin(), candidate_new_vals.end(), [](const combined_value_t & val){
+				return val.first;
+			}, [](const temp_val_t & val){
+				return val.first.first;
+			}, [](const combined_value_t & old_val, const temp_val_t & new_val){
+				return old_val.second == new_val.first.second;
+			});
+
+			size_t old_vals_count = old_vals.size();
+			for (auto it = candidate_new_vals.begin(); it != last_it; ++it)
+			{
+				old_vals.push_back(it->first);
+				success_fun(*(begin + it->second));
+			}
+
+			//Merge with old data
+			auto cmp = [](const combined_value_t & left, const combined_value_t & right){
+				return left.first < right.first;
+			};
+
+			std::inplace_merge(old_vals.begin(), old_vals.begin() + old_vals_count, old_vals.end(), cmp);
+
+			create_chained_blocks(old_vals.begin(), old_vals.end(), write_queue, [](const combined_value_t & val){
+				return val.first;
+			}, [](const combined_value_t & val){
+				return val.second;
+			});
+		}
+
+		//Process write queue
+		std::sort(write_queue.begin(), write_queue.end(), [](const block_t & b1, const block_t & b2){
+			return b1.id < b2.id;
+		});
+
+		for (auto & b : write_queue)
+		{
+			//Update index only for chain beginnings
+			if (b.prev == std::numeric_limits<size_t>::max())
+				m_indicesTree.insert(make_pair(b.first_hash(), b.id));
+		}
+
+		commit_write_queue(m_blocks, write_queue);
 	}
 
 	size_t size() const
@@ -493,6 +450,32 @@ public:
 		return m_blocks.size();
 	}
 private:
+	void insert_into_chain(size_t first_block_id)
+	{
+
+	}
+
+	template<typename InternalContainer>
+	void commit_write_queue(InternalContainer & blocks, const std::vector<block_t> & write_queue)
+	{
+		for (auto & b : write_queue)
+		{
+			if (b.id < blocks.size())
+				blocks[b.id] = std::move(b);
+			else if (b.id == m_blocks.size())
+				blocks.push_back(std::move(b));
+			else
+				throw runtime_error("Invalid block indexing");
+		}
+		//blocks.write_range(blocks);
+	}/**/
+
+	/*template<>
+	void commit_write_queue<cached_paged_vector_t>(cached_paged_vector_t & blocks, const std::vector<block_t> & write_queue)
+	{
+
+	}*/
+
 	map_t::const_iterator index_iterator(size_t hash_val) const
 	{
 		auto it = m_indicesTree.lower_bound(hash_val);
@@ -606,8 +589,72 @@ private:
 		return iterator(block_id, item_index);
 	}
 
+	template<typename It, typename OutCont, typename HashExtractor, typename ValExtractor>
+	void create_chained_blocks(It begin, It end, OutCont & output, HashExtractor hash_fun, ValExtractor val_fun)
+	{
+		auto gr_end_it = begin, last_gr_end = begin;
+		while (gr_end_it != end)
+		{
+			gr_end_it = UltraCore::find_group_end(gr_end_it, end, m_maxItemsInBlock, [=](const typename It::value_type & val){return hash_fun(val); });
+		
+			size_t group_size = std::distance(last_gr_end, gr_end_it);
+			if (group_size > m_maxItemsInBlock) //Needs real chaining
+			{
+				//cout << "Creating chain with length " << std::distance(last_gr_end, gr_end_it) << std::endl;
+				std::vector<block_t> chain(integer_ceil(group_size, m_maxItemsInBlock));
+
+				int block_id = 0;
+				
+				for(auto it = last_gr_end; it != gr_end_it; ++it)
+				{
+					if (chain[block_id].item_count == m_maxItemsInBlock)
+						++block_id;
+					append_to_block(chain[block_id], hash_fun(*it), val_fun(*it));
+				}
+
+				for (int i = 0; i < chain.size(); ++i)
+				{
+					chain[i].id = request_block();
+
+					if (i != 0)
+					{
+						chain[i].prev = chain[i - 1].id;
+						chain[i - 1].next = chain[i].id;
+					}	
+				}
+				
+				for (auto & b : chain)
+					output.push_back(std::move(b));
+			}
+			else
+			{
+				block_t block;
+				block.id = request_block();
+				for (auto it = last_gr_end; it != gr_end_it; ++it)
+					append_to_block(block, hash_fun(*it), val_fun(*it));
+				output.push_back(std::move(block));
+			}
+
+			last_gr_end = gr_end_it;
+		}
+	}
+
+	size_t request_block()
+	{
+		if (m_freedBlocks.empty())
+			return m_blockCount++;
+		else
+		{
+			size_t res = m_freedBlocks.front();
+			m_freedBlocks.pop();
+			return res;
+		}
+	}
 	void append_to_block(block_t & block, size_t hash_val, const value_type & val)
 	{
+		if (block.item_count >= m_maxItemsInBlock)
+			throw out_of_range("Trying to append more than block can handle");
+
 		m_serializeFun(&m_elementCache[0], val);
 
 		char * base_ptr = block.data + block.item_count * m_serializedElementSize;
@@ -639,6 +686,8 @@ private:
 	{
 		str.open("state_database.dat");
 	}
+
+
 private:
 	hasher_t m_hasher;
 	serialize_fun_type m_serializeFun;
@@ -653,7 +702,9 @@ private:
 
 	mutable std::vector<char> m_elementCache;
 
-	size_t m_size;
+	size_t m_size, m_blockCount;
+	const int m_maxItemsInBlock;
+	std::queue<size_t> m_freedBlocks;
 };
 
 #endif

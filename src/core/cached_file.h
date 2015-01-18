@@ -49,6 +49,11 @@ public:
 	{
 		m_file.open(file_name);
 	}
+
+	void write_range(const std::vector<record_t> & write_queue)
+	{
+
+	}
 private:
     data_file<record_t> m_file;
 };

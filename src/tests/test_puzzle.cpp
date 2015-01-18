@@ -100,11 +100,9 @@ void test_puzzle_core()
 		}
 
 
-		puzzle.set_state(state);
-		puzzle.apply(7);
+		puzzle.apply(state, 7);
 
-
-		assert_test(puzzle.state() == correct_state, "Applying transition.");
+		assert_test(state == correct_state, "Applying transition.");
 	}
 		
 }

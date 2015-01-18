@@ -46,23 +46,23 @@ public:
 		auto state = m_system.default_state();
 		m_system.deserialize_state(in_file, state);
 
-		m_system.set_state(state);
+		//m_system.set_state(state);
 
 		transition_system_graph<transition_system_t> graph(m_system);
 		
 
 		if (alg_name == "A*")
-			solve_with_engine<astar_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph);
+			solve_with_engine<astar_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		else if (alg_name == "BA*")
-			solve_with_engine<batched_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph);
+			solve_with_engine<batched_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		else if (alg_name == "GBFS")
-			solve_with_engine<greedy_bfs_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph);
+			solve_with_engine<greedy_bfs_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		
 	}
 private:
 
-	template<typename EngType, typename GraphT>
-	void solve_with_engine(const GraphT & graph)
+	template<typename EngType, typename GraphT, typename StateT>
+	void solve_with_engine(const GraphT & graph, const StateT & initial_state)
 	{
 		EngType search_engine(graph);
 
@@ -92,7 +92,7 @@ private:
 
 
 		cout << "Starting solving process..." << std::endl;
-		plan = solve_puzzle<std::list<transition_system_t::transition_t>>(search_engine, m_system, graph);
+		plan = solve_puzzle<std::list<transition_system_t::transition_t>>(search_engine, m_system, graph, initial_state);
 
 		std::ofstream out_file("plan.txt");
 		for (auto p : plan)
@@ -102,7 +102,7 @@ private:
 	}
 
 	template<typename Res, typename PuzzleT, typename Eng, typename GraphT>
-	Res solve_puzzle(Eng && eng, PuzzleT & puzzle, GraphT & graph)
+	Res solve_puzzle(Eng && eng, PuzzleT & puzzle, GraphT & graph, const typename PuzzleT::state_t & initial_state)
 	{
 		typedef PuzzleT puzzle_t;
 
@@ -110,7 +110,7 @@ private:
 
 		auto start_tp = high_resolution_clock::now();
 
-		bool found = eng(graph, puzzle.state(), [&](const puzzle_t::state_t & state){
+		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){
 			return puzzle.is_solved(state);
 		}, path);
 
@@ -214,10 +214,10 @@ int main(int argc, const char ** argv)
 		//sliding_puzzle::default_state(problem_size)
 		transition_system<sliding_puzzle> puzzle(problem_size);
 
-		random_init(puzzle, permutations.getValue());
+		auto random_state = random_init(puzzle, permutations.getValue());
 
 		std::ofstream out_file(problem_fn_param.getValue());
-		puzzle.serialize_state(out_file, puzzle.state());
+		puzzle.serialize_state(out_file, random_state);
 	}
 
 	return 0;

@@ -14,6 +14,7 @@ public:
 	typedef T _Base;
 	typedef typename _Base::state_t state_t;
 	typedef typename _Base::transition_t transition_t;
+	typedef typename _Base::size_description_t size_description_t;
 
 	/*transition_system(const state_t & _state)
 		:_Base(m_state), m_state(_state)
@@ -22,17 +23,17 @@ public:
 
 	template<typename Args>
 	transition_system(Args descr)
-		:_Base(m_state, descr)
+		:_Base(/*m_state,*/ descr)
 	{
-		m_state = _Base::default_state(descr);
+
 	}
 
 	transition_system(const transition_system & rhs)
-		:_Base(m_state, rhs.m_size), m_state(rhs.m_state)
+		:_Base(/*m_state, */rhs.m_size)//, m_state(rhs.m_state)
 	{
 	}
 
-	transition_system & operator=(const transition_system & rhs)
+	/*transition_system & operator=(const transition_system & rhs)
 	{
 		m_state = rhs.m_state;
 	}
@@ -45,7 +46,7 @@ public:
 	state_t & state()
 	{
 		return m_state;
-	}
+	}*/
 
 	/*
 	Applies transition and generating a new state.
@@ -75,12 +76,7 @@ public:
 		return res;
 	}
 
-	/*bool is_solved() const
-	{
-		return _Base::is_solved(m_state);
-	}*/
-
-	void apply(const transition_t & transition)
+	/*void apply(const transition_t & transition)
 	{
 		_Base::apply(m_state, transition);
 	}
@@ -88,7 +84,7 @@ public:
 	void set_state(const state_t & new_state)
 	{
 		m_state = new_state;
-	}
+	}*/
 
 	template<typename F>
 	void forall_generated_states(const state_t & base_state, F fun) const
@@ -100,9 +96,19 @@ public:
 		});
 	}
 
+	template<typename PlanContainerT>
+	bool verify_solution(state_t initial_state, const PlanContainerT & path) const
+	{
+		for (auto tr : path)
+			apply(initial_state, tr);
+
+		return initial_state == default_state();
+	}
+
 protected:
-	state_t m_state;
+	//state_t m_state;
 	//std::function<transition_t(const state_t &, const state_t &)> m_diffFun;
+	//size_description_t m_size;
 };
 
 #endif

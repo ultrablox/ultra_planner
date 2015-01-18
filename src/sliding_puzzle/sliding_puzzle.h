@@ -90,6 +90,7 @@ public:
 		for(int i = 0; i < size; ++i)
 			PiInv[Pi[i]] = i;
 		return mr_hash(size, Pi, PiInv);
+		//return mr_hash(size, Pi, PiInv) % 2;
     }
 };
 }
@@ -104,8 +105,8 @@ public:
 	typedef int transition_t;
 	typedef std::pair<int, int> size_description_t;
 	
-	sliding_puzzle(state_t & _state, size_description_t description)
-		:m_state(_state), m_size(description)
+	sliding_puzzle(size_description_t description)
+		:/*m_state(_state), */m_size(description)
 	{
 	}
 
@@ -170,14 +171,14 @@ public:
 		state.empty_pos = plate_index;
 	}
 
-	friend void print_puzzle(const sliding_puzzle & puzzle)
+	/*friend void print_puzzle(const sliding_puzzle & puzzle)
 	{
 		cout << "Puzzle " << puzzle.width() << "x" << puzzle.height() << std::endl;
 		
 		puzzle.serialize_state(cout, puzzle.state());
-	}
+	}*/
 
-	friend void random_init(sliding_puzzle & puzzle, int permutation_count = 10)
+	friend state_t random_init(sliding_puzzle & puzzle, int permutation_count = 10)
 	{
 		//Random shuffle
 		//std::random_shuffle(puzzle.m_state.begin(), puzzle.m_state.end());
@@ -187,11 +188,12 @@ public:
 
 		
 		transition_t last_transition(-1);
+		state_t state = puzzle.default_state();
 
 		for(int i = 0; i < permutation_count; ++i)
 		{
 			vector<transition_t> possible_trans;
-			puzzle.forall_available_transitions(puzzle.m_state, [&](transition_t transition){
+			puzzle.forall_available_transitions(state, [&](transition_t transition){
 				if(last_transition != transition)
 					possible_trans.push_back(transition);
 			});
@@ -199,8 +201,10 @@ public:
 			int random_index = distribution(generator);
 			transition_t selected_trans = possible_trans[random_index % possible_trans.size()];
 
-			puzzle.apply(puzzle.m_state, selected_trans);
+			puzzle.apply(state, selected_trans);
 		}
+
+		return state;
 	}
 
 	state_t default_state() const
@@ -282,10 +286,10 @@ public:
 		}
 	}
 
-	const state_t & state() const
+	/*const state_t & state() const
 	{
 		return m_state;
-	}
+	}*/
 
 	int width() const
 	{
@@ -308,7 +312,7 @@ public:
 		return lg_factor(width() * height());
 	}
 protected:
-	state_t & m_state;
+	//state_t & m_state;
 	size_description_t m_size;
 };
 
@@ -345,6 +349,7 @@ public:
 			}
 		}
 
+		//return sum;
 		return sum;
 	}
 private:

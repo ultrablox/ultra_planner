@@ -253,7 +253,7 @@ void test_sliding_puzzle_blind()
 //	assert_test(pr_puzzle.is_solved(), "Sliding puzzle invalid initial state");
 	
 	//print_puzzle(pr_puzzle);
-	random_init(pr_puzzle, 2 * PuzzleW * PuzzleH);
+	auto initial_state = random_init(pr_puzzle, 2 * PuzzleW * PuzzleH);
 	//random_init(pr_puzzle, 1);
 	//print_puzzle(pr_puzzle);
 	assert_test(pr_puzzle.has_solution(), "Sliding puzzle does not have solution");
@@ -267,16 +267,13 @@ void test_sliding_puzzle_blind()
 		dfs_engine<puzzle_t::state_t> eng(graph);
 		std::vector<puzzle_t::state_t> path;
 
-		bool found = eng(graph, puzzle.state(), [=](const puzzle_t::state_t & puzzle_state){
+		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
 			return puzzle_state == puzzle.default_state();
 		}, path);
 		assert_test(found, "DFS (puzzle) failed to find existing solution");
 
 		auto plan = puzzle.build_transition_path(path.begin(), path.end());
-
-		for(auto tr : plan)
-			puzzle.apply(tr);
-//		assert_test(puzzle.is_solved(), "DFS (puzzle): Solution verification failed.");
+		assert_test(puzzle.verify_solution(initial_state, plan), "DFS (puzzle): Solution verification failed.");
 	}
 
 	{
@@ -284,17 +281,14 @@ void test_sliding_puzzle_blind()
 		bfs_engine<puzzle_t::state_t> eng(graph);
 		std::vector<puzzle_t::state_t> path;
 
-		bool found = eng(graph, puzzle.state(), [=](const puzzle_t::state_t & puzzle_state){
+		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
 			return puzzle_state == puzzle.default_state();
 		}, path);
 		assert_test(found, "BFS (puzzle) failed to find existing solution");
 
 		//Verify plan
 		auto plan = puzzle.build_transition_path(path.begin(), path.end());
-
-		for(auto tr : plan)
-			puzzle.apply(tr);
-//		assert_test(puzzle.is_solved(), "BFS (puzzle): Solution verification failed.");
+		assert_test(puzzle.verify_solution(initial_state, plan), "BFS (puzzle): Solution verification failed.");
 	}
 	cout << "done." << std::endl;
 }
@@ -308,7 +302,7 @@ void test_sliding_puzzle_heuristic()
 //	assert_test(pr_puzzle.is_solved(), "Sliding puzzle invalid initial state");
 	
 	//print_puzzle(pr_puzzle);
-	random_init(pr_puzzle, 2 * PuzzleWidth * PuzzleHeight);
+	auto initial_state = random_init(pr_puzzle, 2 * PuzzleWidth * PuzzleHeight);
 	//random_init(pr_puzzle, 1);
 	//print_puzzle(pr_puzzle);
 	assert_test(pr_puzzle.has_solution(), "Sliding puzzle does not have solution");
@@ -318,41 +312,36 @@ void test_sliding_puzzle_heuristic()
 	//Heuristic search
 	cout << "Checking " << PuzzleWidth << "x" << PuzzleHeight << " puzzle heuristic search...";
 
-	{
+/*	{
 		puzzle_t puzzle = pr_puzzle;
 
 		astar_engine<puzzle_t::state_t, fringe_db_heuristic<puzzle_t>, false> eng(graph);
 		std::vector<puzzle_t::state_t> path;
 
-		bool found = eng(graph, puzzle.state(), [&](const puzzle_t::state_t & state){
+		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){
 			return puzzle.is_solved(state);
 		}, path);
 		assert_test(found, "A*-patternDB (puzzle) failed to find existing solution");
 
 		//Verify plan
 		auto plan = puzzle.build_transition_path(path.begin(), path.end());
-
-		for(auto tr : plan)
-			puzzle.apply(tr);
-//		assert_test(puzzle.is_solved(), "A*-patternDB (puzzle): Solution verification failed.");
-	}
+		assert_test(puzzle.verify_solution(initial_state, plan), "A*-patternDB (puzzle): Solution verification failed.");
+	}*/
 
 	{
 		puzzle_t puzzle = pr_puzzle;
 		astar_engine<puzzle_t::state_t, manhattan_heuristic<puzzle_t>, false> eng(graph);
 		std::vector<puzzle_t::state_t> path;
 
-		bool found = eng(graph, puzzle.state(), [&](const puzzle_t::state_t & state){
+		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){
 			return puzzle.is_solved(state);
 		}, path);
 		assert_test(found, "A*-manhatten (puzzle) failed to find existing solution");
 
 		//Verify plan
 		auto plan = puzzle.build_transition_path(path.begin(), path.end());
-
-		for(auto tr : plan)
-			puzzle.apply(tr);
-//		assert_test(puzzle.is_solved(), "A*-manhatten (puzzle): Solution verification failed.");
+		assert_test(puzzle.verify_solution(initial_state, plan), "A*-manhatten (puzzle): Solution verification failed.");
+		cout << "A* plan length: " << plan.size() << std::endl;
 	}
 
 	{
@@ -360,17 +349,15 @@ void test_sliding_puzzle_heuristic()
 		batched_engine<puzzle_t::state_t, manhattan_heuristic<puzzle_t>, false> eng(graph);
 		std::vector<puzzle_t::state_t> path;
 
-		bool found = eng(graph, puzzle.state(), [&](const puzzle_t::state_t & state){
+		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){
 			return puzzle.is_solved(state);
 		}, path);
 		assert_test(found, "BA*-manhatten (puzzle) failed to find existing solution");
 
 		//Verify plan
 		auto plan = puzzle.build_transition_path(path.begin(), path.end());
-
-		for(auto tr : plan)
-			puzzle.apply(tr);
-//		assert_test(puzzle.is_solved(), "BA*-manhatten (puzzle): Solution verification failed.");
+		assert_test(puzzle.verify_solution(initial_state, plan), "BA*-manhatten (puzzle): Solution verification failed.");
+		cout << "BA* plan length: " << plan.size() << std::endl;
 	}
 
 	cout << "done." << std::endl;

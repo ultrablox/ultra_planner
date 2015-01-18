@@ -38,11 +38,16 @@ void test_complex_vector();
 void test_complex_hashmap();
 void test_cached_file();
 void test_merge();
+void test_rubik_core();
 
 int main()
 {
 	test_bitset();
 	test_merge();
+
+	test_puzzle_core();
+	test_rubik_core();
+
 	test_cached_file();
 	test_complex_vector();
 	test_complex_hashmap();
@@ -51,8 +56,6 @@ int main()
 	//test_matrix();
 
 	//test_sorting();
-
-	test_puzzle_core();
 
 	test_search();
 
