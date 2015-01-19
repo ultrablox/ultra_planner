@@ -37,7 +37,7 @@ def solve(problem_name, algorithm_name)
 	return stats
 end
 
-algs = ["A*", "GBFS", "BA*"] #, ,, 
+algs = ["A*", "BA*"] #, ,, , , "GBFS"
 columns = ["wall_time", "plan_length"]
 
 if(File.file?("results.csv"))

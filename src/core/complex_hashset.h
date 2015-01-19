@@ -161,12 +161,116 @@ class complex_hashset
 	};
 
 	typedef typename stxxl::VECTOR_GENERATOR<block_t, 1U, 131072U, BlockSize, stxxl::FR, stxxl::random>::result stxxl_paged_vector_t; //131072U //262144U //65536U
-	typedef cached_file<block_t, 65536U> cached_paged_vector_t;
-	typedef stxxl_paged_vector_t ext_paged_vector_t;
+	//typedef cached_file<block_t, 65536U> cached_paged_vector_t;
+	using direct_paged_vector_t = data_file<block_t>;
+	typedef direct_paged_vector_t ext_paged_vector_t;
 	typedef std::vector<block_t> int_paged_vector_t;
 	typedef typename std::conditional<UseIntMemory, int_paged_vector_t, ext_paged_vector_t>::type paged_vector_t;
 
+	template<typename S>
+	class storage_wrapper
+	{
+		using storage_t = S;
 
+	public:
+		storage_wrapper()
+		{
+		}
+
+		size_t size() const
+		{
+			return m_storage.size();
+		}
+
+		void push_back(const block_t & block)
+		{
+			m_storage.push_back(block);
+		}
+
+		block_t & operator[](size_t index)
+		{
+			return m_storage[index];
+		}
+
+		void read_into(size_t index, block_t & block)
+		{
+			block = m_storage[index];
+		}
+
+		template<typename It>
+		void write(It begin, It end)
+		{			
+			for (auto it = begin; it != end; ++it)
+			{
+				if (it->id < m_storage.size())
+					m_storage[it->id] = std::move(*it);
+				else if (it->id == m_storage.size())
+					m_storage.push_back(std::move(*it));
+				else
+					throw runtime_error("Invalid block indexing");
+			}
+		}
+	private:
+		storage_t m_storage;
+	};
+
+	template<>
+	class storage_wrapper<direct_paged_vector_t>
+	{
+	public:
+		storage_wrapper()
+			:m_storage("state_database.dat")
+		{
+		}
+
+		size_t size() const
+		{
+			return m_storage.size();
+		}
+
+		void push_back(const block_t & block)
+		{
+			m_storage.append(block);
+		}
+
+		block_t & operator[](size_t index)
+		{
+			throw runtime_error("Invalid usage");
+		}
+
+		void read_into(size_t index, block_t & block)
+		{
+			m_storage.get(index, block);
+		}
+
+		template<typename It>
+		void write(It begin, It end)
+		{
+			//cout << "Writing sequence of " << std::distance(begin, end) << " blocks." << std::endl;
+			auto it = begin;
+			while (it != end)
+			{
+				//Find last element, where id is not sequentional
+				auto last_gr_it = it + 1;
+
+				size_t index = it->id + 1;
+				while ((last_gr_it != end) && (last_gr_it->id == index))
+				{
+					++last_gr_it;
+					++index;
+				}
+
+				m_storage.write_range(&(*it), it->id, std::distance(it, last_gr_it));
+
+				it = last_gr_it;
+			}
+		}
+	private:
+		direct_paged_vector_t m_storage;
+	};
+
+
+	typedef storage_wrapper<paged_vector_t> wrapper_t;
 public:
 	class iterator
 	{
@@ -198,11 +302,6 @@ public:
 			throw runtime_error("Serialized element is bigger than page size");
 
 		cout << "Hashset page can store " << m_maxItemsInBlock << " elements." << std::endl;
-	}
-
-	void init()
-	{
-		init_storage(m_blocks);
 	}
 
 	iterator end() const
@@ -260,7 +359,7 @@ public:
 		size_t total_count = std::distance(begin, end);
 
 		//if (total_count == 253)
-		cout << "Inserting " << total_count << " elements into hashset" << std::endl;
+		//cout << "Inserting " << total_count << " elements into hashset" << std::endl;
 
 		//Get ordered seqeunce of blocks
 		vector<block_descr_t> block_descrs;
@@ -324,7 +423,8 @@ public:
 			size_t cur_block_index = get<0>(block_descr);
 			while (cur_block_index != std::numeric_limits<size_t>::max())
 			{
-				block_t & block = m_blocks[cur_block_index];
+				block_t block;// = m_blocks[cur_block_index];
+				m_blocks.read_into(cur_block_index, block);
 				
 				size_t last_size = old_vals.size();
 				old_vals.resize(last_size + block.item_count);
@@ -399,7 +499,7 @@ public:
 				m_indicesTree.insert(make_pair(b.first_hash(), b.id));
 		}
 
-		commit_write_queue(m_blocks, write_queue);
+		m_blocks.write(write_queue.begin(), write_queue.end());
 	}
 
 	size_t size() const
@@ -454,28 +554,7 @@ private:
 	{
 
 	}
-
-	template<typename InternalContainer>
-	void commit_write_queue(InternalContainer & blocks, const std::vector<block_t> & write_queue)
-	{
-		for (auto & b : write_queue)
-		{
-			if (b.id < blocks.size())
-				blocks[b.id] = std::move(b);
-			else if (b.id == m_blocks.size())
-				blocks.push_back(std::move(b));
-			else
-				throw runtime_error("Invalid block indexing");
-		}
-		//blocks.write_range(blocks);
-	}/**/
-
-	/*template<>
-	void commit_write_queue<cached_paged_vector_t>(cached_paged_vector_t & blocks, const std::vector<block_t> & write_queue)
-	{
-
-	}*/
-
+	
 	map_t::const_iterator index_iterator(size_t hash_val) const
 	{
 		auto it = m_indicesTree.lower_bound(hash_val);
@@ -677,17 +756,6 @@ private:
 		return (float)block.item_count / (block.vacant_count(m_serializedElementSize) + (float)block.item_count);
 	}
 
-	template<typename T>
-	void init_storage(T & str)
-	{}
-
-	template<>
-	void init_storage<cached_paged_vector_t>(cached_paged_vector_t & str)
-	{
-		str.open("state_database.dat");
-	}
-
-
 private:
 	hasher_t m_hasher;
 	serialize_fun_type m_serializeFun;
@@ -697,7 +765,8 @@ private:
 	const int m_serializedElementSize, m_serializedValueSize;
 
 	map_t m_indicesTree;
-	paged_vector_t m_blocks;
+	//paged_vector_t m_blocks;
+	wrapper_t m_blocks;
 	const float m_maxLoadFactor;
 
 	mutable std::vector<char> m_elementCache;
@@ -705,6 +774,7 @@ private:
 	size_t m_size, m_blockCount;
 	const int m_maxItemsInBlock;
 	std::queue<size_t> m_freedBlocks;
+	
 };
 
 #endif

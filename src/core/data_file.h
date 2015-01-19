@@ -27,10 +27,20 @@ public:
 		:m_fileName(file_name), m_blockCount(0), m_hFile(0)
     {
 		cout << "Creating data file: " << m_fileName << std::endl;
+		m_hFile = CreateFile(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
+
+		if (m_hFile == INVALID_HANDLE_VALUE)
+		{
+			throw runtime_error("Unable to open file with WinAPI");
+		}
     }
 
-	/*data_file(data_file & rhs)
+
+	data_file(const data_file & rhs)
 	{
+		int x = 0;
+	}
+	/*{
 		std::swap(m_hFile, rhs.m_hFile);
 	}*/
 
@@ -43,7 +53,7 @@ public:
 		}
     }
 
-	int open(const std::string file_name)
+	/*int open(const std::string file_name)
 	{
 		m_hFile = CreateFile(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
 
@@ -53,7 +63,7 @@ public:
 		}
 
 		return 0;
-	}
+	}*/
 
     int set(size_t index, const block_type & data)
     {
@@ -86,6 +96,14 @@ public:
 
 		return r ? 0 : 1;
     }
+
+	void write_range(block_type * buf_begin, size_t first_id, size_t block_count)
+	{
+		//cout << "Writing sequence of " << block_count << std::endl;
+		OVERLAPPED ol = { 0 };
+		ol.Offset = first_id * sizeof(block_type);
+		bool r = WriteFile(m_hFile, buf_begin, sizeof(block_type)* block_count, &m_bytesWritten, &ol);
+	}
 
 	int get(size_t index, block_type & data)
     {

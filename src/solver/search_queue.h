@@ -14,7 +14,9 @@ class search_queue
 	typedef typename combined_value_t::first_type priority_component_t;
 	typedef typename combined_value_t::second_type value_t;
 	typedef C comparator_t;
-	static const int MaxPrimaryLayers = 10;
+	//typedef std::vector<value_t> layer_container_t;
+	typedef std::list<value_t> layer_container_t;
+	static const int MaxPrimaryLayers = 100;
 
 	//static_assert(std::is_pod<priority_component_t>::value, "Priority conmonent must be POD");
 public:
@@ -47,13 +49,14 @@ public:
 			extract_secondary_data();
 
 		auto it = m_primaryData.begin();
-		return combined_value_t(it->first, *it->second.rbegin());
+		//return combined_value_t(it->first, *it->second.rbegin());
+		return combined_value_t(it->first, *it->second.begin());
 	}
 
 	const size_t top(std::vector<value_t> & dest, size_t max_count, bool more_than_one_group = false, priority_component_t * first_node_data = nullptr) const
 	{
 		size_t requested = max_count;
-		auto group_it = m_primaryData.begin();
+		/*auto group_it = m_primaryData.begin();
 		while ((group_it != m_primaryData.end()) && (max_count > 0))
 		{
 			auto last_it = group_it->second.size() < max_count ? group_it->second.rend() : group_it->second.rbegin() + max_count;
@@ -66,10 +69,17 @@ public:
 			else
 				break;
 		}
+*/
+		if (m_primaryData.empty())
+			return 0;
 
 		if (first_node_data && (requested != max_count))
 			*first_node_data = m_primaryData.begin()->first;
-			
+
+		auto group_it = m_primaryData.begin();
+		for (auto it = group_it->second.begin(); (it != group_it->second.end()) && (max_count > 0); ++it, --max_count)
+			dest.push_back(*it);
+
 		return requested - max_count;
 	}
 
@@ -86,12 +96,12 @@ public:
 		else
 		{
 			if (m_primaryData.empty())
-				m_primaryData.insert(make_pair(val.first, std::vector<value_t>(1, val.second)));
+				m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
 			else if (m_primaryData.size() < MaxPrimaryLayers)
-				m_primaryData.insert(make_pair(val.first, std::vector<value_t>(1, val.second)));
+				m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
 			else if (val.first < m_primaryData.rbegin()->first)
 			{
-				m_primaryData.insert(make_pair(val.first, std::vector<value_t>(1, val.second)));
+				m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
 				
 				if (m_primaryData.size() > MaxPrimaryLayers)
 				{
@@ -129,8 +139,8 @@ public:
 
 		
 		auto top_it = m_primaryData.begin();
-		top_it->second.pop_back();
-		//top_it->second.erase(top_it->second.begin());
+		//top_it->second.pop_back();
+		top_it->second.erase(top_it->second.begin());
 
 		if (top_it->second.empty())
 			m_primaryData.erase(top_it);
@@ -138,7 +148,7 @@ public:
 
 	void pop(size_t count)
 	{
-		auto it = m_primaryData.begin();
+		/*auto it = m_primaryData.begin();
 		while ((!m_primaryData.empty()) && (count > 0))
 		{
 			if (it->second.size() <= count)
@@ -153,6 +163,16 @@ public:
 				std::advance(last_it, count);
 				it->second.erase(last_it.base(), it->second.end());
 			}
+		}*/
+
+		auto group_it = m_primaryData.begin();
+		if (group_it->second.size() <= count)
+			m_primaryData.erase(group_it);
+		else
+		{
+			auto it = group_it->second.begin();
+			std::advance(it, count);
+			group_it->second.erase(group_it->second.begin(), it);
 		}
 	}
 
@@ -180,7 +200,7 @@ private:
 		throw runtime_error("Not implemented");
 	}
 private:
-	std::map<priority_component_t, std::vector<value_t>, comparator_t> m_primaryData;
+	std::map<priority_component_t, layer_container_t, comparator_t> m_primaryData;
 	complex_vector<combined_value_t> m_secondaryData;
 };
 

@@ -17,9 +17,10 @@ def generate(width, height, permutation_count)
 end
 
 #testing_permutations = [5, 10, 20, 50, 100, 200]
-testing_permutations = [400]
+testing_permutations = [5, 10, 20, 50, 75, 100, 150, 175, 200, 250, 300, 350, 400, 450, 500]
 #testing_sizes = [[2,6], [3,4], [4,3], [6,2], [7,2], [4,4], [3,5], [4,5]] #[5,5]
-testing_sizes = [[5,5], [6,6]]
+#testing_sizes = [[5,5], [6,6]]
+testing_sizes = [[3,2]]
 
 testing_sizes.each do |info|
 	testing_permutations.each do |p|

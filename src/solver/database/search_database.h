@@ -46,7 +46,7 @@ class search_database
 
 	
 
-	template<typename S>
+	/*template<typename S>
 	struct storage_factory
 	{
 		template<typename... Args>
@@ -65,7 +65,7 @@ class search_database
 		{
 			return std::unordered_set<state_t>();
 		}
-	};
+	};*/
 
 public:
 	//Id + parent search node id + state + init->current path length
@@ -74,7 +74,7 @@ public:
 
 	template<typename SerFun, typename DesFun>
 	search_database(int serialized_state_size, SerFun s_fun, DesFun d_fun)
-		:	m_storages(storage_count, storage_factory<hash_map_t>().create_storage(serialized_state_size, s_fun, d_fun)),
+		:	//m_storages(storage_count, storage_factory<hash_map_t>().create_storage(serialized_state_size, s_fun, d_fun)),
 			m_nodeSerializeFun([=](void * dst, const search_node_t & node){
 				char * cur_ptr = (char*)dst;
 				memcpy(cur_ptr, &get<0>(node), sizeof(size_t));
@@ -90,8 +90,8 @@ public:
 			}),
 		m_searchNodes(serialized_state_size + sizeof(size_t)*2 + sizeof(int), m_nodeSerializeFun, m_nodeDeserializeFun), m_nodeCount(0)
 	{
-		for (auto & storage : m_storages)
-			storage.init();
+		for (int i = 0; i < storage_count; ++i)
+			m_storages.emplace_back(serialized_state_size, s_fun, d_fun);
 	}
 
 	bool contains(const state_t & state) const
