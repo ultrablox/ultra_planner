@@ -3,6 +3,7 @@
 #define UltraCore_math_h
 
 #include <math.h>
+#include <cstddef>
 
 //Return x: x^10 = val!
 template<typename IntT>

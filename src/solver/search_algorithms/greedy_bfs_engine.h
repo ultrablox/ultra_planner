@@ -19,7 +19,7 @@ template<typename N, typename H, bool ExtMemory>
 class greedy_bfs_engine : public queued_search_engine<N, float, greedy_bfs_node_priority_cmp, ExtMemory>
 {
 	typedef float estimation_t;
-	typedef public queued_search_engine<N, float, greedy_bfs_node_priority_cmp, ExtMemory> _Base;
+	typedef queued_search_engine<N, float, greedy_bfs_node_priority_cmp, ExtMemory> _Base;
 	typedef H heuristic_t;
 public:
 	template<typename Gr>

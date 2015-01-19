@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 //#include <stxxl.h>
 
 using namespace std;
@@ -140,11 +141,11 @@ T deserialize_vector(std::ifstream & fin)
 	//Data
 	for(size_t i = 0; i < vec_size; ++i)
 	{
-#ifdef WIN32
+//#ifdef WIN32
 		vec[i] = deserialize_value<typename T::value_type>(fin);
-#else
+/*#else
 		vec[i] = deserialize_value<Element_type<T>>(fin);
-#endif
+#endif*/
 	}
 
 	return std::move(vec);

@@ -677,8 +677,8 @@ private:
 		return (float)block.item_count / (block.vacant_count(m_serializedElementSize) + (float)block.item_count);
 	}
 
-	template<typename T>
-	void init_storage(T & str)
+	template<typename St>
+	void init_storage(St & str)
 	{}
 
 	template<>

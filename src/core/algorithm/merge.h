@@ -102,7 +102,7 @@ namespace UltraCore
 			bool is_duplication;
 			while((first != last) && (mainKeyGetter(*first) == key))
 			{
-				auto ext_eq_it = std::find_if(ext_it, ext_group_end_it, [=](const C1::value_type & val){
+				auto ext_eq_it = std::find_if(ext_it, ext_group_end_it, [=](const typename C1::value_type & val){
 					return eq(val, *first);
 				});
 

@@ -102,7 +102,7 @@ public:
 		for (auto tr : path)
 			apply(initial_state, tr);
 
-		return initial_state == default_state();
+		return initial_state == sliding_puzzle::default_state();
 	}
 
 protected:

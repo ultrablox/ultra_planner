@@ -11,6 +11,7 @@ class queued_search_engine : public search_engine_base<N, ExtMemory>
 {
 	typedef search_engine_base<N, ExtMemory> _Base;
 	typedef M element_meta_t;
+	using search_node_t = typename _Base::search_node_t;
 	
 public:
 	typedef std::tuple<element_meta_t, int> comparison_t;	//any meta + length to initial
@@ -37,7 +38,7 @@ public:
 
 	friend std::ostream & operator<<(std::ostream & os, const stats_t & stats)
 	{
-		cout << static_cast<const _Base::stats_t&>(stats);
+		cout << static_cast<const typename _Base::stats_t&>(stats);
 		cout << "Search queue layer count: " << stats.queue_layers_count << std::endl;
 		cout << "Search queue secondary node count: " << stats.secondary_nodes_count << std::endl;
 		return os;
