@@ -33,12 +33,14 @@ public:
     #endif
     {
 		cout << "Creating data file: " << m_fileName << std::endl;
-		m_hFile = CreateFile(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
+	#ifdef WIN32
+        m_hFile = CreateFile(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
 
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
 			throw runtime_error("Unable to open file with WinAPI");
 		}
+    #endif
     }
 
 
@@ -111,10 +113,12 @@ public:
 
 	void write_range(block_type * buf_begin, size_t first_id, size_t block_count)
 	{
+    #ifdef WIN32
 		//cout << "Writing sequence of " << block_count << std::endl;
 		OVERLAPPED ol = { 0 };
 		ol.Offset = first_id * sizeof(block_type);
 		bool r = WriteFile(m_hFile, buf_begin, sizeof(block_type)* block_count, &m_bytesWritten, &ol);
+    #endif
 	}
 
 	int get(size_t index, block_type & data)
