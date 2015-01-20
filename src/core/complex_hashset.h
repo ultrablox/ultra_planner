@@ -11,6 +11,116 @@
 #include "cached_file.h"
 #include <core/utils/helpers.h>
 
+template<typename S, typename B>
+class vector_storage_wrapper
+{
+	using storage_t = S;
+	using block_t = B;
+
+public:
+	vector_storage_wrapper()
+	{
+	}
+
+	size_t size() const
+	{
+		return m_storage.size();
+	}
+
+	void push_back(const block_t & block)
+	{
+		m_storage.push_back(block);
+	}
+
+	block_t & operator[](size_t index)
+	{
+		return m_storage[index];
+	}
+
+	void read_into(size_t index, block_t & block)
+	{
+		block = m_storage[index];
+	}
+
+	template<typename It>
+	void write(It begin, It end)
+	{
+		for (auto it = begin; it != end; ++it)
+		{
+			if (it->id < m_storage.size())
+				m_storage[it->id] = std::move(*it);
+			else if (it->id == m_storage.size())
+				m_storage.push_back(std::move(*it));
+			else
+				throw runtime_error("Invalid block indexing");
+		}
+	}
+private:
+	storage_t m_storage;
+};
+
+template<typename S, typename B>
+class file_storage_wrapper
+{
+	using storage_t = S;
+	using block_t = B;
+public:
+	file_storage_wrapper()
+		:m_storage("state_database.dat")
+	{
+	}
+
+	size_t size() const
+	{
+		return m_storage.size();
+	}
+
+	void push_back(const block_t & block)
+	{
+		m_storage.append(block);
+	}
+
+	block_t & operator[](size_t index)
+	{
+		throw runtime_error("Invalid usage");
+	}
+
+	void read_into(size_t index, block_t & block)
+	{
+		m_storage.get(index, block);
+	}
+
+	template<typename It>
+	void write(It begin, It end)
+	{
+		//cout << "Writing sequence of " << std::distance(begin, end) << " blocks." << std::endl;
+		int write_count(0);
+
+		auto it = begin;
+		while (it != end)
+		{
+			//Find last element, where id is not sequentional
+			auto last_gr_it = it + 1;
+
+			size_t index = it->id + 1;
+			while ((last_gr_it != end) && (last_gr_it->id == index))
+			{
+				++last_gr_it;
+				++index;
+			}
+
+			m_storage.write_range(&(*it), it->id, std::distance(it, last_gr_it));
+			++write_count;
+
+			it = last_gr_it;
+		}
+
+		//cout << "Write I/O gain " << (float)write_count / std::distance(begin, end) << std::endl;
+	}
+private:
+	storage_t m_storage;
+};
+
 template<typename T, typename H = std::hash<T>, bool UseIntMemory = true, unsigned int BlockSize = 8192U, typename... KeyPart>//65536U //4096U // 8192U
 class complex_hashset
 {
@@ -165,117 +275,10 @@ class complex_hashset
 	using direct_paged_vector_t = data_file<block_t>;
 	typedef direct_paged_vector_t ext_paged_vector_t;
 	typedef std::vector<block_t> int_paged_vector_t;
-	typedef typename std::conditional<UseIntMemory, int_paged_vector_t, ext_paged_vector_t>::type paged_vector_t;
+	//typedef typename std::conditional<UseIntMemory, int_paged_vector_t, ext_paged_vector_t>::type paged_vector_t;
+	//typedef storage_wrapper<paged_vector_t> wrapper_t;
 
-	template<typename S>
-	class storage_wrapper
-	{
-		using storage_t = S;
-
-	public:
-		storage_wrapper()
-		{
-		}
-
-		size_t size() const
-		{
-			return m_storage.size();
-		}
-
-		void push_back(const block_t & block)
-		{
-			m_storage.push_back(block);
-		}
-
-		block_t & operator[](size_t index)
-		{
-			return m_storage[index];
-		}
-
-		void read_into(size_t index, block_t & block)
-		{
-			block = m_storage[index];
-		}
-
-		template<typename It>
-		void write(It begin, It end)
-		{			
-			for (auto it = begin; it != end; ++it)
-			{
-				if (it->id < m_storage.size())
-					m_storage[it->id] = std::move(*it);
-				else if (it->id == m_storage.size())
-					m_storage.push_back(std::move(*it));
-				else
-					throw runtime_error("Invalid block indexing");
-			}
-		}
-	private:
-		storage_t m_storage;
-	};
-
-	template<>
-	class storage_wrapper<direct_paged_vector_t>
-	{
-	public:
-		storage_wrapper()
-			:m_storage("state_database.dat")
-		{
-		}
-
-		size_t size() const
-		{
-			return m_storage.size();
-		}
-
-		void push_back(const block_t & block)
-		{
-			m_storage.append(block);
-		}
-
-		block_t & operator[](size_t index)
-		{
-			throw runtime_error("Invalid usage");
-		}
-
-		void read_into(size_t index, block_t & block)
-		{
-			m_storage.get(index, block);
-		}
-
-		template<typename It>
-		void write(It begin, It end)
-		{
-			//cout << "Writing sequence of " << std::distance(begin, end) << " blocks." << std::endl;
-			int write_count(0);
-
-			auto it = begin;
-			while (it != end)
-			{
-				//Find last element, where id is not sequentional
-				auto last_gr_it = it + 1;
-
-				size_t index = it->id + 1;
-				while ((last_gr_it != end) && (last_gr_it->id == index))
-				{
-					++last_gr_it;
-					++index;
-				}
-
-				m_storage.write_range(&(*it), it->id, std::distance(it, last_gr_it));
-				++write_count;
-
-				it = last_gr_it;
-			}
-
-			//cout << "Write I/O gain " << (float)write_count / std::distance(begin, end) << std::endl;
-		}
-	private:
-		direct_paged_vector_t m_storage;
-	};
-
-
-	typedef storage_wrapper<paged_vector_t> wrapper_t;
+	using wrapper_t = typename std::conditional<UseIntMemory, vector_storage_wrapper<int_paged_vector_t, block_t>, file_storage_wrapper<direct_paged_vector_t, block_t>>::type;
 public:
 	class iterator
 	{
