@@ -29,12 +29,12 @@ public:
 	template<typename VecT>
 	struct iterator_base
 	{
-		typedef typename forward_iterator_tag iterator_category;
-		typedef typename T value_type;
+		typedef forward_iterator_tag iterator_category;
+		typedef T value_type;
 		typedef ptrdiff_t difference_type;
 		typedef difference_type distance_type;	// retained
-		typedef typename value_type* pointer;
-		typedef typename value_type& reference;
+		typedef value_type* pointer;
+		typedef value_type& reference;
 
 
 		struct proxy : public value_type

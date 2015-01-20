@@ -37,8 +37,8 @@ def solve(problem_name, algorithm_name)
 	return stats
 end
 
-algs = ["A*", "BA*"] #, ,, , , "GBFS"
-columns = ["wall_time", "plan_length"]
+algs = ["BA*"] #, ,, , , "GBFS", "A*"
+columns = ["wall_time", "plan_length", "node_count"]
 
 if(File.file?("results.csv"))
 	File.delete("results.csv")

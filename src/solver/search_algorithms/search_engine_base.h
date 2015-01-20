@@ -95,9 +95,9 @@ public:
 
 	friend std::ostream & operator<<(std::ostream & os, const stats_t & stats)
 	{
-		cout << "States discovered: " << stats.state_count << std::endl;
-		cout << "Database hashset block count: " << stats.database_block_count << std::endl;
-		cout << "Database density: " << stats.database_density << std::endl;
+		os << "node_count: " << stats.state_count << std::endl;
+		os << "Database hashset block count: " << stats.database_block_count << std::endl;
+		os << "Database density: " << stats.database_density << std::endl;
 		return os;
 	}
 protected:

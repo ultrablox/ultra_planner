@@ -2,12 +2,14 @@
 #define UltraPlanner_helpers_h
 
 #include "../config.h"
+#include <tbb/parallel_sort.h>
 #include <vector>
 #include <string>
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 //#include <stxxl.h>
 
 using namespace std;
@@ -140,11 +142,11 @@ T deserialize_vector(std::ifstream & fin)
 	//Data
 	for(size_t i = 0; i < vec_size; ++i)
 	{
-#ifdef WIN32
+//#ifdef WIN32
 		vec[i] = deserialize_value<typename T::value_type>(fin);
-#else
+/*#else
 		vec[i] = deserialize_value<Element_type<T>>(fin);
-#endif
+#endif*/
 	}
 
 	return std::move(vec);
@@ -174,4 +176,19 @@ int element_index(vector<T> & data, const T & val)
 int integer_ceil(int x, int y);
 
 ULTRA_CORE_API std::wstring to_wstring(const std::string & str);
+
+template<typename T>
+void resize_if_less(T & container, size_t expected_size)
+{
+	if (container.size() < expected_size)
+		container.resize(expected_size);
+}
+
+template<typename It, typename Pred>
+void sort_wrapper(It begin, It end, Pred pred)
+{
+	//std::sort(begin, end, pred);
+	tbb::parallel_sort(begin, end, pred);
+}
+
 #endif

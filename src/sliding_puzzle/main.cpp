@@ -68,23 +68,34 @@ private:
 
 		std::list<transition_system_t::transition_t> plan;
 		std::thread monitor_thread([&](){
-			std::chrono::milliseconds dura(2000);
+
+			std::chrono::milliseconds print_dura(10000);
+			std::chrono::milliseconds dura(500);
+
+			const int print_counter = print_dura.count() / dura.count();
+
+			int counter = 0;
 
 			cout << "Started solving monitor, interval " << dura.count() << " msecs" << std::endl;
 			double last_explored_count = 0.0;
 			while (!search_engine.finished())
 			{
-				auto stats = search_engine.get_stats();
+				if (!(counter--))
+				{
+					counter = print_counter;
+				
+					auto stats = search_engine.get_stats();
 
-				cout << "=============Monitoring================" << std::endl;
-				cout << stats;
+					cout << "=============Monitoring================" << std::endl;
+					cout << stats;
 
-				double explored_node_count = stats.state_count;
-				size_t pow10_count = explored_node_count > 1 ? ceil(log10(explored_node_count)) : 0;
+					double explored_node_count = stats.state_count;
+					size_t pow10_count = explored_node_count > 1 ? ceil(log10(explored_node_count)) : 0;
 
-				cout << "Observed 10^" << pow10_count << " states (" << explored_node_count / m_maxStateCount << "%), speed = " << (explored_node_count - last_explored_count) / dura.count() * 1e3 << " nodes/sec" << std::endl;
+					cout << "Observed 10^" << pow10_count << " states (" << explored_node_count / m_maxStateCount << "%), speed = " << (explored_node_count - last_explored_count) / print_dura.count() * 1e3 << " nodes/sec" << std::endl;
 
-				last_explored_count = explored_node_count;
+					last_explored_count = explored_node_count;
+				}
 
 				std::this_thread::sleep_for(dura);
 			}
@@ -121,7 +132,8 @@ private:
 
 		std::ofstream stats_file("stats.txt");
 		stats_file << "wall_time:" << search_timecost << std::endl;
-		stats_file << "plan_length:" << plan.size();
+		stats_file << "plan_length:" << plan.size() << std::endl;
+		stats_file << eng.get_stats();
 
 		return plan;
 	}

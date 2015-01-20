@@ -1,29 +1,21 @@
 /*
     Copyright 2005-2014 Intel Corporation.  All Rights Reserved.
 
-    This file is part of Threading Building Blocks.
+    This file is part of Threading Building Blocks. Threading Building Blocks is free software;
+    you can redistribute it and/or modify it under the terms of the GNU General Public License
+    version 2  as  published  by  the  Free Software Foundation.  Threading Building Blocks is
+    distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See  the GNU General Public License for more details.   You should have received a copy of
+    the  GNU General Public License along with Threading Building Blocks; if not, write to the
+    Free Software Foundation, Inc.,  51 Franklin St,  Fifth Floor,  Boston,  MA 02110-1301 USA
 
-    Threading Building Blocks is free software; you can redistribute it
-    and/or modify it under the terms of the GNU General Public License
-    version 2 as published by the Free Software Foundation.
-
-    Threading Building Blocks is distributed in the hope that it will be
-    useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Threading Building Blocks; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-    As a special exception, you may use this file as part of a free software
-    library without restriction.  Specifically, if other files instantiate
-    templates or use macros or inline functions from this file, or you compile
-    this file and link it with other files to produce an executable, this
-    file does not by itself cause the resulting executable to be covered by
-    the GNU General Public License.  This exception does not however
-    invalidate any other reasons why the executable file might be covered by
-    the GNU General Public License.
+    As a special exception,  you may use this file  as part of a free software library without
+    restriction.  Specifically,  if other files instantiate templates  or use macros or inline
+    functions from this file, or you compile this file and link it with other files to produce
+    an executable,  this file does not by itself cause the resulting executable to be covered
+    by the GNU General Public License. This exception does not however invalidate any other
+    reasons why the executable file might be covered by the GNU General Public License.
 */
 
 #ifndef __TBB_task_H
@@ -39,10 +31,7 @@ namespace tbb {
 
 class task;
 class task_list;
-
-#if __TBB_TASK_GROUP_CONTEXT
 class task_group_context;
-#endif /* __TBB_TASK_GROUP_CONTEXT */
 
 // MSVC does not allow taking the address of a member that was defined
 // privately in task_base and made public in class task via a using declaration.
@@ -64,6 +53,7 @@ namespace internal { //< @cond INTERNAL
         void __TBB_EXPORTED_METHOD free( task& ) const;
     };
 
+    struct cpu_ctl_env_space { int space[sizeof(internal::uint64_t)/sizeof(int)]; };
 } //< namespace internal @endcond
 
 namespace interface5 {
@@ -244,7 +234,7 @@ namespace internal {
         //! Miscellaneous state that is not directly visible to users, stored as a byte for compactness.
         /** 0x0 -> version 1.0 task
             0x1 -> version >=2.1 task
-            0x10 -> task was enqueued 
+            0x10 -> task was enqueued
             0x20 -> task_proxy
             0x40 -> task has live ref_count
             0x80 -> a stolen task */
@@ -286,6 +276,7 @@ enum priority_t {
 #endif /* !TBB_USE_CAPTURED_EXCEPTION */
 
 class task_scheduler_init;
+namespace interface7 { class task_arena; }
 
 //! Used to form groups of tasks
 /** @ingroup task_scheduling
@@ -312,6 +303,7 @@ class task_group_context : internal::no_copy {
 private:
     friend class internal::generic_scheduler;
     friend class task_scheduler_init;
+    friend class interface7::task_arena;
 
 #if TBB_USE_CAPTURED_EXCEPTION
     typedef tbb_exception exception_container_type;
@@ -333,6 +325,9 @@ public:
 
     enum traits_type {
         exact_exception = 0x0001ul << traits_offset,
+#if __TBB_FP_CONTEXT
+        fp_settings     = 0x0002ul << traits_offset,
+#endif
         concurrent_wait = 0x0004ul << traits_offset,
 #if TBB_USE_CAPTURED_EXCEPTION
         default_traits = 0
@@ -343,7 +338,9 @@ public:
 
 private:
     enum state {
-        may_have_children = 1
+        may_have_children = 1,
+        // the following enumerations must be the last, new 2^x values must go above
+        next_state_value, low_unused_state_bit = (next_state_value-1)*2
     };
 
     union {
@@ -370,7 +367,18 @@ private:
         line with a local variable that is frequently written to. **/
     char _leading_padding[internal::NFS_MaxLineSize
                           - 2 * sizeof(uintptr_t)- sizeof(void*) - sizeof(internal::context_list_node_t)
-                          - sizeof(__itt_caller)];
+                          - sizeof(__itt_caller)
+#if __TBB_FP_CONTEXT
+                          - sizeof(internal::cpu_ctl_env_space)
+#endif
+                         ];
+
+#if __TBB_FP_CONTEXT
+    //! Space for platform-specific FPU settings.
+    /** Must only be accessed inside TBB binaries, and never directly in user
+        code or inline methods. */
+    internal::cpu_ctl_env_space my_cpu_ctl_env;
+#endif
 
     //! Specifies whether cancellation was requested for this task group.
     uintptr_t my_cancellation_requested;
@@ -436,7 +444,7 @@ public:
     task_group_context ( kind_type relation_with_parent = bound,
                          uintptr_t traits = default_traits )
         : my_kind(relation_with_parent)
-        , my_version_and_traits(1 | traits)
+        , my_version_and_traits(2 | traits)
     {
         init();
     }
@@ -476,6 +484,18 @@ public:
         of the scheduler's dispatch loop exception handler. **/
     void __TBB_EXPORTED_METHOD register_pending_exception ();
 
+#if __TBB_FP_CONTEXT
+    //! Captures the current FPU control settings to the context.
+    /** Because the method assumes that all the tasks that used to be associated with
+        this context have already finished, calling it while the context is still
+        in use somewhere in the task hierarchy leads to undefined behavior.
+
+        IMPORTANT: This method is not thread safe!
+
+        The method does not change the FPU control settings of the context's parent. **/
+    void __TBB_EXPORTED_METHOD capture_fp_settings ();
+#endif
+
 #if __TBB_TASK_PRIORITY
     //! Changes priority of the task group
     void set_priority ( priority_t );
@@ -502,15 +522,17 @@ private:
     template <typename T>
     void propagate_task_group_state ( T task_group_context::*mptr_state, task_group_context& src, T new_state );
 
-    //! Makes sure that the context is registered with a scheduler instance.
-    inline void finish_initialization ( internal::generic_scheduler *local_sched );
-
     //! Registers this context with the local scheduler and binds it to its parent context
     void bind_to ( internal::generic_scheduler *local_sched );
 
     //! Registers this context with the local scheduler
     void register_with ( internal::generic_scheduler *local_sched );
 
+#if __TBB_FP_CONTEXT
+    //! Copies FPU control setting from another context
+    // TODO: Consider adding #else stub in order to omit #if sections in other code
+    void copy_fp_settings( const task_group_context &src );
+#endif /* __TBB_FP_CONTEXT */
 }; // class task_group_context
 
 #endif /* __TBB_TASK_GROUP_CONTEXT */
@@ -653,13 +675,6 @@ public:
         prefix().state = to_enqueue;
     }
 #endif /* __TBB_RECYCLE_TO_ENQUEUE */
-
-    // All depth-related methods are obsolete, and are retained for the sake
-    // of backward source compatibility only
-    intptr_t depth() const {return 0;}
-    void set_depth( intptr_t ) {}
-    void add_to_depth( int ) {}
-
 
     //------------------------------------------------------------------------
     // Spawning and blocking

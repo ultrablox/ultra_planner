@@ -10,13 +10,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\sliding_puzzle\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\sliding_puzzle\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\sliding_puzzle\sliding_puzzle.h">
-      <Filter>src</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\sliding_puzzle\sliding_puzzle.h" />
   </ItemGroup>
 </Project>

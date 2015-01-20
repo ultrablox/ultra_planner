@@ -16,7 +16,7 @@ class search_queue
 	typedef C comparator_t;
 	//typedef std::vector<value_t> layer_container_t;
 	typedef std::list<value_t> layer_container_t;
-	static const int MaxPrimaryLayers = 100;
+	static const int MaxPrimaryLayers = 3;
 
 	//static_assert(std::is_pod<priority_component_t>::value, "Priority conmonent must be POD");
 public:

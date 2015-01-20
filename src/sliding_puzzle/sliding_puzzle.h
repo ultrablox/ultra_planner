@@ -193,7 +193,7 @@ public:
 		for(int i = 0; i < permutation_count; ++i)
 		{
 			vector<transition_t> possible_trans;
-			puzzle.forall_available_transitions(state, [&](transition_t transition){
+			puzzle.forall_available_transitions(state, [&](const transition_t & transition){
 				if(last_transition != transition)
 					possible_trans.push_back(transition);
 			});

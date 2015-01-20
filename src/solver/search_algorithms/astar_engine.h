@@ -13,12 +13,10 @@ struct astar_node_priority_cmp
 	{
 		float sum1 = get<1>(lhs) + get<0>(lhs),
 			sum2 = get<1>(rhs) + get<0>(rhs);
-
 		/*if (sum1 == sum2)
 			return get<0>(lhs) < get<0>(rhs);
 		else
 			return sum1 < sum2;*/
-
 		return sum1 < sum2;
 	}
 };
@@ -27,8 +25,11 @@ template<typename N, typename H, bool ExtMemory>
 class astar_engine : public queued_search_engine<N, float, astar_node_priority_cmp, ExtMemory>
 {
 	typedef float estimation_t;
-	typedef public queued_search_engine<N, float, astar_node_priority_cmp, ExtMemory> _Base;
+	typedef queued_search_engine<N, float, astar_node_priority_cmp, ExtMemory> _Base;
 	typedef H heuristic_t;
+	using search_node_t = typename _Base::search_node_t;
+	using state_t = typename _Base::state_t;
+	using comparison_t = typename _Base::comparison_t;
 public:
 	template<typename Gr>
 	astar_engine(Gr & graph)

@@ -31,11 +31,11 @@ class batched_engine : public queued_search_engine<N, float, batched_priority_cm
 	typedef H heuristic_t;
 	typedef typename _Base::state_t state_t;
 
-	typedef std::tuple<size_t, search_node_t, estimation_t> expanded_node_t;
+	typedef std::tuple<size_t, search_node_t/*, estimation_t*/> expanded_node_t;
 	typedef std::vector<expanded_node_t> expanded_nodes_container_t;
 public:
 	template<typename Tr>
-	batched_engine(const Tr & transition_system, size_t batch_size = 800)
+	batched_engine(const Tr & transition_system, size_t batch_size = 1000)
 		:_Base(transition_system), m_batchSize(batch_size)
 	{}
 
@@ -63,11 +63,13 @@ public:
 			
 			expand_best_nodes(graph);
 
-			estimate_expand_buffer([&](const state_t & state){
+			/*estimate_expand_buffer([&](const state_t & state){
+				return h_fun(state);
+			});*/
+
+			merge(is_goal_fun, [&](const state_t & state){
 				return h_fun(state);
 			});
-
-			merge(is_goal_fun);
 		}
 
 		m_finished = true;
@@ -99,7 +101,7 @@ private:
 			});*/
 
 			graph.forall_adj_verts(get<2>(*it), [&](const state_t & state){
-				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1), -1.0f));
+				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1)/*, -1.0f*/));
 			});
 		}
 
@@ -142,7 +144,7 @@ private:
 		//Remove duplications
 
 		//Sort (parallel) by hash
-		std::sort(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & n1, const expanded_node_t & n2){
+		sort_wrapper(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & n1, const expanded_node_t & n2){
 			return get<0>(n1) < get<0>(n2);
 		});
 		
@@ -195,8 +197,8 @@ private:
 	}
 
 	
-		template<typename IsGoalFun>
-		void merge(IsGoalFun is_goal)
+		template<typename IsGoalFun, typename EstFun>
+		void merge(IsGoalFun is_goal, EstFun est_fun)
 		{
 			m_database.add_range(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & exp_node){
 				return get<0>(exp_node);
@@ -204,7 +206,7 @@ private:
 				return get<2>(get<1>(exp_node));
 			}, [=](const expanded_node_t & expanded_node){
 				search_node_t new_node = create_node(get<2>(get<1>(expanded_node)), get<1>(get<1>(expanded_node)));
-				enqueue(is_goal, new_node, get<2>(expanded_node));
+				enqueue(is_goal, new_node, est_fun(get<2>(get<1>(expanded_node))));
 			});
 
 			m_expandBuffer.clear();

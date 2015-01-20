@@ -1,29 +1,21 @@
 /*
     Copyright 2005-2014 Intel Corporation.  All Rights Reserved.
 
-    This file is part of Threading Building Blocks.
+    This file is part of Threading Building Blocks. Threading Building Blocks is free software;
+    you can redistribute it and/or modify it under the terms of the GNU General Public License
+    version 2  as  published  by  the  Free Software Foundation.  Threading Building Blocks is
+    distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See  the GNU General Public License for more details.   You should have received a copy of
+    the  GNU General Public License along with Threading Building Blocks; if not, write to the
+    Free Software Foundation, Inc.,  51 Franklin St,  Fifth Floor,  Boston,  MA 02110-1301 USA
 
-    Threading Building Blocks is free software; you can redistribute it
-    and/or modify it under the terms of the GNU General Public License
-    version 2 as published by the Free Software Foundation.
-
-    Threading Building Blocks is distributed in the hope that it will be
-    useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Threading Building Blocks; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-    As a special exception, you may use this file as part of a free software
-    library without restriction.  Specifically, if other files instantiate
-    templates or use macros or inline functions from this file, or you compile
-    this file and link it with other files to produce an executable, this
-    file does not by itself cause the resulting executable to be covered by
-    the GNU General Public License.  This exception does not however
-    invalidate any other reasons why the executable file might be covered by
-    the GNU General Public License.
+    As a special exception,  you may use this file  as part of a free software library without
+    restriction.  Specifically,  if other files instantiate templates  or use macros or inline
+    functions from this file, or you compile this file and link it with other files to produce
+    an executable,  this file does not by itself cause the resulting executable to be covered
+    by the GNU General Public License. This exception does not however invalidate any other
+    reasons why the executable file might be covered by the GNU General Public License.
 */
 
 #ifndef __TBB_parallel_reduce_H
@@ -37,7 +29,7 @@
 
 namespace tbb {
 
-namespace interface6 {
+namespace interface7 {
 //! @cond INTERNAL
 namespace internal {
 
@@ -59,7 +51,7 @@ namespace internal {
         bool has_right_zombie;
         const reduction_context my_context;
         Body* my_body;
-        aligned_space<Body,1> zombie_space;
+        aligned_space<Body> zombie_space;
         finish_reduce( reduction_context context_ ) :
             has_right_zombie(false), // TODO: substitute by flag_task::child_stolen?
             my_context(context_),
@@ -116,10 +108,10 @@ public:
         }
         //! Splitting constructor used to generate children.
         /** parent_ becomes left child.  Newly constructed object is right child. */
-        start_reduce( start_reduce& parent_, split ) :
+        start_reduce( start_reduce& parent_, typename Partitioner::split_type& split_obj ) :
             my_body(parent_.my_body),
-            my_range(parent_.my_range, split()),
-            my_partition(parent_.my_partition, split()),
+            my_range(parent_.my_range, split_obj),
+            my_partition(parent_.my_partition, split_obj),
             my_context(right_child)
         {
             my_partition.set_affinity(*this);
@@ -160,11 +152,11 @@ public:
 
         //! spawn right task, serves as callback for partitioner
         // TODO: remove code duplication from 'offer_work' methods
-        void offer_work(split) {
+        void offer_work(typename Partitioner::split_type& split_obj) {
             task *tasks[2];
             allocate_sibling(static_cast<task*>(this), tasks, sizeof(start_reduce), sizeof(finish_type));
             new((void*)tasks[0]) finish_type(my_context);
-            new((void*)tasks[1]) start_reduce(*this, split());
+            new((void*)tasks[1]) start_reduce(*this, split_obj);
             spawn(*tasks[1]);
         }
         //! spawn right task, serves as callback for partitioner
@@ -289,8 +281,8 @@ public:
 
 //! @cond INTERNAL
 namespace internal {
-    using interface6::internal::start_reduce;
-    using interface6::internal::start_deterministic_reduce;
+    using interface7::internal::start_reduce;
+    using interface7::internal::start_deterministic_reduce;
     //! Auxiliary class for parallel_reduce; for internal use only.
     /** The adaptor class that implements \ref parallel_reduce_body_req "parallel_reduce Body"
         using given \ref parallel_reduce_lambda_req "anonymous function objects".

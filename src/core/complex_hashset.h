@@ -9,7 +9,7 @@
 #include <map>
 #include <stxxl.h>
 #include "cached_file.h"
-
+#include <core/utils/helpers.h>
 
 template<typename T, typename H = std::hash<T>, bool UseIntMemory = true, unsigned int BlockSize = 8192U, typename... KeyPart>//65536U //4096U // 8192U
 class complex_hashset
@@ -247,6 +247,8 @@ class complex_hashset
 		void write(It begin, It end)
 		{
 			//cout << "Writing sequence of " << std::distance(begin, end) << " blocks." << std::endl;
+			int write_count(0);
+
 			auto it = begin;
 			while (it != end)
 			{
@@ -261,9 +263,12 @@ class complex_hashset
 				}
 
 				m_storage.write_range(&(*it), it->id, std::distance(it, last_gr_it));
+				++write_count;
 
 				it = last_gr_it;
 			}
+
+			//cout << "Write I/O gain " << (float)write_count / std::distance(begin, end) << std::endl;
 		}
 	private:
 		direct_paged_vector_t m_storage;
@@ -296,7 +301,7 @@ public:
 
 	template<typename SerFun, typename DesFun>
 	complex_hashset(int serialized_element_size, SerFun s_fun, DesFun d_fun)
-		:m_serializeFun(s_fun), m_deserializeFun(d_fun), m_serializedValueSize(serialized_element_size), m_serializedElementSize(serialized_element_size + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(serialized_element_size), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0)
+		:m_serializeFun(s_fun), m_deserializeFun(d_fun), m_serializedValueSize(serialized_element_size), m_serializedElementSize(serialized_element_size + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(serialized_element_size), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0), m_writeQueue(20480)
 	{
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");
@@ -358,18 +363,21 @@ public:
 
 		size_t total_count = std::distance(begin, end);
 
+		//Allocate buffer for blocks to be writen
+		//resize_if_less(m_writeQueue, block_descrs.size() * 2);
+		m_writeQueueIndex = 0;
+
 		//if (total_count == 253)
 		//cout << "Inserting " << total_count << " elements into hashset" << std::endl;
 
 		//Get ordered seqeunce of blocks
 		vector<block_descr_t> block_descrs;
-		std::vector<block_t> write_queue;
 
 		//Create new blocks for all elements with hash less then min value (or all - if empty)
 		auto it = m_indicesTree.empty() ? end : std::lower_bound(begin, end, m_indicesTree.begin()->first, [=](const typename It::value_type & val1, size_t max_val){
 			return hash_fun(val1) < max_val;
 		});
-		create_chained_blocks(begin, it, write_queue, [=](const typename It::value_type & val){
+		create_chained_blocks(begin, it, [=](const typename It::value_type & val){
 			return hash_fun(val);
 		}, val_fun);
 		for_each(begin, it, success_fun);
@@ -407,10 +415,9 @@ public:
 		}
 
 		//Sort blocks by their ordering
-		std::sort(block_descrs.begin(), block_descrs.end(), [](const block_descr_t & lhs, const block_descr_t & rhs){
+		sort_wrapper(block_descrs.begin(), block_descrs.end(), [](const block_descr_t & lhs, const block_descr_t & rhs){
 			return get<0>(lhs) < get<0>(rhs);
 		});
-
 
 		//Now process the blocks
 		for (auto & block_descr : block_descrs)
@@ -480,26 +487,28 @@ public:
 
 			std::inplace_merge(old_vals.begin(), old_vals.begin() + old_vals_count, old_vals.end(), cmp);
 
-			create_chained_blocks(old_vals.begin(), old_vals.end(), write_queue, [](const combined_value_t & val){
+			create_chained_blocks(old_vals.begin(), old_vals.end(), [](const combined_value_t & val){
 				return val.first;
 			}, [](const combined_value_t & val){
 				return val.second;
 			});
 		}
 
+		//cout << m_writeQueueIndex << std::endl;
 		//Process write queue
-		std::sort(write_queue.begin(), write_queue.end(), [](const block_t & b1, const block_t & b2){
+		auto last_write_it = m_writeQueue.begin() + m_writeQueueIndex;
+		sort_wrapper(m_writeQueue.begin(), last_write_it, [](const block_t & b1, const block_t & b2){
 			return b1.id < b2.id;
 		});
 
-		for (auto & b : write_queue)
+		for (auto it = m_writeQueue.begin(); it != last_write_it; ++it)
 		{
 			//Update index only for chain beginnings
-			if (b.prev == std::numeric_limits<size_t>::max())
-				m_indicesTree.insert(make_pair(b.first_hash(), b.id));
+			if (it->prev == std::numeric_limits<size_t>::max())
+				m_indicesTree.insert(make_pair(it->first_hash(), it->id));
 		}
 
-		m_blocks.write(write_queue.begin(), write_queue.end());
+		m_blocks.write(m_writeQueue.begin(), last_write_it);
 	}
 
 	size_t size() const
@@ -668,50 +677,51 @@ private:
 		return iterator(block_id, item_index);
 	}
 
-	template<typename It, typename OutCont, typename HashExtractor, typename ValExtractor>
-	void create_chained_blocks(It begin, It end, OutCont & output, HashExtractor hash_fun, ValExtractor val_fun)
+	template<typename It, typename HashExtractor, typename ValExtractor>
+	void create_chained_blocks(It begin, It end, HashExtractor hash_fun, ValExtractor val_fun)
 	{
 		auto gr_end_it = begin, last_gr_end = begin;
 		while (gr_end_it != end)
 		{
 			gr_end_it = UltraCore::find_group_end(gr_end_it, end, m_maxItemsInBlock, [=](const typename It::value_type & val){return hash_fun(val); });
 		
+			int block_id = m_writeQueueIndex++;
+			m_writeQueue[block_id].id = request_block();
+			m_writeQueue[block_id].prev = std::numeric_limits<size_t>::max();
+			m_writeQueue[block_id].item_count = 0;
+
 			size_t group_size = std::distance(last_gr_end, gr_end_it);
 			if (group_size > m_maxItemsInBlock) //Needs real chaining
 			{
 				//cout << "Creating chain with length " << std::distance(last_gr_end, gr_end_it) << std::endl;
-				std::vector<block_t> chain(integer_ceil(group_size, m_maxItemsInBlock));
+				//std::vector<block_t> chain(integer_ceil(group_size, m_maxItemsInBlock));
 
-				int block_id = 0;
+				int prev_block_id = -1;
 				
 				for(auto it = last_gr_end; it != gr_end_it; ++it)
 				{
-					if (chain[block_id].item_count == m_maxItemsInBlock)
-						++block_id;
-					append_to_block(chain[block_id], hash_fun(*it), val_fun(*it));
-				}
-
-				for (int i = 0; i < chain.size(); ++i)
-				{
-					chain[i].id = request_block();
-
-					if (i != 0)
+					if (m_writeQueue[block_id].item_count == m_maxItemsInBlock)
 					{
-						chain[i].prev = chain[i - 1].id;
-						chain[i - 1].next = chain[i].id;
-					}	
+						prev_block_id = block_id;
+						block_id = m_writeQueueIndex++;
+						m_writeQueue[block_id].id = request_block();
+						if (prev_block_id != -1)
+						{
+							m_writeQueue[block_id].item_count = 0;
+							m_writeQueue[block_id].prev = m_writeQueue[prev_block_id].id;
+							m_writeQueue[prev_block_id].next = m_writeQueue[block_id].id;
+						}
+					}
+	
+					append_to_block(m_writeQueue[block_id], hash_fun(*it), val_fun(*it));
 				}
-				
-				for (auto & b : chain)
-					output.push_back(std::move(b));
 			}
 			else
 			{
-				block_t block;
-				block.id = request_block();
+				m_writeQueue[block_id].next = std::numeric_limits<size_t>::max();
+
 				for (auto it = last_gr_end; it != gr_end_it; ++it)
-					append_to_block(block, hash_fun(*it), val_fun(*it));
-				output.push_back(std::move(block));
+					append_to_block(m_writeQueue[block_id], hash_fun(*it), val_fun(*it));
 			}
 
 			last_gr_end = gr_end_it;
@@ -756,6 +766,17 @@ private:
 		return (float)block.item_count / (block.vacant_count(m_serializedElementSize) + (float)block.item_count);
 	}
 
+/*
+	template<typename St>
+	void init_storage(St & str)
+	{}
+
+	template<>
+	void init_storage<cached_paged_vector_t>(cached_paged_vector_t & str)
+	{
+		str.open("state_database.dat");
+	}
+*/
 private:
 	hasher_t m_hasher;
 	serialize_fun_type m_serializeFun;
@@ -774,7 +795,9 @@ private:
 	size_t m_size, m_blockCount;
 	const int m_maxItemsInBlock;
 	std::queue<size_t> m_freedBlocks;
-	
+
+	std::vector<block_t> m_writeQueue;
+	int m_writeQueueIndex;
 };
 
 #endif
