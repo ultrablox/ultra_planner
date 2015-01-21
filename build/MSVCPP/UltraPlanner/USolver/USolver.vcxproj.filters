@@ -69,9 +69,6 @@
     <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\UExternalMemoryController.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\solver\USolverBase.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -137,9 +134,6 @@
     <ClInclude Include="..\..\..\..\src\solver\database\search_database.h">
       <Filter>src\database</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\UExternalMemoryController.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -163,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.h">
       <Filter>src\heuristics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\serial_engine.h">
+      <Filter>src\search_algorithms</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

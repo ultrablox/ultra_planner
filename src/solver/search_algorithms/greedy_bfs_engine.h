@@ -15,6 +15,19 @@ struct greedy_bfs_node_priority_cmp
 	}
 };
 
+template<typename Gr, typename H, bool ExtMemory>
+class greedy_bfs_engine : public heuristic_engine<Gr, greedy_bfs_node_priority_cmp, H, ExtMemory>
+{
+	using _Base = heuristic_engine<Gr, greedy_bfs_node_priority_cmp, H, ExtMemory>;
+public:
+	//template<typename Gr>
+	greedy_bfs_engine(Gr & graph)
+		:_Base(graph)
+	{}
+};
+
+
+/*
 template<typename N, typename H, bool ExtMemory>
 class greedy_bfs_engine : public queued_search_engine<N, float, greedy_bfs_node_priority_cmp, ExtMemory>
 {
@@ -49,21 +62,21 @@ public:
 				best_data = get<0>(current_data);
 				cout << "Best heuristic: " << best_data << std::endl;
 
-				/*graph.transition_system().serialize_state(cout, get<2>(cur_node));*/
+				//graph.transition_system().serialize_state(cout, get<2>(cur_node));
 			}
 
 
 			graph.forall_adj_verts(get<2>(cur_node), [&](const state_t & state){
 
 				//Check that node is not expanded or discovered by trying to add
-				auto res = _Base::m_database.add(state);
+				auto res = this->m_database.add(state);
 				if (res)
 				{
 					//search_node_t new_node = create_node(state, get<0>(cur_node));
-					search_node_t new_node = _Base::m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
+					search_node_t new_node = this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
 					auto res = this->enqueue(is_goal, new_node, h_fun(state));
 					if (res.first)
-						_Base::m_database.compress_keys_less(res.second);
+						this->m_database.compress_keys_less(res.second);
 				}
 			});
 		}
@@ -76,5 +89,5 @@ public:
 		return !_Base::m_goalNodes.empty();
 	}
 };
-
+*/
 #endif

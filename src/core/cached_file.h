@@ -47,7 +47,7 @@ public:
 
 	void open(const std::string file_name)
 	{
-		m_file.open(file_name);
+		//m_file.open(file_name);
 	}
 
 	void write_range(const std::vector<record_t> & write_queue)

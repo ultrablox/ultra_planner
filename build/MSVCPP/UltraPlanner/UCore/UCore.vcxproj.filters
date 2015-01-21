@@ -54,8 +54,11 @@
     <ClCompile Include="..\..\..\..\src\core\UMatrix.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\expression\UNumericExpression.cpp">
-      <Filter>src\expression</Filter>
+    <ClCompile Include="..\..\..\..\src\core\expression\UNumericExpression.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\UExternalMemoryController.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,20 +89,11 @@
     <ClInclude Include="..\..\..\..\src\core\UMatrix.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\expression\UNumericExpression.h">
-      <Filter>src\expression</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h">
       <Filter>src\algorithm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\transition_system\transition_system.h">
       <Filter>src\transition_system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\core\complex_vector.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\complex_hashset.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h">
       <Filter>src\algorithm</Filter>
@@ -118,6 +112,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\algorithm\merge.h">
       <Filter>src\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\buffered_complex_hashset.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\direct_complex_hashset.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset_base.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_vector.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\UExternalMemoryController.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

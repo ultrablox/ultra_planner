@@ -1,7 +1,8 @@
 
 #include "helpers.h"
 #include <core/complex_vector.h>
-#include <core/complex_hashset.h>
+#include <core/direct_complex_hashset.h>
+#include <core/buffered_complex_hashset.h>
 #include <random>
 #include <chrono>
 #include <unordered_set>
@@ -187,7 +188,7 @@ void test_complex_hashmap()
 	{
 		std::unordered_set<complex_element> correct_set;
 
-		complex_hashset<complex_element> hset(sizeof(int)* 3,
+		buffered_complex_hashset<complex_element> hset(sizeof(int)* 3,
 			[](void * dst, const complex_element & el){
 			memcpy(dst, &el.m_data[0], sizeof(int)* 3);
 		},
@@ -236,7 +237,7 @@ void test_complex_hashmap()
 	}
 	//Test add_range
 	{
-		complex_hashset<complex_element, std::hash<complex_element>, true, 256U> hset(sizeof(int)* 3,
+		direct_complex_hashset<complex_element, std::hash<complex_element>, true, 256U> hset(sizeof(int)* 3,
 			[](void * dst, const complex_element & el){
 			memcpy(dst, &el.m_data[0], sizeof(int)* 3);
 		},
@@ -260,7 +261,7 @@ void test_complex_hashmap()
 			{
 				auto begin_it = ins_data.begin() + i * 100, end_it = ins_data.begin() + i * 100 + 90;
 
-				hset.insert(begin_it, end_it, [=](const complex_element & el){
+				hset.insert_range(begin_it, end_it, [=](const complex_element & el){
 					return hasher(el);
 				}, [](const complex_element & el){
 					return el;

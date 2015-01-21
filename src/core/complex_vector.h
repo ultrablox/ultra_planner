@@ -10,14 +10,15 @@
 
 using namespace std;
 
-template<typename T, bool ExtMemory = false>
+template<typename T, typename S, bool ExtMemory = false>
 class complex_vector
 {
 	friend class proxy;
 	friend class iterator_base;
 public:
-	typedef complex_vector<T> _Self;
+	typedef complex_vector<T, S> _Self;
 	typedef T value_type;
+	using streamer_t = S;
 	typedef int base_type_t;
 	typedef std::function<void(const void*, value_type &)> deserialize_fun_type;
 	typedef std::function<void(void*, const value_type &)> serialize_fun_type;
@@ -171,15 +172,16 @@ public:
 	typedef iterator_base<_Self> iterator;
 	typedef iterator_base<const _Self> const_iterator;
 
-	template<typename SerFun, typename DesFun>
-	complex_vector(int serialized_element_size, SerFun s_fun, DesFun d_fun)
-		:m_serializeFun(s_fun), m_deserializeFun(d_fun), m_elementSize(integer_ceil(serialized_element_size, sizeof(base_type_t))), m_valueTmp(serialized_element_size)
+	//template<typename SerFun, typename DesFun>
+	complex_vector(const streamer_t & _steamer/*, int serialized_element_size, SerFun s_fun, DesFun d_fun*/)
+		:m_streamer(_steamer), /*m_serializeFun(s_fun), m_deserializeFun(d_fun),*/ m_elementSize(integer_ceil(m_streamer.serialized_size(), sizeof(base_type_t))), m_valueTmp(m_streamer.serialized_size())
 	{
 	}
 
 	void push_back(const value_type & new_val)
 	{
-		m_serializeFun(&m_valueTmp[0], new_val);
+		//m_serializeFun(&m_valueTmp[0], new_val);
+		m_streamer.serialize(&m_valueTmp[0], new_val);
 
 		for(int i = 0; i < m_elementSize; ++i)
 			m_data.push_back(m_valueTmp[i]);
@@ -193,7 +195,8 @@ public:
 	value_type operator[](size_t index) const
 	{
 		value_type res;
-		m_deserializeFun(&m_data[index * m_elementSize], res);
+		//m_deserializeFun(&m_data[index * m_elementSize], res);
+		m_streamer.deserialize(&m_data[index * m_elementSize], res);
 		return std::move(res);
 	}
 
@@ -238,8 +241,9 @@ public:
 		return m_data.empty();
 	}
 private:
-	serialize_fun_type m_serializeFun;
-	deserialize_fun_type m_deserializeFun;
+	streamer_t m_streamer;
+	//serialize_fun_type m_serializeFun;
+	//deserialize_fun_type m_deserializeFun;
 
 	//Number of base elements per one value_type
 	const int m_elementSize;

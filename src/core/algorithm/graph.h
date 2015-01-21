@@ -32,8 +32,9 @@ vertices and edges.
 template<typename V>
 class explicit_graph : public simple_graph<V>
 {
-	typedef V vertex_t;
 public:
+	typedef V vertex_t;
+
 	template<typename Verts, typename Edges>
 	explicit_graph(const Verts & verts, const Edges & edgs)
 	{
@@ -77,8 +78,9 @@ known, before they were discovered.
 template<typename V>
 class implicit_graph : public simple_graph<V>
 {
+public:	
 	typedef V vertex_t;
-public:
+
 	template<typename AdjFun>
 	implicit_graph(AdjFun adj_fun)
 		:m_adjGetter(adj_fun)
@@ -99,10 +101,11 @@ private:
 template<typename TS>
 class transition_system_graph
 {
-	typedef TS transition_system_t;
-	typedef typename transition_system_t::state_t vertex_t;
-
 public:
+	typedef TS transition_system_t;
+	using vertex_t = typename transition_system_t::state_t;
+	using vertex_streamer_t = typename transition_system_t::state_streamer_t;
+
 	transition_system_graph(transition_system_t & ts)
 		:m_system(ts)
 	{
@@ -119,7 +122,7 @@ public:
 		return m_system;
 	}
 
-	int serialized_state_size() const
+	/*int serialized_state_size() const
 	{
 		return m_system.serialized_state_size();
 	}
@@ -132,7 +135,7 @@ public:
 	void deserialize_state(const void * src, vertex_t & vertex) const
 	{
 		m_system.deserialize_state(src, vertex);
-	}
+	}*/
 private:
 	transition_system_t & m_system;
 };

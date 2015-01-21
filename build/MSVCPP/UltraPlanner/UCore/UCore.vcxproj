@@ -278,11 +278,14 @@
     <ClCompile Include="..\..\..\..\src\core\transition_system\UTransitionSystem.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UBitset.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UError.cpp" />
+    <ClCompile Include="..\..\..\..\src\core\UExternalMemoryController.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UMatrix.cpp" />
     <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\core\buffered_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_vector.h" />
+    <ClInclude Include="..\..\..\..\src\core\direct_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h" />
@@ -291,7 +294,7 @@
     <ClInclude Include="..\..\..\..\src\core\algorithm\sort.h" />
     <ClInclude Include="..\..\..\..\src\core\cache.h" />
     <ClInclude Include="..\..\..\..\src\core\cached_file.h" />
-    <ClInclude Include="..\..\..\..\src\core\complex_hashset.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset_base.h" />
     <ClInclude Include="..\..\..\..\src\core\config.h" />
     <ClInclude Include="..\..\..\..\src\core\data_file.h" />
     <ClInclude Include="..\..\..\..\src\core\transition_system\transition_system.h" />
@@ -300,6 +303,7 @@
     <ClInclude Include="..\..\..\..\src\core\transition_system\UTransitionSystem.h" />
     <ClInclude Include="..\..\..\..\src\core\UBitset.h" />
     <ClInclude Include="..\..\..\..\src\core\UError.h" />
+    <ClInclude Include="..\..\..\..\src\core\UExternalMemoryController.h" />
     <ClInclude Include="..\..\..\..\src\core\UMatrix.h" />
     <ClInclude Include="..\..\..\..\src\core\utils\helpers.h" />
   </ItemGroup>

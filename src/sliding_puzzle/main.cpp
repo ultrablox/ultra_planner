@@ -48,21 +48,22 @@ public:
 
 		//m_system.set_state(state);
 
-		transition_system_graph<transition_system_t> graph(m_system);
+		typedef transition_system_graph<transition_system_t> graph_t;
+		graph_t graph(m_system);
 		
 
 		if (alg_name == "A*")
-			solve_with_engine<astar_engine<typename transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
+			solve_with_engine<astar_engine<graph_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		else if (alg_name == "BA*")
-			solve_with_engine<batched_engine<typename transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
+			solve_with_engine<batched_engine<graph_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		else if (alg_name == "GBFS")
-			solve_with_engine<greedy_bfs_engine<typename transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
+			solve_with_engine<greedy_bfs_engine<graph_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		
 	}
 private:
 
 	template<typename EngType, typename GraphT, typename StateT>
-	void solve_with_engine(const GraphT & graph, const StateT & initial_state)
+	void solve_with_engine(GraphT & graph, const StateT & initial_state)
 	{
 		EngType search_engine(graph);
 

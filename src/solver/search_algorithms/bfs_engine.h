@@ -3,10 +3,7 @@
 #ifndef UltraSolver_bfs_engine_h
 #define UltraSolver_bfs_engine_h
 
-#include "queued_engine.h"
-#include <vector>
-#include <functional>
-#include <iostream>
+#include "serial_engine.h"
 
 
 using namespace std;
@@ -26,6 +23,18 @@ struct bfs_node_priority_cmp
 	}
 };
 
+template<typename Gr>
+class bfs_engine : public blind_engine<Gr, bfs_node_priority_cmp>
+{
+	using _Base = blind_engine<Gr, bfs_node_priority_cmp>;
+public:
+	//template<typename Gr>
+	bfs_engine(Gr & graph)
+		:_Base(graph)
+	{}
+};
+
+/*
 template<typename N>
 class bfs_engine : public queued_search_engine<N, bool, bfs_node_priority_cmp>
 {
@@ -41,9 +50,7 @@ public:
 		:_Base(graph)
 	{}
 
-	/*
-	Returns true, if found.
-	*/
+	//Returns true, if found.
 	template<typename GraphT>
 	bool operator()(GraphT & graph, state_t init_node, std::function<bool(const state_t & node)> goal_check_fun, std::vector<state_t> & solution_path)
 	{
@@ -55,10 +62,6 @@ public:
 			//Pop node for expansion and mark as expanded
 			search_node_t cur_node = dequeue();
 
-			/*forall_adj_vertices<true>(graph, get<2>(cur_node), [&](state_t state){
-				search_node_t new_node = create_node(state, get<0>(cur_node));
-				enqueue(goal_check_fun, new_node, step);
-			});*/
 
 			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
@@ -78,6 +81,7 @@ public:
 	}
 
 };
+*/
 
 #endif
 

@@ -76,22 +76,65 @@ size_t mr_hash(int n, T & Pi, T & PiInv)
 	return s + n * mr_hash(n-1, Pi, PiInv);
 }
 
+template<typename T>
+size_t mr_hash(int _n, T & Pi, T & PiInv, vector<size_t> & cache)
+{
+	size_t res(0);
+	for (int n = _n; n > 1; --n)
+	{
+		int s = Pi[n - 1];
+		std::swap(Pi[n - 1], Pi[PiInv[n - 1]]);
+		std::swap(PiInv[s], PiInv[n - 1]);
+		cache[n - 2] = s;
+	}
+
+	for (int i = 0; i < _n-1; ++i)
+		res = cache[i] + (i+2) * res;
+
+	return res;
+}
+
 namespace std {
 template<>
 class hash<puzzle_state>
 {
 	typedef unsigned char element_t;
 public:
-    size_t operator()(const puzzle_state & state) const
-    {
-		const int size = state.data.size();
+	hash()
+	{
+		cache.m_size = 0;
+	}
 
-		vector<element_t> Pi = state.data, PiInv(size);
-		for(int i = 0; i < size; ++i)
-			PiInv[Pi[i]] = i;
-		return mr_hash(size, Pi, PiInv);
+	size_t operator()(const puzzle_state & state) const
+	{
+		const int size = state.data.size();
+		if (cache.m_size != size)
+		{
+			cache.m_size = size;
+			cache.Pi.resize(size);
+			cache.PiInv.resize(size);
+			cache.cache.resize(size-1);
+		}
+
+		//vector<element_t> Pi = state.data;
+		cache.Pi = state.data;
+
+		//vector<element_t> Pi = state.data, PiInv(size);
+		for (int i = 0; i < size; ++i)
+			cache.PiInv[cache.Pi[i]] = i;
+		
+		//return mr_hash(size, cache.Pi, cache.PiInv);
+		return mr_hash(size, cache.Pi, cache.PiInv, cache.cache);
+
 		//return mr_hash(size, Pi, PiInv) % 2;
-    }
+	}
+private:
+	mutable struct
+	{
+		int m_size;
+		vector<element_t> Pi, PiInv;/**/
+		vector<size_t> cache;
+	} cache;
 };
 }
 
@@ -104,6 +147,39 @@ public:
 
 	typedef int transition_t;
 	typedef std::pair<int, int> size_description_t;
+	
+	class state_streamer_t
+	{
+	public:
+		state_streamer_t(const sliding_puzzle & _puzzle)
+			:m_size(_puzzle.m_size), m_serializedStateSize(m_size.first * m_size.second * sizeof(state_t::plate_t))
+		{}
+
+		size_t serialized_size() const
+		{
+			return m_serializedStateSize;
+		}
+
+		void serialize(void * dst, const state_t & state) const
+		{
+			memcpy(dst, &state.data[0], m_serializedStateSize);
+		}
+
+		void deserialize(const void * src, state_t & state) const
+		{
+			state.data.resize(m_serializedStateSize);
+			memcpy(&state.data[0], src, m_serializedStateSize);
+
+			//Obtain empty pos
+			auto it = std::find(state.data.begin(), state.data.end(), 0);
+			state.empty_pos = std::distance(state.data.begin(), it);
+		}
+
+	private:
+		size_description_t m_size;
+		size_t m_serializedStateSize;
+	};
+
 	
 	sliding_puzzle(size_description_t description)
 		:/*m_state(_state), */m_size(description)
@@ -239,7 +315,7 @@ public:
 		}
 	}
 
-	void serialize_state(void * dst, const state_t & state) const
+	/*void serialize_state(void * dst, const state_t & state) const
 	{
 		memcpy(dst, &state.data[0], serialized_state_size());
 	}
@@ -252,7 +328,7 @@ public:
 		//Obtain empty pos
 		auto it = std::find(state.data.begin(), state.data.end(), 0);
 		state.empty_pos = std::distance(state.data.begin(), it);
-	}
+	}*/
 
 	void deserialize_state(std::istream & is, state_t & state) const
 	{

@@ -7,22 +7,54 @@
 #include <vector>
 #include <functional>
 
-template<typename T, typename C>
+template<typename T, typename C, typename S>
 class search_queue
 {
 	typedef T combined_value_t;
 	typedef typename combined_value_t::first_type priority_component_t;
 	typedef typename combined_value_t::second_type value_t;
 	typedef C comparator_t;
+	using value_streamer = S;
 	//typedef std::vector<value_t> layer_container_t;
 	typedef std::list<value_t> layer_container_t;
 	static const int MaxPrimaryLayers = 3;
 
 	//static_assert(std::is_pod<priority_component_t>::value, "Priority conmonent must be POD");
+
+	class combined_val_streamer_t
+	{
+	public:
+		combined_val_streamer_t(const value_streamer & value_str)
+			:m_valStreamer(value_str), m_serializedSize(value_str.serialized_size() + sizeof(priority_component_t))
+		{
+		}
+
+		size_t serialized_size() const
+		{
+			return m_serializedSize;
+		}
+
+		void serialize(void * dst, const combined_value_t & val) const
+		{
+			char * ptr = (char*)dst;
+			memcpy(ptr, &val.first, sizeof(combined_value_t));
+			m_valStreamer.serialize(ptr + sizeof(combined_value_t), val.second);
+		}
+
+		void deserialize(const void * src, combined_value_t & val)
+		{
+			const char * ptr = (char*)src;
+			memcpy(&val.first, ptr, sizeof(combined_value_t));
+			m_valStreamer.deserialize(ptr + sizeof(combined_value_t), val.second);
+		}
+	private:
+		const value_streamer m_valStreamer;
+		size_t m_serializedSize;
+	};
 public:
 
-	search_queue(int serialized_value_size, std::function<void(char *, const value_t &)> ser_fun, std::function<void(const char *, value_t &)> des_fun)
-		:m_secondaryData(serialized_value_size + sizeof(priority_component_t), 
+	search_queue(const value_streamer & node_streamer/*, int serialized_value_size, std::function<void(char *, const value_t &)> ser_fun, std::function<void(const char *, value_t &)> des_fun*/)
+		:m_secondaryData(combined_val_streamer_t(node_streamer)/*, serialized_value_size + sizeof(priority_component_t),
 			[=](void * dst, const combined_value_t & val){
 				char * ptr = (char*)dst;
 				memcpy(ptr, &val.first, sizeof(combined_value_t));
@@ -32,7 +64,7 @@ public:
 				const char * ptr = (char*)src;
 				memcpy(&val.first, ptr, sizeof(combined_value_t));
 				des_fun(ptr + sizeof(combined_value_t), val.second);
-			}
+			}*/
 		)
 	{
 
@@ -201,7 +233,7 @@ private:
 	}
 private:
 	std::map<priority_component_t, layer_container_t, comparator_t> m_primaryData;
-	complex_vector<combined_value_t> m_secondaryData;
+	complex_vector<combined_value_t, combined_val_streamer_t> m_secondaryData;
 };
 
 #endif

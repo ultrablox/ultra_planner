@@ -22,11 +22,11 @@ struct batched_priority_cmp
 	}
 };
 
-template<typename N, typename H, bool ExtMemory>
-class batched_engine : public queued_search_engine<N, float, batched_priority_cmp, ExtMemory>
+template<typename Gr, typename H, bool ExtMemory>
+class batched_engine : public queued_search_engine<Gr, float, batched_priority_cmp, ExtMemory>
 {
-	typedef batched_engine<N, H, ExtMemory> _Self;
-	typedef queued_search_engine<N, float, batched_priority_cmp, ExtMemory> _Base;
+	typedef batched_engine<Gr, H, ExtMemory> _Self;
+	typedef queued_search_engine<Gr, float, batched_priority_cmp, ExtMemory> _Base;
 	typedef float estimation_t;
 	typedef H heuristic_t;
 	typedef typename _Base::state_t state_t;
@@ -36,9 +36,9 @@ class batched_engine : public queued_search_engine<N, float, batched_priority_cm
 	typedef std::tuple<size_t, search_node_t/*, estimation_t*/> expanded_node_t;
 	typedef std::vector<expanded_node_t> expanded_nodes_container_t;
 public:
-	template<typename Tr>
-	batched_engine(const Tr & transition_system, size_t batch_size = 1000)
-		:_Base(transition_system), m_batchSize(batch_size)
+	//template<typename Tr>
+	batched_engine(Gr & graph, size_t batch_size = 1000)
+		:_Base(graph), m_batchSize(batch_size)
 	{}
 
 	template<typename GraphT, typename IsGoalFun>

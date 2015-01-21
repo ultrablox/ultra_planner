@@ -19,6 +19,18 @@ struct dfs_node_priority_cmp
 	}
 };
 
+template<typename Gr>
+class dfs_engine : public blind_engine<Gr, dfs_node_priority_cmp>
+{
+	using _Base = blind_engine<Gr, dfs_node_priority_cmp>;
+public:
+	//template<typename Gr>
+	dfs_engine(Gr & graph)
+		:_Base(graph)
+	{}
+};
+
+/*
 template<typename N>
 class dfs_engine : public queued_search_engine<N, bool, dfs_node_priority_cmp>
 {
@@ -33,9 +45,7 @@ public:
 		:_Base(graph)
 	{}
 
-	/*
-	Returns true, if found.
-	*/
+	//Returns true, if found.
 	template<typename GraphT>
 	bool operator()(GraphT & graph, state_t init_node, std::function<bool(state_t node)> goal_check_fun, std::vector<state_t> & solution_path)
 	{
@@ -47,11 +57,6 @@ public:
 			//Pop node for expansion and mark as expanded
 			search_node_t cur_node = dequeue();
 
-			/*forall_adj_vertices<true>(graph, get<2>(cur_node), [&](state_t state){
-				search_node_t new_node = create_node(state, get<0>(cur_node));
-				enqueue(goal_check_fun, new_node, step);
-				//cout << "Enqueueing:" << node << std::endl;
-			});*/
 			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
 				m_database.add(state, [=](const state_t & state){
@@ -68,6 +73,6 @@ public:
 		//Build solution path
 		return !m_goalNodes.empty();
 	}
-};
+};*/
 
 #endif

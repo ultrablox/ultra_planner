@@ -308,7 +308,6 @@
     <ClCompile Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\UExternalMemoryController.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\USolverBase.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\UHeuristic.cpp" />
     <ClCompile Include="..\..\..\..\src\solver\UInstantiator.cpp" />
@@ -334,7 +333,7 @@
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\bfs_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\dfs_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\queued_engine.h" />
-    <ClInclude Include="..\..\..\..\src\solver\UExternalMemoryController.h" />
+    <ClInclude Include="..\..\..\..\src\solver\search_algorithms\serial_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\config.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\greedy_bfs_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\search_engine_base.h" />

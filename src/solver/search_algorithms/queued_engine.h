@@ -6,11 +6,12 @@
 #include "../search_queue.h"
 #include <queue>
 
-template<typename N, typename M, template<typename> class Cmp, bool ExtMemory = false>
-class queued_search_engine : public search_engine_base<N, ExtMemory>
+template<typename Gr, typename M, template<typename> class Cmp, bool ExtMemory = false>
+class queued_search_engine : public search_engine_base<Gr, ExtMemory>
 {
 protected:
-	typedef search_engine_base<N, ExtMemory> _Base;
+	using graph_t = Gr;
+	typedef search_engine_base<Gr, ExtMemory> _Base;
 	typedef M element_meta_t;
 	using search_node_t = typename _Base::search_node_t;
 	
@@ -18,9 +19,9 @@ public:
 	typedef std::tuple<element_meta_t, int> comparison_t;	//any meta + length to initial
 	typedef std::pair<comparison_t, search_node_t> open_list_el_t;
 
-	template<typename Gr>
-	queued_search_engine(Gr & graph)
-		:_Base(graph), m_searchQueue(graph.serialized_state_size() + sizeof(size_t)* 2 + sizeof(int), _Base::m_database.m_nodeSerializeFun, _Base::m_database.m_nodeDeserializeFun), m_firstNode(true)
+	//template<typename Gr>
+	queued_search_engine(graph_t & graph)
+		:_Base(graph), m_searchQueue(typename _Base::node_streamer_t(typename graph_t::vertex_streamer_t(graph.transition_system()))/*, graph.serialized_state_size() + sizeof(size_t)* 2 + sizeof(int), _Base::m_database.m_nodeSerializeFun, _Base::m_database.m_nodeDeserializeFun*/), m_firstNode(true)
 	{}
 
 	struct stats_t : public _Base::stats_t
@@ -71,7 +72,7 @@ protected:
 	};*/
 
 	//typedef std::priority_queue<open_list_el_t, std::vector<open_list_el_t>, open_list_cmp> open_list_t;
-	typedef search_queue<open_list_el_t, Cmp<comparison_t>> open_list_t;
+	typedef search_queue<open_list_el_t, Cmp<comparison_t>, typename _Base::node_streamer_t> open_list_t;
 
 protected:
 	template<typename IsGoalFun>

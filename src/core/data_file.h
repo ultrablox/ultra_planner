@@ -26,11 +26,14 @@ template<typename T>
 class data_file
 {
     using block_type = T;
+	
     //using data_vec_t = std::vector<block_type>;
 
     static_assert((sizeof(block_type) % 4096) == 0, "ERROR: user_record_data size is not 4K/divisible");
 public:
-    data_file(const std::string & file_name)
+	using value_type = block_type;
+
+    data_file(const std::string & file_name = "unnamed")
 		:m_fileName(file_name), m_blockCount(0)
     #ifdef WIN32
         , m_hFile(0)
@@ -147,6 +150,8 @@ public:
     {
         cout << "Attempt to write " << first_id << " - " << first_id + block_count << std::endl;
 
+#ifdef WIN32
+#else
         aiocb * cb = new aiocb;
     
         memset(cb, 0, sizeof(aiocb));
@@ -180,10 +185,14 @@ public:
         }*/
 
         m_pendingRequests.push_back(cb);
+#endif
     }
 
     bool ready()
     {
+#ifdef WIN32
+		return true;
+#else
         if(!m_pendingRequests.empty())
         {
             auto it = m_pendingRequests.begin();
@@ -200,6 +209,7 @@ public:
         }
         
         return m_pendingRequests.empty();
+#endif
     }
 
 	int get(size_t index, block_type & data)
