@@ -37,6 +37,9 @@ bool compare_paths(C1 path1, C2 path2)
 
 void test_explicit_graph_search()
 {
+	typedef explicit_graph<int> graph_t;
+	graph_t::vertex_streamer_t streamer;
+
 	/*
 	Simpliest graph.
 	*/
@@ -45,10 +48,11 @@ void test_explicit_graph_search()
 		int edges[][2] = {{1,2}, {1,5}, {2,5}, {5,6}, {2,7}, {3,7}, {3,4}, {7,8}};
 		std::array<int, 5> correct_path = {1, 2, 7, 3, 4};
 
-		explicit_graph<int> graph(vertices, edges);
+		
+		graph_t graph(vertices, edges);
 
 		{
-			bfs_engine<int> eng(graph);
+			bfs_engine<graph_t> eng(graph, streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 1, [](int vertex){
 				return vertex == 4;
@@ -59,7 +63,7 @@ void test_explicit_graph_search()
 		}
 
 		{
-			dfs_engine<int> eng(graph);
+			dfs_engine<graph_t> eng(graph, streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 1, [](int vertex){
 				return vertex == 4;
@@ -78,10 +82,10 @@ void test_explicit_graph_search()
 		int edges[][2] = {{13,12},{12,7},{7,8},{8,9},{9,14},{14,19},{19,18},{18,17},{17,16},{16,11},{11,6},{6,1},{1,2},{2,3},{3,4},{4,5},{5,10},{10,15},{15,20},{20,25},{25,24},{24,23},{23,22},{22,21}};
 		std::array<int, 25> correct_path = {21,22,23,24,25,20,15,10,5,4,3,2,1,6,11,16,17,18,19,14,9,8,7,12,13};
 
-		explicit_graph<int> graph(vertices, edges);
+		graph_t graph(vertices, edges);
 
 		{
-			bfs_engine<int> eng(graph);
+			bfs_engine<graph_t> eng(graph, streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 21, [](int vertex){
 				return vertex == 13;
@@ -92,7 +96,7 @@ void test_explicit_graph_search()
 		}
 
 		{
-			dfs_engine<int> eng(graph);
+			dfs_engine<graph_t> eng(graph, streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 21, [](int vertex){
 				return vertex == 13;
@@ -111,10 +115,10 @@ void test_explicit_graph_search()
 		int edges[][2] = {{15,9},{9,3},{9,10},{9,17},{17,23},{17,24},{10,18},{18,11},{11,5},{18,12},{12,20},{12,19},{19,27},{20,13},{20,14},{13,7}};
 		std::array<int, 7> correct_path = {15,9,10,18,12,20,14};
 
-		explicit_graph<int> graph(vertices, edges);
+		graph_t graph(vertices, edges);
 
 		{
-			bfs_engine<int> eng(graph);
+			bfs_engine<graph_t> eng(graph, streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 15, [](int vertex){
 				return vertex == 14;
@@ -125,7 +129,7 @@ void test_explicit_graph_search()
 		}
 
 		{
-			dfs_engine<int> eng(graph);
+			dfs_engine<graph_t> eng(graph, streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 15, [](int vertex){
 				return vertex == 14;
@@ -195,7 +199,10 @@ void test_random_ladder(int ladder_size)
 	auto correct_path = solve_ladder(horizontal_edges, make_pair(0, 0), make_pair(ladder_size, ladder_size));
 
 	//Now solve the problem with tested search engines
-	implicit_graph<pair<int, int>> graph([=](const pair<int, int> & vertex){
+	typedef implicit_graph<pair<int, int>> graph_t;
+	graph_t::vertex_streamer_t streamer;
+
+	graph_t graph([=](const pair<int, int> & vertex){
 		std::list<pair<int, int>> res;
 
 		if(vertex.second > 0)
@@ -216,7 +223,7 @@ void test_random_ladder(int ladder_size)
 	});
 
 	{
-		dfs_engine<pair<int, int>> eng(graph);
+		dfs_engine<graph_t> eng(graph, streamer);
 		std::vector<pair<int, int>> path;
 		bool found = eng(graph, make_pair(0, 0), [=](const pair<int, int> & vertex){
 			return vertex == make_pair(ladder_size, ladder_size);
@@ -227,7 +234,7 @@ void test_random_ladder(int ladder_size)
 	}
 
 	{
-		bfs_engine<pair<int, int>> eng(graph);
+		bfs_engine<graph_t> eng(graph, streamer);
 		std::vector<pair<int, int>> path;
 		bool found = eng(graph, make_pair(0, 0), [=](const pair<int, int> & vertex){
 			return vertex == make_pair(ladder_size, ladder_size);
@@ -258,13 +265,16 @@ void test_sliding_puzzle_blind()
 	//print_puzzle(pr_puzzle);
 	assert_test(pr_puzzle.has_solution(), "Sliding puzzle does not have solution");
 
-	transition_system_graph<puzzle_t> graph(pr_puzzle);
+	typedef transition_system_graph<puzzle_t> graph_t;
+	graph_t::vertex_streamer_t streamer(pr_puzzle);
+
+	graph_t graph(pr_puzzle);
 
 	//Blind search
 	cout << "Checking " << PuzzleW << "x" << PuzzleH << " puzzle blind search...";
 	{
 		auto puzzle = pr_puzzle;
-		dfs_engine<puzzle_t::state_t> eng(graph);
+		dfs_engine<graph_t> eng(graph, streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
@@ -278,7 +288,7 @@ void test_sliding_puzzle_blind()
 
 	{
 		auto puzzle = pr_puzzle;
-		bfs_engine<puzzle_t::state_t> eng(graph);
+		bfs_engine<graph_t> eng(graph, streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
@@ -307,7 +317,11 @@ void test_sliding_puzzle_heuristic()
 	//print_puzzle(pr_puzzle);
 	assert_test(pr_puzzle.has_solution(), "Sliding puzzle does not have solution");
 
-	transition_system_graph<puzzle_t> graph(pr_puzzle);
+	typedef transition_system_graph<puzzle_t> graph_t;
+	graph_t::vertex_streamer_t streamer(pr_puzzle);
+
+	graph_t graph(pr_puzzle);
+
 
 	//Heuristic search
 	cout << "Checking " << PuzzleWidth << "x" << PuzzleHeight << " puzzle heuristic search...";
@@ -330,7 +344,7 @@ void test_sliding_puzzle_heuristic()
 
 	{
 		puzzle_t puzzle = pr_puzzle;
-		astar_engine<puzzle_t::state_t, manhattan_heuristic<puzzle_t>, false> eng(graph);
+		astar_engine<graph_t, manhattan_heuristic<puzzle_t>, false> eng(graph, streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){
@@ -346,7 +360,7 @@ void test_sliding_puzzle_heuristic()
 
 	{
 		auto puzzle = pr_puzzle;
-		batched_engine<puzzle_t::state_t, manhattan_heuristic<puzzle_t>, false> eng(graph);
+		batched_engine<graph_t, manhattan_heuristic<puzzle_t>, false> eng(graph, streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){

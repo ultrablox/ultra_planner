@@ -23,7 +23,8 @@ protected:
 	typedef H hasher_t;
 	typedef std::pair<size_t, value_type> combined_value_t;
 	typedef std::map<size_t, size_t> map_t;
-
+	using bucket_t = map_t;
+	static const int MaxNodesPerBucket = 500;
 	struct block_t;
 
 	class block_iterator
@@ -196,9 +197,8 @@ public:
 		int element_id;
 	};
 
-	//template<typename SerFun, typename DesFun>
-	complex_hashset_base(const value_streamer_t & vs/*, int serialized_element_size, SerFun s_fun, DesFun d_fun*/)
-		:m_valueStreamer(vs), /*m_serializeFun(s_fun), m_deserializeFun(d_fun), m_serializedValueSize(serialized_element_size),*/ m_serializedElementSize(m_valueStreamer.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_valueStreamer.serialized_size()), m_blockCount(0)
+	complex_hashset_base(const value_streamer_t & vs)
+		:m_valueStreamer(vs), m_serializedElementSize(m_valueStreamer.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_valueStreamer.serialized_size()), m_blockCount(0)//, m_buckets(1)
 	{
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");
@@ -223,18 +223,14 @@ public:
 	{
 		//Find appropriate block, create if it does not exists
 		
-		size_t block_id;
+		size_t block_id = block_with_hash(hash_val);
 
-		auto it = index_iterator(hash_val);
-
-		if (it == m_indicesTree.end())
+		if (block_id == std::numeric_limits<size_t>::max())
 		{
 			block_id = m_blocks.size();
 			m_blocks.push_back(block_t());
-			m_indicesTree.insert(make_pair(hash_val, block_id));
+			create_index_record(hash_val, block_id);
 		}
-		else
-			block_id = it->second;
 
 		auto res = write_to_block(block_id, hash_val, val);
 		
@@ -260,12 +256,15 @@ public:
 	iterator find(const value_type & val) const
 	{
 		size_t hash_val = m_hasher(val);
-		auto index_it = index_iterator(hash_val);
+		/*auto index_it = index_iterator(hash_val);
 		
 		if (index_it == m_indicesTree.end())
+			return end();*/
+		size_t block_id = block_with_hash(hash_val);
+		if (block_id == std::numeric_limits<size_t>::max())
 			return end();
 
-		const block_t & block = m_blocks[index_it->second];
+		const block_t & block = m_blocks[block_id];
 
 		//print_block(block);
 
@@ -275,12 +274,13 @@ public:
 
 		//Serialize searching value
 		//vector<char> inserting_data(m_serializedValueSize);
-		m_serializeFun(&m_elementCache[0], val);
+		//m_serializeFun(&m_elementCache[0], val);
+		m_valueStreamer.serialize(&m_elementCache[0], val);
 
 		for (; (*it == hash_val) && (it != end_it); ++it)
 		{
-			if (memcmp(&m_elementCache[0], it.value_ptr(), m_serializedValueSize) == 0)
-				return iterator(index_it->second, it.element_id);
+			if (memcmp(&m_elementCache[0], it.value_ptr(), m_valueStreamer.serialized_size()/*m_serializedValueSize*/) == 0)
+				return iterator(block_id, it.element_id);
 		}
 
 		return end();
@@ -296,7 +296,49 @@ protected:
 
 	}
 	
-	map_t::const_iterator index_iterator(size_t hash_val) const
+	size_t block_with_hash(size_t hash_val) const
+	{
+		//bucket_t & bucket = bucket_with_hash(hash_val);
+
+		auto it = m_indicesTree.lower_bound(hash_val);
+
+		if (it == m_indicesTree.end())
+			return std::numeric_limits<size_t>::max();
+		else
+		{
+			if (it == m_indicesTree.begin())
+				return std::numeric_limits<size_t>::max();
+			else
+			{
+				--it;
+				return it->second;
+			}
+		}
+	}
+
+	void create_index_record(size_t hash_val, size_t block_id)
+	{
+		/*bucket_t & bucket = bucket_with_hash(hash_val);
+
+		bucket.insert(make_pair(hash_val, block_id));
+
+		if (bucket.size() > MaxNodesPerBucket)
+			split_buckets();*/
+		m_indicesTree.insert(make_pair(hash_val, block_id));
+	}
+	
+	bucket_t & bucket_with_hash(size_t hash_val)
+	{
+		int bucket_id = hash_val % m_buckets.size();
+		return m_buckets[bucket_id];
+	}
+
+	void split_buckets()
+	{
+		int x = 0;
+	}
+
+	/*map_t::const_iterator index_iterator(size_t hash_val) const
 	{
 		auto it = m_indicesTree.lower_bound(hash_val);
 
@@ -318,7 +360,7 @@ protected:
 		}
 
 		return it;
-	}
+	}*/
 
 	std::pair<iterator, bool> write_to_block(size_t block_id, size_t hash_val, const value_type & val)
 	{
@@ -392,7 +434,8 @@ protected:
 				block.item_count = middle_it.element_id;
 
 				//Update index tree
-				m_indicesTree.insert(make_pair(*middle_it, new_block_id));
+				//m_indicesTree.insert(make_pair(*middle_it, new_block_id));
+				create_index_record(*middle_it, new_block_id);
 
 				//Save the block
 				m_blocks.push_back(new_block);
@@ -452,6 +495,8 @@ protected:
 
 	size_t m_size, m_blockCount;
 	const int m_maxItemsInBlock;
+
+	//std::vector<bucket_t> m_buckets;
 };
 
 

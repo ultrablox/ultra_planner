@@ -20,8 +20,8 @@ public:
 	typedef std::pair<comparison_t, search_node_t> open_list_el_t;
 
 	//template<typename Gr>
-	queued_search_engine(graph_t & graph)
-		:_Base(graph), m_searchQueue(typename _Base::node_streamer_t(typename graph_t::vertex_streamer_t(graph.transition_system()))/*, graph.serialized_state_size() + sizeof(size_t)* 2 + sizeof(int), _Base::m_database.m_nodeSerializeFun, _Base::m_database.m_nodeDeserializeFun*/), m_firstNode(true)
+	queued_search_engine(graph_t & graph, const typename Gr::vertex_streamer_t & vstreamer)
+		:_Base(graph, vstreamer), m_searchQueue(typename _Base::node_streamer_t(vstreamer)/*, graph.serialized_state_size() + sizeof(size_t)* 2 + sizeof(int), _Base::m_database.m_nodeSerializeFun, _Base::m_database.m_nodeDeserializeFun*/), m_firstNode(true)
 	{}
 
 	struct stats_t : public _Base::stats_t

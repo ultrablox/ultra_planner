@@ -29,7 +29,7 @@ class data_file
 	
     //using data_vec_t = std::vector<block_type>;
 
-    static_assert((sizeof(block_type) % 4096) == 0, "ERROR: user_record_data size is not 4K/divisible");
+//    static_assert((sizeof(block_type) % 4096) == 0, "ERROR: user_record_data size is not 4K/divisible");
 public:
 	using value_type = block_type;
 

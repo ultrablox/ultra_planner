@@ -32,16 +32,8 @@ public:
 
 	//enum class state_state_t {Unknown, Discovered, Expanded};
 	//template<typename Gr>
-	search_engine_base(const graph_t & graph)
-		:/*m_stateSerializeFun(
-			[=](void * dest, const state_t & state){
-					graph.serialize_state(dest, state);
-				}),
-			m_stateDeserializeFun(
-				[=](const void * src, state_t & state){
-					graph.deserialize_state(src, state);
-			}),*/
-			m_database(state_streamer_t(graph.transition_system())/*, graph.serialized_state_size(), m_stateSerializeFun, m_stateDeserializeFun*/), m_finished(false)
+	search_engine_base(const graph_t & graph, const state_streamer_t & streamer)
+		:m_database(streamer), m_finished(false)
 	{
 	}
 protected:

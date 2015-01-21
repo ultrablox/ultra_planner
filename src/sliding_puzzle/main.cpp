@@ -65,7 +65,9 @@ private:
 	template<typename EngType, typename GraphT, typename StateT>
 	void solve_with_engine(GraphT & graph, const StateT & initial_state)
 	{
-		EngType search_engine(graph);
+		GraphT::vertex_streamer_t streamer(graph.transition_system());
+
+		EngType search_engine(graph, streamer);
 
 		std::list<typename transition_system_t::transition_t> plan;
 		std::thread monitor_thread([&](){

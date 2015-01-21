@@ -39,15 +39,17 @@ void test_complex_hashmap();
 void test_cached_file();
 void test_merge();
 void test_rubik_core();
+void test_bdd_map();
 
 int main()
 {
 	test_bitset();
 	test_merge();
-
+	
 	test_puzzle_core();
 	test_rubik_core();
 
+	test_bdd_map();
 	test_cached_file();
 	test_complex_vector();
 	test_complex_hashmap();

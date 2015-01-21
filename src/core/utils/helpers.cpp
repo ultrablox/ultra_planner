@@ -158,3 +158,22 @@ std::wstring to_wstring(const std::string & str)
 	//std::string narrow = converter.to_bytes(wide_utf16_source_string);
 	return converter.from_bytes(str);
 }
+
+std::pair<size_t, bool> different_radix(size_t lhs, size_t rhs)
+{
+	size_t digit = 1ULL << (sizeof(size_t)*8 - 1);
+
+	size_t res = 0;
+	while ((lhs & digit) == (rhs & digit))
+	{
+		digit = digit >> 1;
+		++res;
+	}
+	return make_pair(res, (lhs & digit) < (rhs & digit));
+}
+
+bool check_radix(size_t val, size_t radix_id)
+{
+	size_t digit = 1ULL << (sizeof(size_t)* 8 - 1 - radix_id);
+	return (val & digit) != 0;
+}

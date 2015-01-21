@@ -16,8 +16,8 @@ class blind_engine : public queued_search_engine<Gr, bool, Cmp>
 
 public:
 	//template<typename Gr>
-	blind_engine(graph_t & graph)
-		:_Base(graph)
+	blind_engine(graph_t & graph, const typename graph_t::vertex_streamer_t & vstreamer)
+		:_Base(graph, vstreamer)
 	{}
 
 	//Returns true, if found.
@@ -65,8 +65,8 @@ class heuristic_engine : public queued_search_engine<Gr, float, Cmp, ExtMemory>
 	using comparison_t = typename _Base::comparison_t;
 public:
 	//template<typename Gr>
-	heuristic_engine(graph_t & graph)
-		:_Base(graph)
+	heuristic_engine(graph_t & graph, const typename graph_t::vertex_streamer_t & vstreamer)
+		:_Base(graph, vstreamer)
 	{}
 
 	template<typename IsGoalFun>

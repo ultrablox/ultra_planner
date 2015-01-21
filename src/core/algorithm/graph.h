@@ -3,6 +3,7 @@
 
 #include <unordered_set>
 #include <unordered_map>
+#include <core/streamer.h>
 
 template<typename V>
 class simple_graph
@@ -34,6 +35,7 @@ class explicit_graph : public simple_graph<V>
 {
 public:
 	typedef V vertex_t;
+	using vertex_streamer_t = base_type_streamer<vertex_t>;
 
 	template<typename Verts, typename Edges>
 	explicit_graph(const Verts & verts, const Edges & edgs)
@@ -80,6 +82,7 @@ class implicit_graph : public simple_graph<V>
 {
 public:	
 	typedef V vertex_t;
+	using vertex_streamer_t = base_type_streamer<vertex_t>;
 
 	template<typename AdjFun>
 	implicit_graph(AdjFun adj_fun)

@@ -37,6 +37,26 @@ struct complex_element
 	std::vector<int> m_data;
 };
 
+class complex_element_streamer : public streamer_base
+{
+public:
+	complex_element_streamer()
+		:streamer_base(3*sizeof(int))
+	{
+	}
+
+	void serialize(void * dst, const complex_element & val) const
+	{
+		memcpy(dst, &val.m_data[0], m_serializedSize);
+	}
+
+	void deserialize(const void * src, complex_element & val) const
+	{
+		val.m_data.resize(3);
+		memcpy(&val.m_data[0], src, m_serializedSize);
+	}
+};
+
 bool operator==(const complex_element & lhs, const complex_element & rhs)
 {
 	return lhs.m_data == rhs.m_data;
@@ -63,14 +83,8 @@ namespace std
 
 void test_complex_vector()
 {
-	complex_vector<complex_element> vec(sizeof(int) * 3, 
-		[](void * dst, const complex_element & el){
-			memcpy(dst, &el.m_data[0], sizeof(int) * 3);
-		},
-		[](const void * src, complex_element & el){
-			memcpy(&el.m_data[0], src, sizeof(int) * 3);
-		}
-	);
+	complex_element_streamer stremer;
+	complex_vector<complex_element, complex_element_streamer> vec(stremer);
 
 	vec.push_back(complex_element(0, 0, 1));
 	vec.push_back(complex_element(0, 1, 0));
@@ -188,14 +202,8 @@ void test_complex_hashmap()
 	{
 		std::unordered_set<complex_element> correct_set;
 
-		buffered_complex_hashset<complex_element> hset(sizeof(int)* 3,
-			[](void * dst, const complex_element & el){
-			memcpy(dst, &el.m_data[0], sizeof(int)* 3);
-		},
-			[](const void * src, complex_element & el){
-			memcpy(&el.m_data[0], src, sizeof(int)* 3);
-		}
-		);
+		complex_element_streamer streamer;
+		buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);
 
 		
 
@@ -237,13 +245,8 @@ void test_complex_hashmap()
 	}
 	//Test add_range
 	{
-		direct_complex_hashset<complex_element, std::hash<complex_element>, true, 256U> hset(sizeof(int)* 3,
-			[](void * dst, const complex_element & el){
-			memcpy(dst, &el.m_data[0], sizeof(int)* 3);
-		},
-			[](const void * src, complex_element & el){
-			memcpy(&el.m_data[0], src, sizeof(int)* 3);
-		});
+		complex_element_streamer streamer;
+		direct_complex_hashset<complex_element, complex_element_streamer, std::hash<complex_element>, true, 256U> hset(streamer);
 
 		std::unordered_set<complex_element> correct_set;
 

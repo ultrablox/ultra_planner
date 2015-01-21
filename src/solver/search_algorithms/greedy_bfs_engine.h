@@ -21,8 +21,8 @@ class greedy_bfs_engine : public heuristic_engine<Gr, greedy_bfs_node_priority_c
 	using _Base = heuristic_engine<Gr, greedy_bfs_node_priority_cmp, H, ExtMemory>;
 public:
 	//template<typename Gr>
-	greedy_bfs_engine(Gr & graph)
-		:_Base(graph)
+	greedy_bfs_engine(Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)
+		:_Base(graph, vstreamer)
 	{}
 };
 

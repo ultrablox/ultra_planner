@@ -22,9 +22,8 @@ class astar_engine : public heuristic_engine<Gr, astar_node_priority_cmp, H, Ext
 {
 	using _Base = heuristic_engine<Gr, astar_node_priority_cmp, H, ExtMemory>;
 public:
-	//template<typename Gr>
-	astar_engine(Gr & graph)
-		:_Base(graph)
+	astar_engine(Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)
+		:_Base(graph, vstreamer)
 	{}
 };
 

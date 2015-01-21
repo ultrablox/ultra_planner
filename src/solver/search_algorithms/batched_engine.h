@@ -37,8 +37,8 @@ class batched_engine : public queued_search_engine<Gr, float, batched_priority_c
 	typedef std::vector<expanded_node_t> expanded_nodes_container_t;
 public:
 	//template<typename Tr>
-	batched_engine(Gr & graph, size_t batch_size = 1000)
-		:_Base(graph), m_batchSize(batch_size)
+	batched_engine(Gr & graph, const typename Gr::vertex_streamer_t & vstreamer, size_t batch_size = 1000)
+		:_Base(graph, vstreamer), m_batchSize(batch_size)
 	{}
 
 	template<typename GraphT, typename IsGoalFun>

@@ -3,6 +3,7 @@
 #define UltraCore_complex_vector_h
 
 #include "utils/helpers.h"
+#include "streamer.h"
 #include <functional>
 #include <vector>
 #include <type_traits>
@@ -10,7 +11,7 @@
 
 using namespace std;
 
-template<typename T, typename S, bool ExtMemory = false>
+template<typename T, typename S = base_type_streamer<T>, bool ExtMemory = false>
 class complex_vector
 {
 	friend class proxy;
@@ -43,7 +44,8 @@ public:
 			proxy(void * _ptr, VecT & _vec)
 				:m_ptr(_ptr), m_vec(_vec)
 			{
-				m_vec.m_deserializeFun(m_ptr, *this);
+				//m_vec.m_deserializeFun(m_ptr, *this);
+				m_vec.m_streamer.deserialize(m_ptr, *this);
 			}
 
 			/*proxy(const proxy && rhs)
@@ -54,29 +56,34 @@ public:
 
 			proxy& operator=(const value_type &val)
 			{
-				m_vec.m_serializeFun(m_ptr, val);
+				//m_vec.m_serializeFun(m_ptr, val);
+				m_vec.m_streamer.serialize(m_ptr, val);
 				return *this;
 			}
 
 			proxy& operator=(const proxy & rhs)
 			{
 				//memcpy(m_ptr, rhs.m_ptr, m_vec.m_elementSize * sizeof(typename VecT::base_type_t));
-				m_vec.m_serializeFun(m_ptr, rhs);
+				//m_vec.m_serializeFun(m_ptr, rhs);
+				m_vec.m_streamer.serialize(m_ptr, rhs);
 				return *this;
 			}
 
 			bool operator==(const value_type & rhs) const
 			{
 				value_type tmp;
-				m_vec.m_deserializeFun(m_ptr, tmp);
+				//m_vec.m_deserializeFun(m_ptr, tmp);
+				m_vec.m_streamer.deserialize(m_ptr, tmp);
 				return tmp == rhs;
 			}
 
 			bool operator<(const proxy & rhs) const
 			{
 				value_type v1, v2;
-				m_vec.m_deserializeFun(m_ptr, v1);
-				rhs.m_vec.m_deserializeFun(rhs.m_ptr, v2);
+				//m_vec.m_deserializeFun(m_ptr, v1);
+				//rhs.m_vec.m_deserializeFun(rhs.m_ptr, v2);
+				m_vec.m_streamer.deserialize(m_ptr, v1);
+				rhs.m_vec.m_streamer.deserialize(rhs.m_ptr, v2);
 				return v1 < v2;
 			}
 		
@@ -223,7 +230,8 @@ public:
 	void insert(iterator iter, const value_type & new_val)
 	{
 		m_data.insert(m_data.begin() + iter.pos, m_elementSize, 0);
-		m_serializeFun(&m_data[iter.pos], new_val);		
+		//m_serializeFun(&m_data[iter.pos], new_val);
+		m_streamer.serialize(&m_data[iter.pos], new_val);
 	}
 
 	void clear()

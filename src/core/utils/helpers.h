@@ -191,4 +191,8 @@ void sort_wrapper(It begin, It end, Pred pred)
 	tbb::parallel_sort(begin, end, pred);
 }
 
+//True, if left radix is less
+ULTRA_CORE_API std::pair<size_t, bool> different_radix(size_t lhs, size_t rhs);
+ULTRA_CORE_API bool check_radix(size_t val, size_t radix_id);
+
 #endif
