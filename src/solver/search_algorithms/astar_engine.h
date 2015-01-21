@@ -41,14 +41,14 @@ public:
 	{
 		heuristic_t h_fun(graph.transition_system());
 
-		enqueue(is_goal_fun, create_node(init_state, 0), std::numeric_limits<float>::max());
+		this->enqueue(is_goal_fun, this->create_node(init_state, 0), std::numeric_limits<float>::max());
 
 		float best_data = std::numeric_limits<float>::max();
 		comparison_t current_data;
 
-		while((!m_searchQueue.empty()) && m_goalNodes.empty())
+		while((!_Base::m_searchQueue.empty()) && _Base::m_goalNodes.empty())
 		{
-			search_node_t cur_node = dequeue(&current_data);
+			search_node_t cur_node = this->dequeue(&current_data);
 			
 			if(get<0>(current_data) < best_data)
 			{
@@ -60,19 +60,19 @@ public:
 
 			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
-				m_database.add(state, [=](const state_t & state){
-					search_node_t new_node = m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) + 1);
-					enqueue(is_goal_fun, new_node, h_fun(state));
+				_Base::m_database.add(state, [=](const state_t & state){
+					search_node_t new_node = _Base::m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) + 1);
+					this->enqueue(is_goal_fun, new_node, h_fun(state));
 				});
 			});
 		}
 
-		if(!m_goalNodes.empty())
-			solution_path = backtrace_path(m_goalNodes[0]);
+		if(!_Base::m_goalNodes.empty())
+			solution_path = this->backtrace_path(_Base::m_goalNodes[0]);
 
-		m_finished = true;
+		_Base::m_finished = true;
 
-		return !m_goalNodes.empty();
+		return !_Base::m_goalNodes.empty();
 	}
 };
 

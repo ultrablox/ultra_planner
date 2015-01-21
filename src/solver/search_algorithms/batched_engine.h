@@ -31,6 +31,8 @@ class batched_engine : public queued_search_engine<N, float, batched_priority_cm
 	typedef H heuristic_t;
 	typedef typename _Base::state_t state_t;
 
+	using search_node_t = typename _Base::search_node_t;
+	using comparison_t = typename _Base::comparison_t;
 	typedef std::tuple<size_t, search_node_t/*, estimation_t*/> expanded_node_t;
 	typedef std::vector<expanded_node_t> expanded_nodes_container_t;
 public:
@@ -44,12 +46,12 @@ public:
 	{
 		heuristic_t h_fun(graph.transition_system());
 
-		enqueue(is_goal_fun, create_node(init_node, 0), std::numeric_limits<float>::max());
+		this->enqueue(is_goal_fun, this->create_node(init_node, 0), std::numeric_limits<float>::max());
 
 		float best_estimation = std::numeric_limits<float>::max();
 		comparison_t current_data;
 
-		while((!m_searchQueue.empty()) && m_goalNodes.empty())
+		while((!_Base::m_searchQueue.empty()) && _Base::m_goalNodes.empty())
 		{
 			//Extract batch of best states
 
@@ -72,12 +74,12 @@ public:
 			});
 		}
 
-		m_finished = true;
+		_Base::m_finished = true;
 
-		if(!m_goalNodes.empty())
-			solution_path = backtrace_path(m_goalNodes[0]);
+		if(!_Base::m_goalNodes.empty())
+			solution_path = this->backtrace_path(_Base::m_goalNodes[0]);
 
-		return !m_goalNodes.empty();
+		return !_Base::m_goalNodes.empty();
 	}
 private:
 	
@@ -85,8 +87,8 @@ private:
 	{
 		res.reserve(max_count);
 
-		size_t picked_count = m_searchQueue.top(res, max_count, false, first_node_data);
-		m_searchQueue.pop(picked_count);
+		size_t picked_count = _Base::m_searchQueue.top(res, max_count, false, first_node_data);
+		_Base::m_searchQueue.pop(picked_count);
 	}
 
 	template<typename GraphT, typename It>
@@ -200,13 +202,13 @@ private:
 		template<typename IsGoalFun, typename EstFun>
 		void merge(IsGoalFun is_goal, EstFun est_fun)
 		{
-			m_database.add_range(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & exp_node){
+			_Base::m_database.add_range(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & exp_node){
 				return get<0>(exp_node);
 			}, [](const expanded_node_t & exp_node){
 				return get<2>(get<1>(exp_node));
 			}, [=](const expanded_node_t & expanded_node){
-				search_node_t new_node = create_node(get<2>(get<1>(expanded_node)), get<1>(get<1>(expanded_node)));
-				enqueue(is_goal, new_node, est_fun(get<2>(get<1>(expanded_node))));
+				search_node_t new_node = this->create_node(get<2>(get<1>(expanded_node)), get<1>(get<1>(expanded_node)));
+				this->enqueue(is_goal, new_node, est_fun(get<2>(get<1>(expanded_node))));
 			});
 
 			m_expandBuffer.clear();

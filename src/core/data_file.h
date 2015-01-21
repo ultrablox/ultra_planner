@@ -4,14 +4,18 @@
 
 #include "utils/helpers.h"
 #include <mutex>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <iostream>
 
 #ifdef WIN32
     #include <windows.h>
+#else
+    #include <unistd.h>
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <fcntl.h>
+    #include <aio.h>
 #endif
+
 
 using namespace std;
 
@@ -40,6 +44,13 @@ public:
 		{
 			throw runtime_error("Unable to open file with WinAPI");
 		}
+    #else
+        m_fileDescriptor = ::open(file_name.c_str(), O_RDWR | O_CREAT, 0644);
+        if(m_fileDescriptor == -1)
+            throw runtime_error("Unable to open file with unix API");
+
+        //Allocate 1GB
+        //set(250000, block_type());
     #endif
     }
 
@@ -60,6 +71,8 @@ public:
 			cout << "Deleting data file: " << m_fileName << std::endl;
 			CloseHandle(m_hFile);
 		}
+    #else
+        close(m_fileDescriptor);
     #endif
     }
 
@@ -107,8 +120,13 @@ public:
 		bool r = WriteFile(m_hFile, &data, sizeof(block_type), &m_bytesWritten, &ol);
 
 		return r ? 0 : 1;
+    #else
+        int n_write = pwrite(m_fileDescriptor, &data, sizeof(block_type), sizeof(block_type)*index);
+        if(n_write == -1)
+            cout << "Write failed: " << strerror(errno) << std::endl;
+
+        return (n_write != sizeof(block_type));
     #endif
-        return 0;
     }
 
 	void write_range(block_type * buf_begin, size_t first_id, size_t block_count)
@@ -118,8 +136,71 @@ public:
 		OVERLAPPED ol = { 0 };
 		ol.Offset = first_id * sizeof(block_type);
 		bool r = WriteFile(m_hFile, buf_begin, sizeof(block_type)* block_count, &m_bytesWritten, &ol);
+    #else
+        int n_write = pwrite(m_fileDescriptor, buf_begin, sizeof(block_type) * block_count, sizeof(block_type) * first_id);
+        if(n_write == -1)
+            cout << "Write failed: " << strerror(errno) << std::endl;
     #endif
 	}
+
+    void write_range_async(block_type * buf_begin, size_t first_id, size_t block_count)
+    {
+        cout << "Attempt to write " << first_id << " - " << first_id + block_count << std::endl;
+
+        aiocb * cb = new aiocb;
+    
+        memset(cb, 0, sizeof(aiocb));
+        cb->aio_nbytes = block_count * sizeof(block_type);
+        cb->aio_fildes = m_fileDescriptor;
+        cb->aio_offset = sizeof(block_type) * first_id;
+        cb->aio_buf = buf_begin;
+
+        int r = aio_write(cb);
+        while(r == -1)
+        {
+            cout << r << "," << aio_error(cb) << std::endl;
+            //std::this_thread::yield();
+            std::chrono::milliseconds dura(200);
+            std::this_thread::sleep_for(dura);
+
+            memset(cb, 0, sizeof(aiocb));
+            cb->aio_nbytes = block_count * sizeof(block_type);
+            cb->aio_fildes = m_fileDescriptor;
+            cb->aio_offset = sizeof(block_type) * first_id;
+            cb->aio_buf = buf_begin;
+        
+            r = aio_write(cb);
+        }
+
+        /*if(r == -1)
+        {
+            cout << "Unable to create write async request!" << endl;
+            cout << aio_error(cb) << std::endl;
+            throw runtime_error("Failed to write");
+        }*/
+
+        m_pendingRequests.push_back(cb);
+    }
+
+    bool ready()
+    {
+        if(!m_pendingRequests.empty())
+        {
+            auto it = m_pendingRequests.begin();
+            while(it != m_pendingRequests.end())
+            {
+                if(aio_error(*it) != 0)
+                    ++it;
+                else
+                {
+                    delete *it;
+                    it = m_pendingRequests.erase(it);
+                }
+            }
+        }
+        
+        return m_pendingRequests.empty();
+    }
 
 	int get(size_t index, block_type & data)
     {
@@ -135,8 +216,13 @@ public:
 		bool res = ReadFile(m_hFile, &data, sizeof(block_type), &bytes_read, &ol);
 
 		return res ? 0 : 1;
+    #else
+        int n_read = pread(m_fileDescriptor, &data, sizeof(block_type), sizeof(block_type)*index);
+        if(n_read == -1)
+            cout << "Read failed: " << strerror(errno) << std::endl;
+
+        return (n_read != sizeof(block_type));
     #endif
-        return 0;
     }
 
 	void append(const block_type & data)
@@ -176,11 +262,13 @@ private:
 	}
 private:
     std::string m_fileName;
-    int m_fileDescriptor;
 	size_t m_blockCount;
 #ifdef WIN32
     HANDLE m_hFile;
 	DWORD m_bytesWritten;
+#else
+    std::list<aiocb*> m_pendingRequests;
+    int m_fileDescriptor;
 #endif
 };
 

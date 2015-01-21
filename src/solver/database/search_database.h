@@ -14,8 +14,8 @@ class simple_search_database
 {
 	typedef T state_t;
 public:
-	template<typename... Args>
-	simple_search_database(Args... args)
+	template<typename... ConstrArgs>
+	simple_search_database(ConstrArgs... args)
 	{}
 
 	bool contains(const state_t & state) const

@@ -33,7 +33,8 @@ class bfs_engine : public queued_search_engine<N, bool, bfs_node_priority_cmp>
 	using state_t = typename _Base::state_t;
 	using comparison_t = typename _Base::comparison_t;
 	using state_t = typename _Base::state_t;
-
+	using comparison_t = typename _Base::comparison_t;
+	
 public:
 	template<typename Gr>
 	bfs_engine(Gr & graph)

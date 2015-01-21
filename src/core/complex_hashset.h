@@ -10,6 +10,8 @@
 #include <stxxl.h>
 #include "cached_file.h"
 #include <core/utils/helpers.h>
+//#include <tbb/parallel_for.h>
+#include <thread>
 
 template<typename S, typename B>
 class vector_storage_wrapper
@@ -58,6 +60,17 @@ public:
 private:
 	storage_t m_storage;
 };
+/*
+class thread_pool
+{
+public:
+	thread_pool(int thread_count)
+	{
+	}
+private:
+	vector<std::thread> m_threads;
+};
+*/
 
 template<typename S, typename B>
 class file_storage_wrapper
@@ -66,7 +79,7 @@ class file_storage_wrapper
 	using block_t = B;
 public:
 	file_storage_wrapper()
-		:m_storage("state_database.dat")
+		:m_storage("state_database.dat")//, m_threadPool(200)
 	{
 	}
 
@@ -109,16 +122,27 @@ public:
 				++index;
 			}
 
-			m_storage.write_range(&(*it), it->id, std::distance(it, last_gr_it));
+			//m_storage.write_range(&(*it), it->id, std::distance(it, last_gr_it));
+			m_storage.write_range_async(&(*it), it->id, std::distance(it, last_gr_it));
 			++write_count;
 
 			it = last_gr_it;
 		}
 
+		while(!m_storage.ready())
+		{
+			cout << "Waiting data to be written..." << std::endl;
+			std::this_thread::yield();
+		}
 		//cout << "Write I/O gain " << (float)write_count / std::distance(begin, end) << std::endl;
+
+		/*tbb::parallel_for(begin, end, 1, [&](const block_t & block){
+			m_storage.set(block.id, block);
+		});*/
 	}
 private:
 	storage_t m_storage;
+	//thread_pool m_threadPool;
 };
 
 template<typename T, typename H = std::hash<T>, bool UseIntMemory = true, unsigned int BlockSize = 8192U, typename... KeyPart>//65536U //4096U // 8192U

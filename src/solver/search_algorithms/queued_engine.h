@@ -20,7 +20,7 @@ public:
 
 	template<typename Gr>
 	queued_search_engine(Gr & graph)
-		:_Base(graph), m_searchQueue(graph.serialized_state_size() + sizeof(size_t)* 2 + sizeof(int), m_database.m_nodeSerializeFun, m_database.m_nodeDeserializeFun), m_firstNode(true)
+		:_Base(graph), m_searchQueue(graph.serialized_state_size() + sizeof(size_t)* 2 + sizeof(int), _Base::m_database.m_nodeSerializeFun, _Base::m_database.m_nodeDeserializeFun), m_firstNode(true)
 	{}
 
 	struct stats_t : public _Base::stats_t
@@ -32,7 +32,7 @@ public:
 
 	stats_t get_stats() const
 	{
-		stats_t res = _Base::get_stats<stats_t>();
+		stats_t res = _Base::template get_stats<stats_t>();
 		res.queue_layers_count = m_searchQueue.layer_count();
 		res.secondary_nodes_count = m_searchQueue.secondary_nodes_count();
 		res.best_priority = get<0>(m_bestPriority) + get<1>(m_bestPriority);
@@ -79,7 +79,7 @@ protected:
 	{
 		if (is_goal(get<2>(node)))
 		{
-			m_goalNodes.push_back(node);
+			_Base::m_goalNodes.push_back(node);
 			return make_pair(false, comparison_t());
 		}
 		else

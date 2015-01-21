@@ -21,6 +21,9 @@ class greedy_bfs_engine : public queued_search_engine<N, float, greedy_bfs_node_
 	typedef float estimation_t;
 	typedef queued_search_engine<N, float, greedy_bfs_node_priority_cmp, ExtMemory> _Base;
 	typedef H heuristic_t;
+	using state_t = typename _Base::state_t;
+	using comparison_t = typename _Base::comparison_t;
+	using search_node_t = typename _Base::search_node_t;
 public:
 	template<typename Gr>
 	greedy_bfs_engine(Gr & graph)
@@ -32,14 +35,14 @@ public:
 	{
 		heuristic_t h_fun(graph.transition_system());
 
-		enqueue(is_goal, create_node(init_node, 0), std::numeric_limits<float>::max());
+		this->enqueue(is_goal, this->create_node(init_node, 0), std::numeric_limits<float>::max());
 
 		float best_data = std::numeric_limits<float>::max();
 		comparison_t current_data;
 
-		while ((!m_searchQueue.empty()) && m_goalNodes.empty())
+		while ((!_Base::m_searchQueue.empty()) && _Base::m_goalNodes.empty())
 		{
-			search_node_t cur_node = dequeue(&current_data);
+			search_node_t cur_node = this->dequeue(&current_data);
 
 			if (get<0>(current_data) < best_data)
 			{
@@ -53,24 +56,24 @@ public:
 			graph.forall_adj_verts(get<2>(cur_node), [&](const state_t & state){
 
 				//Check that node is not expanded or discovered by trying to add
-				auto res = m_database.add(state);
+				auto res = _Base::m_database.add(state);
 				if (res)
 				{
 					//search_node_t new_node = create_node(state, get<0>(cur_node));
-					search_node_t new_node = m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
-					auto res = enqueue(is_goal, new_node, h_fun(state));
+					search_node_t new_node = _Base::m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
+					auto res = this->enqueue(is_goal, new_node, h_fun(state));
 					if (res.first)
-						m_database.compress_keys_less(res.second);
+						_Base::m_database.compress_keys_less(res.second);
 				}
 			});
 		}
 
-		if (!m_goalNodes.empty())
-			solution_path = backtrace_path(m_goalNodes[0]);
+		if (!_Base::m_goalNodes.empty())
+			solution_path = this->backtrace_path(_Base::m_goalNodes[0]);
 
-		m_finished = true;
+		_Base::m_finished = true;
 
-		return !m_goalNodes.empty();
+		return !_Base::m_goalNodes.empty();
 	}
 };
 

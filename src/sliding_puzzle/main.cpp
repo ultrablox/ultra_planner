@@ -5,7 +5,7 @@
 #include <solver/search_algorithms/astar_engine.h>
 #include <solver/search_algorithms/greedy_bfs_engine.h>
 #include <solver/search_algorithms/batched_engine.h>
-#include <solver/UExternalMemoryController.h>
+#include <core/UExternalMemoryController.h>
 #include <tclap/CmdLine.h>
 #include <string>
 #include <iostream>
@@ -23,7 +23,7 @@ class state_space_solver
 {
 	typedef T transition_system_t;
 
-	template<typename T>
+	template<typename X>
 	struct engine_generator
 	{
 
@@ -52,11 +52,11 @@ public:
 		
 
 		if (alg_name == "A*")
-			solve_with_engine<astar_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
+			solve_with_engine<astar_engine<typename transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		else if (alg_name == "BA*")
-			solve_with_engine<batched_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
+			solve_with_engine<batched_engine<typename transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		else if (alg_name == "GBFS")
-			solve_with_engine<greedy_bfs_engine<transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
+			solve_with_engine<greedy_bfs_engine<typename transition_system_t::state_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
 		
 	}
 private:
@@ -66,7 +66,7 @@ private:
 	{
 		EngType search_engine(graph);
 
-		std::list<transition_system_t::transition_t> plan;
+		std::list<typename transition_system_t::transition_t> plan;
 		std::thread monitor_thread([&](){
 
 			std::chrono::milliseconds print_dura(10000);
@@ -74,7 +74,7 @@ private:
 
 			const int print_counter = print_dura.count() / dura.count();
 
-			int counter = 0;
+			int counter = print_counter;
 
 			cout << "Started solving monitor, interval " << dura.count() << " msecs" << std::endl;
 			double last_explored_count = 0.0;
@@ -103,7 +103,7 @@ private:
 
 
 		cout << "Starting solving process..." << std::endl;
-		plan = solve_puzzle<std::list<transition_system_t::transition_t>>(search_engine, m_system, graph, initial_state);
+		plan = solve_puzzle<std::list<typename transition_system_t::transition_t>>(search_engine, m_system, graph, initial_state);
 
 		std::ofstream out_file("plan.txt");
 		for (auto p : plan)
@@ -117,11 +117,11 @@ private:
 	{
 		typedef PuzzleT puzzle_t;
 
-		std::vector<puzzle_t::state_t> path;
+		std::vector<typename puzzle_t::state_t> path;
 
 		auto start_tp = high_resolution_clock::now();
 
-		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){
+		bool found = eng(graph, initial_state, [&](const typename puzzle_t::state_t & state){
 			return puzzle.is_solved(state);
 		}, path);
 

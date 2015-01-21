@@ -70,7 +70,7 @@ public:
 		if(begin_state != end_state)
 		{
 			for(; (begin_state+1) != end_state; ++begin_state)
-				res.push_back(difference(*begin_state, *(begin_state+1)));
+				res.push_back(this->difference(*begin_state, *(begin_state+1)));
 		}
 
 		return res;
@@ -89,7 +89,7 @@ public:
 	template<typename F>
 	void forall_generated_states(const state_t & base_state, F fun) const
 	{
-		forall_available_transitions(base_state, [&](transition_t transition){
+		this->forall_available_transitions(base_state, [&](transition_t transition){
 			state_t new_state(base_state);
 			_Base::apply(new_state, transition);
 			fun(new_state);
