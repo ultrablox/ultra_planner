@@ -14,6 +14,41 @@
 #include <thread>
 
 
+template<typename T>
+class map_wrapper
+{
+	using map_t = T;
+public:
+	/*
+	Returns block index for given hash. Or size_t::max() if
+	such a block does not exists.
+	*/
+	size_t block_with_hash(size_t hash_val) const
+	{
+		auto it = m_map.lower_bound(hash_val);
+
+		if (it == m_map.end())
+			return std::numeric_limits<size_t>::max();
+		else
+		{
+			if (it == m_map.begin())
+				return std::numeric_limits<size_t>::max();
+			else
+			{
+				--it;
+				return it->second;
+			}
+		}
+	}
+
+	void create_mapping(size_t hash_val, size_t block_index)
+	{
+		m_map.insert(make_pair(hash_val, block_index));
+	}
+private:
+	map_t m_map;
+};
+
 template<typename T, typename S, typename H, template<typename> class W, template<typename> class SG, unsigned int BlockSize>//65536U //4096U // 8192U
 class complex_hashset_base
 {
@@ -22,8 +57,11 @@ protected:
 	using value_streamer_t = S;
 	typedef H hasher_t;
 	typedef std::pair<size_t, value_type> combined_value_t;
-	typedef std::map<size_t, size_t> map_t;
-	using bucket_t = map_t;
+	
+	typedef std::map<size_t, size_t> map_t;	//Maps hash_value => block index where it should be
+	using index_t = map_wrapper<map_t>;
+
+	//using bucket_t = map_t;
 	static const int MaxNodesPerBucket = 500;
 	struct block_t;
 
@@ -223,7 +261,7 @@ public:
 	{
 		//Find appropriate block, create if it does not exists
 		
-		size_t block_id = block_with_hash(hash_val);
+		size_t block_id = m_index.block_with_hash(hash_val);
 
 		if (block_id == std::numeric_limits<size_t>::max())
 		{
@@ -296,26 +334,6 @@ protected:
 
 	}
 	
-	size_t block_with_hash(size_t hash_val) const
-	{
-		//bucket_t & bucket = bucket_with_hash(hash_val);
-
-		auto it = m_indicesTree.lower_bound(hash_val);
-
-		if (it == m_indicesTree.end())
-			return std::numeric_limits<size_t>::max();
-		else
-		{
-			if (it == m_indicesTree.begin())
-				return std::numeric_limits<size_t>::max();
-			else
-			{
-				--it;
-				return it->second;
-			}
-		}
-	}
-
 	void create_index_record(size_t hash_val, size_t block_id)
 	{
 		/*bucket_t & bucket = bucket_with_hash(hash_val);
@@ -324,7 +342,7 @@ protected:
 
 		if (bucket.size() > MaxNodesPerBucket)
 			split_buckets();*/
-		m_indicesTree.insert(make_pair(hash_val, block_id));
+		m_index.create_mapping(hash_val, block_id);
 	}
 	
 	/*bucket_t & bucket_with_hash(size_t hash_val)
@@ -486,7 +504,8 @@ protected:
 	//In bytes
 	const int m_serializedElementSize;
 
-	map_t m_indicesTree;
+	//map_t m_indicesTree;
+	index_t m_index;
 	//paged_vector_t m_blocks;
 	wrapper_t m_blocks;
 	const float m_maxLoadFactor;

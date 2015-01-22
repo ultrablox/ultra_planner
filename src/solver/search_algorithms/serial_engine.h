@@ -93,8 +93,9 @@ public:
 			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
 				this->m_database.add(state, [=](const state_t & state){
-					search_node_t new_node = this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
-					this->enqueue(is_goal_fun, new_node, h_fun(state));
+					//search_node_t new_node = this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
+					//this->enqueue(is_goal_fun, new_node, h_fun(state));
+					this->enqueue(is_goal_fun, this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) + 1), h_fun(state));
 				});
 			});
 		}

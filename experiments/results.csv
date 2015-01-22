@@ -1,6 +1,5 @@
 ;A*;;;
 problem_name;wall_time;plan_length;node_count;
-korf_1.txt;14.2298;53.0;6017682.0;
-korf_10.txt;3.64321;46.0;1776145.0;
-korf_100.txt;67.1428;54.0;24429904.0;
-korf_11.txt;
+korf_1.txt;14.2088;53.0;6028697.0;
+korf_10.txt;3.5842;46.0;1779430.0;
+korf_100.txt;

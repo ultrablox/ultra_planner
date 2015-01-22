@@ -44,10 +44,12 @@ protected:
 
 template<bool ExtMem, bool BlockLargerThanElement> class grained_vector_base {};
 
+#define VECTOR_BLOCK_SIZE 65536
+
 template<bool ExtMem>
-class grained_vector_base<ExtMem, true> : public complex_vector_base<ExtMem, 8192>
+class grained_vector_base<ExtMem, true> : public complex_vector_base<ExtMem, VECTOR_BLOCK_SIZE>
 {
-	using _Base = complex_vector_base<ExtMem, 8192>;
+	using _Base = complex_vector_base<ExtMem, VECTOR_BLOCK_SIZE>;
 protected:
 	using block_t = typename _Base::block_t;
 public:
