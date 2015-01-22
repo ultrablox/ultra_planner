@@ -96,7 +96,7 @@ public:
 	{
 		for (auto it = begin; it != end; ++it)
 		{
-			insert(val_fun(*it), hash_fun(*it));
+			this->insert(val_fun(*it), hash_fun(*it));
 		}
 	}
 };

@@ -258,7 +258,7 @@ private:
 	std::vector<hash_map_t> m_storages;
 	//std::array<hash_map_t, StorageCount> m_storages;
 
-	complex_vector<search_node_t, node_streamer_t, ExtMemory> m_searchNodes;
+	complex_vector<search_node_t, node_streamer_t, ExtMemory, true> m_searchNodes;
 
 	std::atomic<size_t> m_nodeCount;
 	

@@ -327,11 +327,11 @@ protected:
 		m_indicesTree.insert(make_pair(hash_val, block_id));
 	}
 	
-	bucket_t & bucket_with_hash(size_t hash_val)
+	/*bucket_t & bucket_with_hash(size_t hash_val)
 	{
 		int bucket_id = hash_val % m_buckets.size();
 		return m_buckets[bucket_id];
-	}
+	}*/
 
 	void split_buckets()
 	{

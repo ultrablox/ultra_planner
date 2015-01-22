@@ -65,7 +65,8 @@ private:
 	template<typename EngType, typename GraphT, typename StateT>
 	void solve_with_engine(GraphT & graph, const StateT & initial_state)
 	{
-		GraphT::vertex_streamer_t streamer(graph.transition_system());
+		typedef typename GraphT::vertex_streamer_t streamer_t;
+		streamer_t streamer(graph.transition_system());
 
 		EngType search_engine(graph, streamer);
 
@@ -129,6 +130,11 @@ private:
 		}, path);
 
 		auto plan = puzzle.build_transition_path(path.begin(), path.end());
+
+		if(found)
+			cout << "Solution found (length " << plan.size() << ")" << std::endl;
+		else
+			cout << "Solution not found!" << std::endl;
 
 		auto end_tp = high_resolution_clock::now();
 		double search_timecost = duration_cast<microseconds>(end_tp - start_tp).count() * 1e-6;

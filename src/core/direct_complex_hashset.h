@@ -96,6 +96,8 @@ template<typename T, typename S, typename H = std::hash<T>, bool UseIntMemory = 
 class direct_complex_hashset : public complex_hashset_base<T, S, H, file_storage_wrapper, direct_hashset::ext_storage_generator, BlockSize>
 {
 	using _Base = complex_hashset_base<T, S, H, file_storage_wrapper, direct_hashset::ext_storage_generator, BlockSize>;
+	using block_t = typename _Base::block_t;
+	using combined_value_t = typename _Base::combined_value_t;
 public:
 	//template<typename SerFun, typename DesFun>
 	direct_complex_hashset(const S & ss/*, int serialized_element_size, SerFun s_fun, DesFun d_fun*/)
@@ -113,7 +115,7 @@ public:
 	void insert_range(It begin, It end, HashFun hash_fun, ValFun val_fun, CallbackFun fun)
 	{
 		auto success_fun = [&](const typename It::value_type & el){
-			++m_size;
+			++(this->m_size);
 			fun(el);
 		};
 
@@ -130,7 +132,7 @@ public:
 		vector<block_descr_t> block_descrs;
 
 		//Create new blocks for all elements with hash less then min value (or all - if empty)
-		auto it = m_indicesTree.empty() ? end : std::lower_bound(begin, end, m_indicesTree.begin()->first, [=](const typename It::value_type & val1, size_t max_val){
+		auto it = this->m_indicesTree.empty() ? end : std::lower_bound(begin, end, this->m_indicesTree.begin()->first, [=](const typename It::value_type & val1, size_t max_val){
 			return hash_fun(val1) < max_val;
 		});
 		create_chained_blocks(begin, it, [=](const typename It::value_type & val){
@@ -138,21 +140,21 @@ public:
 		}, val_fun);
 		for_each(begin, it, success_fun);
 
-		if (!m_indicesTree.empty())
+		if (!this->m_indicesTree.empty())
 		{
 			//Element >= max index should be added to highest block
-			auto last_it = std::upper_bound(it, end, m_indicesTree.rbegin()->first, [=](size_t min_val, const typename It::value_type & val1){
+			auto last_it = std::upper_bound(it, end, this->m_indicesTree.rbegin()->first, [=](size_t min_val, const typename It::value_type & val1){
 				return min_val < hash_fun(val1) + 1;
 			});
 			if (last_it != end)
-				block_descrs.push_back(block_descr_t(m_indicesTree.rbegin()->second, std::distance(begin, last_it), std::distance(begin, end)));
+				block_descrs.push_back(block_descr_t(this->m_indicesTree.rbegin()->second, std::distance(begin, last_it), std::distance(begin, end)));
 
 			//Others should be added to their equal ranges
 			while (it != last_it)
 			{
-				auto lb = m_indicesTree.upper_bound(hash_fun(*it));
+				auto lb = this->m_indicesTree.upper_bound(hash_fun(*it));
 
-				if (lb == m_indicesTree.end())
+				if (lb == this->m_indicesTree.end())
 					throw runtime_error("Impossible");
 
 				size_t max_hash = lb->first;
@@ -178,7 +180,7 @@ public:
 		//Now process the blocks
 		for (auto & block_descr : block_descrs)
 		{
-			insert_into_chain(get<0>(block_descr));
+			this->insert_into_chain(get<0>(block_descr));
 
 			std::vector<combined_value_t> old_vals;
 
@@ -187,7 +189,7 @@ public:
 			while (cur_block_index != std::numeric_limits<size_t>::max())
 			{
 				block_t block;// = m_blocks[cur_block_index];
-				m_blocks.read_into(cur_block_index, block);
+				this->m_blocks.read_into(cur_block_index, block);
 
 				size_t last_size = old_vals.size();
 				old_vals.resize(last_size + block.item_count);
@@ -195,14 +197,14 @@ public:
 				for (int i = 0; i < block.item_count; ++i)
 				{
 					combined_value_t cur_val;
-					char * base_ptr = block.data + i * m_serializedElementSize;
+					char * base_ptr = block.data + i * this->m_serializedElementSize;
 					old_vals[last_size + i].first = *((size_t*)base_ptr);
 					//m_deserializeFun(base_ptr + sizeof(size_t), old_vals[last_size + i].second);
-					m_valueStreamer.deserialize(base_ptr + sizeof(size_t), old_vals[last_size + i].second);
+					this->m_valueStreamer.deserialize(base_ptr + sizeof(size_t), old_vals[last_size + i].second);
 				}
 
 				m_freedBlocks.push(cur_block_index);
-				m_indicesTree.erase(block.first_hash());
+				this->m_indicesTree.erase(block.first_hash());
 				cur_block_index = block.next;
 			}
 
@@ -262,10 +264,10 @@ public:
 		{
 			//Update index only for chain beginnings
 			if (it->prev == std::numeric_limits<size_t>::max())
-				m_indicesTree.insert(make_pair(it->first_hash(), it->id));
+				this->m_indicesTree.insert(make_pair(it->first_hash(), it->id));
 		}
 
-		m_blocks.write(m_writeQueue.begin(), last_write_it);
+		this->m_blocks.write(m_writeQueue.begin(), last_write_it);
 	}
 
 	template<typename It, typename HashExtractor, typename ValExtractor>
@@ -274,7 +276,7 @@ public:
 		auto gr_end_it = begin, last_gr_end = begin;
 		while (gr_end_it != end)
 		{
-			gr_end_it = UltraCore::find_group_end(gr_end_it, end, m_maxItemsInBlock, [=](const typename It::value_type & val){return hash_fun(val); });
+			gr_end_it = UltraCore::find_group_end(gr_end_it, end, this->m_maxItemsInBlock, [=](const typename It::value_type & val){return hash_fun(val); });
 
 			int block_id = m_writeQueueIndex++;
 			m_writeQueue[block_id].id = request_block();
@@ -282,7 +284,7 @@ public:
 			m_writeQueue[block_id].item_count = 0;
 
 			size_t group_size = std::distance(last_gr_end, gr_end_it);
-			if (group_size > m_maxItemsInBlock) //Needs real chaining
+			if (group_size > this->m_maxItemsInBlock) //Needs real chaining
 			{
 				//cout << "Creating chain with length " << std::distance(last_gr_end, gr_end_it) << std::endl;
 				//std::vector<block_t> chain(integer_ceil(group_size, m_maxItemsInBlock));
@@ -291,7 +293,7 @@ public:
 
 				for (auto it = last_gr_end; it != gr_end_it; ++it)
 				{
-					if (m_writeQueue[block_id].item_count == m_maxItemsInBlock)
+					if (m_writeQueue[block_id].item_count == this->m_maxItemsInBlock)
 					{
 						prev_block_id = block_id;
 						block_id = m_writeQueueIndex++;
@@ -322,7 +324,7 @@ public:
 	size_t request_block()
 	{
 		if (m_freedBlocks.empty())
-			return m_blockCount++;
+			return this->m_blockCount++;
 		else
 		{
 			size_t res = m_freedBlocks.front();

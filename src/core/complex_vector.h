@@ -11,24 +11,172 @@
 
 using namespace std;
 
-template<typename T, typename S = base_type_streamer<T>, bool ExtMemory = false>
-class complex_vector
+
+template<bool ExtMem, int BS>
+class complex_vector_base
+{
+protected:
+	static const int BlockSize = BS;
+
+	struct block_t
+	{
+		char data[BlockSize];
+	};
+
+	typedef typename stxxl::VECTOR_GENERATOR<block_t>::result ext_base_vec_t;
+	typedef std::vector<block_t> int_ext_base_vec_t;
+	typedef typename std::conditional<ExtMem, ext_base_vec_t, int_ext_base_vec_t>::type base_vec_t;
+
+public:
+	void clear()
+	{
+		m_data.clear();
+	}
+
+	bool empty() const
+	{
+		return m_data.empty();
+	}
+
+protected:
+	base_vec_t m_data;
+};
+
+template<bool ExtMem, bool BlockLargerThanElement> class grained_vector_base {};
+
+template<bool ExtMem>
+class grained_vector_base<ExtMem, true> : public complex_vector_base<ExtMem, 8192>
+{
+	using _Base = complex_vector_base<ExtMem, 8192>;
+protected:
+	using block_t = typename _Base::block_t;
+public:
+	grained_vector_base(size_t serialized_value_size)
+		:m_elementsPerBlock(_Base::BlockSize / serialized_value_size), m_size(0)
+	{
+		cout << "Creating complex vector with block_size=" << _Base::BlockSize << ", " << m_elementsPerBlock << ", " << m_elementsPerBlock << " elements per block" << std::endl;
+		m_cache.item_count = 0;
+	}
+
+	//Return {BlockIndex, Offset}
+	std::pair<size_t, size_t> element_address(size_t index) const
+	{
+		return make_pair(index / m_elementsPerBlock, index % m_elementsPerBlock);
+	}
+
+	size_t size() const
+	{
+		return m_size;
+	}
+
+	template<typename S, typename V>
+	void push_back(const S & streamer, const V & new_val)
+	{
+		//cout << "Pushing..." << std::endl;
+		streamer.serialize(m_cache.block.data + m_cache.item_count * streamer.serialized_size(), new_val);
+		++m_cache.item_count;
+		++m_size;
+
+		if(m_cache.item_count == m_elementsPerBlock)
+		{
+			this->m_data.push_back(m_cache.block);
+			m_cache.item_count = 0;
+		}
+	}
+
+	template<typename S, typename V>
+	void get(size_t index, const S & streamer, V & val) const
+	{
+		auto address = element_address(index);
+		const char * ptr = 0;
+		if(address.first < this->m_data.size())
+		{
+			const block_t & block_ref = this->m_data[address.first];
+			ptr = block_ref.data + address.second * streamer.serialized_size();
+		}
+		else
+			ptr = m_cache.block.data + address.second * streamer.serialized_size();
+
+		streamer.deserialize(ptr, val);
+	}
+
+private:
+	const size_t m_elementsPerBlock;
+	size_t m_size;
+	struct 
+	{
+		block_t block;
+		size_t item_count;
+	} m_cache;
+};
+
+template<bool ExtMem>
+class grained_vector_base<ExtMem, false> : public complex_vector_base<ExtMem, 8>
+{
+protected:
+	using _Base = complex_vector_base<ExtMem, 8>;
+	using block_t = typename _Base::block_t;
+public:
+	grained_vector_base(size_t serialized_value_size)
+		:m_elementSize(integer_ceil(serialized_value_size, _Base::BlockSize)), m_valueTmp(m_elementSize)
+	{
+		cout << "Creating complex vector with element_size = " << serialized_value_size << ", block_size = " << _Base::BlockSize << " (" << m_elementSize << " blocks per element)" << std::endl;
+	}
+
+	//Return {BlockIndex, 0}
+	std::pair<size_t, size_t> element_address(size_t index) const
+	{
+		return make_pair(index / m_elementSize, 0);
+	}
+
+	template<typename S, typename V>
+	void push_back(const S & streamer, const V & new_val)
+	{
+		//cout << "Pushing mini..." << std::endl;
+
+		streamer.serialize(&m_valueTmp[0], new_val);
+
+		for(int i = 0; i < m_elementSize; ++i)
+			this->m_data.push_back(m_valueTmp[i]);
+	}
+
+	template<typename S, typename V>
+	void get(size_t index, const S & streamer, V & val) const
+	{
+		auto address = element_address(index);
+		const block_t & block_ref = this->m_data[address.first];
+
+		const char * ptr = (const char *)&block_ref;
+		streamer.deserialize(ptr + address.second, val);
+	}
+
+	size_t size() const
+	{
+		return this->m_data.size() / m_elementSize;
+	}
+
+private:
+	//Number of blocks per one value_type
+	const int m_elementSize;
+	mutable std::vector<block_t> m_valueTmp;
+};
+
+template<typename T, typename S = base_type_streamer<T>, bool ExtMemory = false, bool UseLargeBlocks = false>
+class complex_vector : public grained_vector_base<ExtMemory, UseLargeBlocks>
 {
 	friend class proxy;
 	friend class iterator_base;
+
+	using _Base = grained_vector_base<ExtMemory, UseLargeBlocks>;
+
 public:
 	typedef complex_vector<T, S> _Self;
 	typedef T value_type;
 	using streamer_t = S;
-	typedef int base_type_t;
-	typedef std::function<void(const void*, value_type &)> deserialize_fun_type;
-	typedef std::function<void(void*, const value_type &)> serialize_fun_type;
+	using block_t = typename _Base::block_t;
+	using base_type_t = block_t;
 
-	typedef typename stxxl::VECTOR_GENERATOR<base_type_t>::result ext_base_vec_t;
-	typedef std::vector<base_type_t> int_ext_base_vec_t;
-	typedef typename std::conditional<ExtMemory, ext_base_vec_t, int_ext_base_vec_t>::type base_vec_t;
-
-	template<typename VecT>
+	/*template<typename VecT>
 	struct iterator_base
 	{
 		typedef forward_iterator_tag iterator_category;
@@ -48,23 +196,14 @@ public:
 				m_vec.m_streamer.deserialize(m_ptr, *this);
 			}
 
-			/*proxy(const proxy && rhs)
-				:m_vec(rhs.m_vec)
-			{
-				memcpy(m_ptr, rhs.m_ptr, m_vec.m_elementSize * sizeof(typename VecT::base_type_t));
-			}*/
-
 			proxy& operator=(const value_type &val)
 			{
-				//m_vec.m_serializeFun(m_ptr, val);
 				m_vec.m_streamer.serialize(m_ptr, val);
 				return *this;
 			}
 
 			proxy& operator=(const proxy & rhs)
 			{
-				//memcpy(m_ptr, rhs.m_ptr, m_vec.m_elementSize * sizeof(typename VecT::base_type_t));
-				//m_vec.m_serializeFun(m_ptr, rhs);
 				m_vec.m_streamer.serialize(m_ptr, rhs);
 				return *this;
 			}
@@ -72,7 +211,6 @@ public:
 			bool operator==(const value_type & rhs) const
 			{
 				value_type tmp;
-				//m_vec.m_deserializeFun(m_ptr, tmp);
 				m_vec.m_streamer.deserialize(m_ptr, tmp);
 				return tmp == rhs;
 			}
@@ -80,8 +218,6 @@ public:
 			bool operator<(const proxy & rhs) const
 			{
 				value_type v1, v2;
-				//m_vec.m_deserializeFun(m_ptr, v1);
-				//rhs.m_vec.m_deserializeFun(rhs.m_ptr, v2);
 				m_vec.m_streamer.deserialize(m_ptr, v1);
 				rhs.m_vec.m_streamer.deserialize(rhs.m_ptr, v2);
 				return v1 < v2;
@@ -178,43 +314,31 @@ public:
 
 	typedef iterator_base<_Self> iterator;
 	typedef iterator_base<const _Self> const_iterator;
+	*/
 
-	//template<typename SerFun, typename DesFun>
-	complex_vector(const streamer_t & _steamer/*, int serialized_element_size, SerFun s_fun, DesFun d_fun*/)
-		:m_streamer(_steamer), /*m_serializeFun(s_fun), m_deserializeFun(d_fun),*/ m_elementSize(integer_ceil(m_streamer.serialized_size(), sizeof(base_type_t))), m_valueTmp(m_streamer.serialized_size())
-	{
-	}
-
-	void push_back(const value_type & new_val)
-	{
-		//m_serializeFun(&m_valueTmp[0], new_val);
-		m_streamer.serialize(&m_valueTmp[0], new_val);
-
-		for(int i = 0; i < m_elementSize; ++i)
-			m_data.push_back(m_valueTmp[i]);
-
-		/*size_t old_size = m_data.size();
-		m_data.resize(old_size + m_elementSize);
-		for (size_t i = 0; i < m_elementSize; ++i)
-			m_data[old_size + i] = m_valueTmp[i];*/
-	}
+	complex_vector(const streamer_t & _steamer)
+		:_Base(_steamer.serialized_size()), m_streamer(_steamer)
+	{}
 
 	value_type operator[](size_t index) const
 	{
 		value_type res;
-		//m_deserializeFun(&m_data[index * m_elementSize], res);
-		m_streamer.deserialize(&m_data[index * m_elementSize], res);
+		this->get(index, m_streamer, res);
 		return std::move(res);
 	}
 
-	iterator begin()
+	void push_back(const value_type & new_val)
+	{
+		_Base::push_back(m_streamer, new_val);
+	}
+/*	iterator begin()
 	{
 		return iterator(m_elementSize, 0, *this);
 	}
 
 	iterator end()
 	{
-		return iterator(m_elementSize, m_data.size(), *this);
+		return iterator(m_elementSize, this->m_data.size(), *this);
 	}
 
 	const_iterator begin() const
@@ -224,41 +348,18 @@ public:
 
 	const_iterator end() const
 	{
-		return const_iterator(m_elementSize, m_data.size(), *this);
+		return const_iterator(m_elementSize, this->m_data.size(), *this);
 	}
 
 	void insert(iterator iter, const value_type & new_val)
 	{
-		m_data.insert(m_data.begin() + iter.pos, m_elementSize, 0);
+		this->m_data.insert(this->m_data.begin() + iter.pos, m_elementSize, 0);
 		//m_serializeFun(&m_data[iter.pos], new_val);
-		m_streamer.serialize(&m_data[iter.pos], new_val);
+		m_streamer.serialize(&this->m_data[iter.pos], new_val);
 	}
-
-	void clear()
-	{
-		m_data.clear();
-	}
-
-	size_t size() const
-	{
-		return m_data.size() / m_elementSize;
-	}
-
-	bool empty() const
-	{
-		return m_data.empty();
-	}
+*/
 private:
 	streamer_t m_streamer;
-	//serialize_fun_type m_serializeFun;
-	//deserialize_fun_type m_deserializeFun;
-
-	//Number of base elements per one value_type
-	const int m_elementSize;
-
-	base_vec_t m_data;
-
-	mutable std::vector<base_type_t> m_valueTmp;
 };
 
 
