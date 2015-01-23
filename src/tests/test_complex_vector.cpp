@@ -95,7 +95,7 @@ void test_complex_vector()
 	assert_test(vec[2] == complex_element(1, 0, 0), "Complex vector []");
 
 	//Find
-	auto it = std::find(vec.begin(), vec.end(), complex_element(0, 1, 0));
+/*	auto it = std::find(vec.begin(), vec.end(), complex_element(0, 1, 0));
 	assert_test(std::distance(vec.begin(), it) == 1, "Complex vector + std::find");
 
 	//Insertion
@@ -151,7 +151,7 @@ void test_complex_vector()
 			for (int i = 0; i < vec.size(); ++i)
 				cout << correct_vec[i] << '\t' << vec[i].val() << std::endl;
 		}
-	}
+	}*/
 }
 
 void test_algorithm()
@@ -216,15 +216,19 @@ void test_complex_hashmap()
 
 			auto r2 = correct_set.insert(val);
 
-			if (val == 157)
+			if (i >= 21)
+			{
 				++count;
-			if (count = 7)
+				//hset.print_debug();
+			}
+			if (val == 307)
 				int x = 0;
-
+			
+			//cout << i << std::endl;
 			auto r1 = hset.insert(val);
+			//hset.print_debug();
 
-
-			assert_test(r1.second == r2.second, "Complex hashset insertion");
+			assert_test(r1 == r2.second, "Complex hashset insertion");
 			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
 		}
 
@@ -244,7 +248,7 @@ void test_complex_hashmap()
 		}
 	}
 	//Test add_range
-	{
+	/*{
 		complex_element_streamer streamer;
 		direct_complex_hashset<complex_element, complex_element_streamer, std::hash<complex_element>, true, 256U> hset(streamer);
 
@@ -276,5 +280,5 @@ void test_complex_hashmap()
 
 		assert_test(hset.size() == correct_set.size(), "Complex hashset insert range");
 		
-	}
+	}*/
 }

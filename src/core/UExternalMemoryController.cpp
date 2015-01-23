@@ -27,7 +27,8 @@ UExternalMemoryController::UExternalMemoryController(const std::string & ignored
 	//std::string drive_letters[] = { "D:", "F:", "G:" };
 
 #ifdef WIN32
-	std::string drive_letters[] = { "D:"};
+	std::string drive_letters[] = { "C:/temp"};
+	//std::string drive_letters[] = { "D:"};
 #elif defined(__APPLE__)
 	std::string drive_letters[] = {"/Volumes/HDD/Users/ultrablox/Projects/ultra_planner/bin/osx"};
 #endif
@@ -35,7 +36,7 @@ UExternalMemoryController::UExternalMemoryController(const std::string & ignored
 	{
 		for (int i = 0; i < 1; ++i)
 		{
-			size_t disc_space_size = 2ULL * 1024 * 1024 * 1024;
+			size_t disc_space_size = 16ULL * 1024 * 1024 * 1024;
 		#ifdef WIN32
 			stxxl::disk_config * p_disk1 = new stxxl::disk_config(drive + "/stxxl_" + to_string(i) + ".tmp", disc_space_size, "wincall direct=try");
 		#elif defined(__APPLE__)

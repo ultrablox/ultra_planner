@@ -124,10 +124,10 @@ public:
 		auto & storage = m_storages[hash_val % storage_count];
 		auto res = storage.insert(state, hash_val);
 		
-		if(res.second)
+		if(res)
 			++m_nodeCount;
 
-		return res.second;
+		return res;
 	}
 
 	template<typename CallbackFun>
