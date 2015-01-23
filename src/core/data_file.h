@@ -19,6 +19,8 @@
 
 using namespace std;
 
+void onWriteComplete(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
+
 /*
 Linear container of fixed-length data elements.
 */
@@ -36,7 +38,7 @@ public:
     data_file(const std::string & file_name = "unnamed")
 		:m_fileName(file_name), m_blockCount(0)
     #ifdef WIN32
-        , m_hFile(0)
+		, m_hFile(0), m_asyncCache(20000), m_pendingCount(0)
     #endif
     {
 		cout << "Creating data file: " << m_fileName << std::endl;
@@ -148,9 +150,27 @@ public:
 
     void write_range_async(block_type * buf_begin, size_t first_id, size_t block_count)
     {
-        cout << "Attempt to write " << first_id << " - " << first_id + block_count << std::endl;
+        //cout << "Attempt to write " << first_id << " - " << first_id + block_count << std::endl;
 
 #ifdef WIN32
+		int request_id = m_pendingCount++;
+		m_asyncCache[request_id] = { 0 };
+		if (first_id < m_blockCount)
+			m_asyncCache[request_id].Offset = first_id * sizeof(block_type);
+		else
+		{
+			m_asyncCache[request_id].Offset = 0xFFFFFFFF;
+			m_asyncCache[request_id].OffsetHigh = 0xFFFFFFFF;
+		}
+
+		bool r = WriteFileEx(m_hFile, buf_begin, sizeof(block_type)* block_count, &m_asyncCache[request_id], onWriteComplete);
+		m_blockCount = max(m_blockCount, first_id + block_count);
+		if (!r)
+		{
+			DWORD err_code = GetLastError();
+
+			cout << "Write async failed = "<< err_code << "\n";
+		}
 #else
         aiocb * cb = new aiocb;
     
@@ -191,6 +211,7 @@ public:
     bool ready()
     {
 #ifdef WIN32
+		m_pendingCount = 0;
 		return true;
 #else
         if(!m_pendingRequests.empty())
@@ -276,6 +297,8 @@ private:
 #ifdef WIN32
     HANDLE m_hFile;
 	DWORD m_bytesWritten;
+	std::vector<OVERLAPPED> m_asyncCache;
+	int m_pendingCount;
 #else
     std::list<aiocb*> m_pendingRequests;
     int m_fileDescriptor;

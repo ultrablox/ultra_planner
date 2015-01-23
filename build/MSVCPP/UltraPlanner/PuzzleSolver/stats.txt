@@ -1,7 +1,8 @@
-wall_time:0.001
-plan_length:1
-node_count: 3
-Database hashset block count: 3
-Database density: 0.00171527
-Search queue layer count: 1
+wall_time:0.002
+plan_length:0
+node_count: 4
+Database hashset block count: 4
+Database density: 0.166667
+Search queue layer count: 0
 Search queue secondary node count: 0
+Best priority: 3.40282e+038

@@ -140,7 +140,7 @@ public:
 					//Compress last layer into secondary data
 					auto rit = m_primaryData.rbegin();
 
-					cout << "Erasing search queue layer (" << rit->second.size() << " nodes)..." << std::endl;
+					//cout << "Erasing search queue layer (" << rit->second.size() << " nodes)..." << std::endl;
 
 					for (auto & node : rit->second)
 						m_secondaryData.push_back(combined_value_t(rit->first, std::move(node)));

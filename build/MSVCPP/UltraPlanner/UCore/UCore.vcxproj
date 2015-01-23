@@ -272,6 +272,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\core\data_file.cpp" />
     <ClCompile Include="..\..\..\..\src\core\expression\UNumericExpression.cpp" />
     <ClCompile Include="..\..\..\..\src\core\transition_system\UState.cpp" />
     <ClCompile Include="..\..\..\..\src\core\transition_system\UTransition.cpp" />

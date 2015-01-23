@@ -36,7 +36,9 @@ public:
 
 	void read_into(size_t index, block_t & block)
 	{
-		m_storage.get(index, block);
+		int r = m_storage.get(index, block);
+		if (r)
+			cout << "Read failed!" << std::endl;
 	}
 
 	template<typename It>
@@ -109,7 +111,7 @@ public:
 	Inserts range of new elements into hashset. Calls callback for each sucess
 	insertion. Is optimized for inserting range.
 	*/
-	typedef std::tuple<size_t, int, int> block_descr_t; //Block id + first_element_index + (last_element_index+1)
+	typedef std::tuple<size_t, int, int, size_t> block_descr_t; //Block id + first_element_index + (last_element_index+1)
 
 	template<typename It, typename HashFun, typename ValFun, typename CallbackFun>
 	void insert_range(It begin, It end, HashFun hash_fun, ValFun val_fun, CallbackFun fun)
@@ -131,8 +133,28 @@ public:
 		//Get ordered seqeunce of blocks
 		vector<block_descr_t> block_descrs;
 
+		auto it = begin;
+		while (it != end)
+		{
+			size_t group_start_hash = m_index.expected_block_min_hash(hash_fun(*it));
+			auto last_it = std::find_if_not(it, end, [&](const typename It::value_type & el){
+				return group_start_hash == m_index.expected_block_min_hash(hash_fun(el));
+			});
+
+			auto chain = m_index.chain_with_hash(group_start_hash);
+			block_descrs.push_back(block_descr_t(chain.first, std::distance(begin, it), std::distance(begin, last_it), group_start_hash));
+
+			it = last_it;
+		}
+
+		for (auto & bd : block_descrs)
+		{
+			auto chain = merge_into_chain(get<0>(bd), begin + get<1>(bd), begin + get<2>(bd), hash_fun, val_fun, success_fun);
+			m_index.update_mapping(get<3>(bd), chain);
+		}
+
 		//Create new blocks for all elements with hash less then min value (or all - if empty)
-		auto it = this->m_indicesTree.empty() ? end : std::lower_bound(begin, end, this->m_indicesTree.begin()->first, [=](const typename It::value_type & val1, size_t max_val){
+		/*auto it = this->m_indicesTree.empty() ? end : std::lower_bound(begin, end, this->m_indicesTree.begin()->first, [=](const typename It::value_type & val1, size_t max_val){
 			return hash_fun(val1) < max_val;
 		});
 		create_chained_blocks(begin, it, [=](const typename It::value_type & val){
@@ -253,21 +275,136 @@ public:
 			});
 		}
 
-		//cout << m_writeQueueIndex << std::endl;
+		//cout << m_writeQueueIndex << std::endl;*/
 		//Process write queue
 		auto last_write_it = m_writeQueue.begin() + m_writeQueueIndex;
 		sort_wrapper(m_writeQueue.begin(), last_write_it, [](const block_t & b1, const block_t & b2){
 			return b1.id < b2.id;
 		});
 
-		for (auto it = m_writeQueue.begin(); it != last_write_it; ++it)
-		{
-			//Update index only for chain beginnings
-			if (it->prev == std::numeric_limits<size_t>::max())
-				this->m_indicesTree.insert(make_pair(it->first_hash(), it->id));
-		}
-
 		this->m_blocks.write(m_writeQueue.begin(), last_write_it);
+	}
+	template<typename It, typename HashExtractor, typename ValExtractor, typename Callback>
+	std::pair<size_t, size_t> merge_into_chain(size_t start_block_id, It begin, It end, HashExtractor hash_fun, ValExtractor val_fun, Callback cb_fun)
+	{
+		if (start_block_id == std::numeric_limits<size_t>::max())
+		{
+			start_block_id = request_block();
+			size_t local_block_id = m_writeQueueIndex++;
+			m_writeQueue[local_block_id].set_meta(start_block_id, start_block_id, start_block_id, 0);
+
+			auto it = begin;
+			while (it != end)
+			{
+				append_to_block(m_writeQueue[local_block_id], hash_fun(*it), val_fun(*it));
+				if (m_writeQueue[local_block_id].item_count == m_maxItemsInBlock)
+				{
+					size_t new_block_id = request_block();
+					size_t prev_block_id = local_block_id;
+					local_block_id = m_writeQueueIndex++;
+					m_writeQueue[local_block_id].set_meta(new_block_id, prev_block_id, new_block_id, 0);
+					m_writeQueue[prev_block_id].next = local_block_id;
+				}
+
+				cb_fun(*it++);
+			}
+
+			return make_pair(start_block_id, local_block_id);
+		}
+		else
+		{
+			vector<size_t> local_blocks;
+			vector<combined_value_t> chain_elements; //Hash + value
+
+			//Deserialize all the chain....
+
+			size_t block_id = start_block_id, last_block_id = start_block_id;
+			
+			do
+			{
+				size_t local_block_id = m_writeQueueIndex++;
+				local_blocks.push_back(local_block_id);
+
+				block_t & block = m_writeQueue[local_block_id];
+				memset(&block, 0, sizeof(block_t));
+				this->m_blocks.read_into(block_id, block);
+				
+
+				for (int i = 0; i < block.item_count; ++i)
+				{
+					combined_value_t val;
+					const char * base_ptr = block.data + i * this->m_serializedElementSize;
+					val.first = *((size_t*)base_ptr);
+					this->m_valueStreamer.deserialize(base_ptr + sizeof(size_t), val.second);
+					chain_elements.push_back(val);
+				}
+
+				m_writeQueue[local_block_id].item_count = 0;
+				last_block_id = block_id;
+				block_id = m_writeQueue[local_block_id].next;
+			} while (block_id != last_block_id);
+
+			//Remove duplication amongst news
+			auto last_it = UltraCore::unique(chain_elements, begin, end, [](const combined_value_t & val){
+				return val.first;
+			}, [=](const typename It::value_type & val){
+				return hash_fun(val);
+			}, [=](const combined_value_t & old_val, const typename It::value_type & new_val){
+				return old_val.second == val_fun(new_val);
+			});
+
+			//Merge
+			size_t old_vals_count = chain_elements.size();
+			for (auto it = begin; it != last_it; ++it)
+			{
+				cb_fun(*it);
+				chain_elements.push_back(make_pair(hash_fun(*it), val_fun(*it)));		
+			}
+
+			//Merge with old data
+			std::inplace_merge(chain_elements.begin(), chain_elements.begin() + old_vals_count, chain_elements.end(), [](const combined_value_t & left, const combined_value_t & right){
+				return left.first < right.first;
+			});
+
+			//And serialize back
+			auto local_block_it = local_blocks.begin();
+			bool writing_new = false;
+			size_t local_block_id = *local_block_it;
+
+			for (auto & el : chain_elements)
+			{
+				append_to_block(m_writeQueue[local_block_id], el.first, el.second);
+				if (m_writeQueue[local_block_id].item_count == m_maxItemsInBlock)
+				{
+					size_t last_local_block_id = local_block_id;
+
+					if (writing_new)
+					{
+						size_t new_block_id = request_block();
+						local_block_id = m_writeQueueIndex++;
+						m_writeQueue[local_block_id].set_meta(new_block_id, m_writeQueue[last_local_block_id].id, new_block_id, 0);
+						m_writeQueue[last_local_block_id].next = m_writeQueue[local_block_id].id;
+					}
+					else
+					{
+						++local_block_it;
+						if (local_block_it == local_blocks.end())
+						{
+							writing_new = true;
+							size_t new_block_id = request_block();
+							local_block_id = m_writeQueueIndex++;
+							m_writeQueue[local_block_id].set_meta(new_block_id, m_writeQueue[last_local_block_id].id, new_block_id, 0);
+							m_writeQueue[last_local_block_id].next = m_writeQueue[local_block_id].id;
+						}
+						else
+							local_block_id = *local_block_it;
+					}
+				}
+			}
+
+			return make_pair(local_blocks[0], local_block_id);
+		}
+		
 	}
 
 	template<typename It, typename HashExtractor, typename ValExtractor>

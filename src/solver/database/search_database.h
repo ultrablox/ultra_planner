@@ -43,8 +43,8 @@ class search_database
 	typedef H hash_t;
 	typedef std::tuple<size_t, state_t> record_t;
 	//typedef std::unordered_set<state_t> hash_map_t;
-	//typedef direct_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> hash_map_t;
-	typedef buffered_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> hash_map_t;
+	typedef direct_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> hash_map_t;
+	//typedef buffered_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> hash_map_t;
 	const int storage_count = StorageCount;
 
 	
@@ -124,10 +124,10 @@ public:
 		auto & storage = m_storages[hash_val % storage_count];
 		auto res = storage.insert(state, hash_val);
 		
-		if(res.second)
+		if(res)
 			++m_nodeCount;
 
-		return res.second;
+		return res;
 	}
 
 	template<typename CallbackFun>
