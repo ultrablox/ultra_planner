@@ -6,12 +6,12 @@
 #include "../search_queue.h"
 #include <queue>
 
-template<typename Gr, typename M, template<typename> class Cmp, bool ExtMemory = false>
-class queued_search_engine : public search_engine_base<Gr, ExtMemory>
+template<typename Gr, typename M, template<typename> class Cmp, bool ExtMemory = false, bool RAMBuffered = true>
+class queued_search_engine : public search_engine_base<Gr, ExtMemory, RAMBuffered>
 {
 protected:
 	using graph_t = Gr;
-	typedef search_engine_base<Gr, ExtMemory> _Base;
+	typedef search_engine_base<Gr, ExtMemory, RAMBuffered> _Base;
 	typedef M element_meta_t;
 	using search_node_t = typename _Base::search_node_t;
 	

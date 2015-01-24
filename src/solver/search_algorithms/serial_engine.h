@@ -42,17 +42,13 @@ public:
 			++step;
 		}
 
-		if (!this->m_goalNodes.empty())
-			solution_path = backtrace_path(this->m_goalNodes[0]);
-
-		//Build solution path
-		return !this->m_goalNodes.empty();
+		return this->finalize(solution_path);
 	}
 
 };
 
 template<typename Gr, template<typename> class Cmp, typename H, bool ExtMemory>
-class heuristic_engine : public queued_search_engine<Gr, float, Cmp, ExtMemory>
+class heuristic_engine : public queued_search_engine<Gr, float, Cmp, ExtMemory, true>
 {
 	//using priority_t = template<typename> Cmp;
 	using graph_t = Gr;
@@ -82,30 +78,56 @@ public:
 		{
 			search_node_t cur_node = this->dequeue(&current_data);
 
-			/*if (get<0>(current_data) < best_data)
-			{
-				best_data = get<0>(current_data);
-				cout << "Best heuristic: " << best_data << std::endl;
-
-				graph.transition_system().serialize_state(cout, get<2>(cur_node));
-			}*/
-
 			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
 				this->m_database.add(state, [=](const state_t & state){
-					//search_node_t new_node = this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
-					//this->enqueue(is_goal_fun, new_node, h_fun(state));
 					this->enqueue(is_goal_fun, this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) + 1), h_fun(state));
 				});
 			});
 		}
 
-		if (!_Base::m_goalNodes.empty())
-			solution_path = this->backtrace_path(_Base::m_goalNodes[0]);
+		return this->finalize(solution_path);
+	}
+};
 
-		_Base::m_finished = true;
+template<typename Gr, template<typename> class Cmp, typename H, bool ExtMemory>
+class buffered_heuristic_engine : public queued_search_engine<Gr, float, Cmp, ExtMemory, false>
+{
+	using _Base = queued_search_engine<Gr, float, Cmp, ExtMemory, false>;
+	using graph_t = Gr;
+	typedef float estimation_t;
+	typedef H heuristic_t;
+	using search_node_t = typename _Base::search_node_t;
+	using state_t = typename _Base::state_t;
+	using comparison_t = typename _Base::comparison_t;
+public:
+	buffered_heuristic_engine(graph_t & graph, const typename graph_t::vertex_streamer_t & vstreamer)
+		:_Base(graph, vstreamer)
+	{}
 
-		return !_Base::m_goalNodes.empty();
+	template<typename IsGoalFun>
+	bool operator()(graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
+	{
+		heuristic_t h_fun(graph.transition_system());
+
+		this->enqueue(is_goal_fun, this->create_node(init_state, 0), std::numeric_limits<float>::max());
+
+		float best_data = std::numeric_limits<float>::max();
+		comparison_t current_data;
+
+		while ((!_Base::m_searchQueue.empty()) && _Base::m_goalNodes.empty())
+		{
+			search_node_t cur_node = this->dequeue(&current_data);
+
+			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
+				//Check that node is not expanded or discovered by trying to add
+				this->m_database.add(state, [=](const state_t & state){
+					this->enqueue(is_goal_fun, this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1), h_fun(state));
+				});
+			});
+		}
+
+		return this->finalize(solution_path);
 	}
 };
 

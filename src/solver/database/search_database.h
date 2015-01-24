@@ -35,7 +35,7 @@ private:
 };
 
 
-template<typename T, typename S, typename H = std::hash<T>, bool ExtMemory = false, int StorageCount = 1>
+template<typename T, typename S, typename H = std::hash<T>, bool ExtMemory = false, bool RAMBuffered = true, int StorageCount = 1>
 class search_database
 {
 	typedef T state_t;
@@ -43,12 +43,13 @@ class search_database
 	typedef H hash_t;
 	typedef std::tuple<size_t, state_t> record_t;
 	//typedef std::unordered_set<state_t> hash_map_t;
-	typedef direct_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> hash_map_t;
-	//typedef buffered_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> hash_map_t;
+	typedef direct_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> direct_hash_map_t;
+	typedef buffered_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> buffered_hash_map_t;
+
+	typedef typename std::conditional<RAMBuffered, buffered_hash_map_t, direct_hash_map_t>::type hash_map_t;
 	const int storage_count = StorageCount;
 
 	
-
 public:
 	//Id + parent search node id + state + init->current path length
 	typedef std::tuple<size_t, size_t, state_t, int> search_node_t;
@@ -89,26 +90,11 @@ public:
 	};
 
 
-	//template<typename SerFun, typename DesFun>
-	search_database(const state_streamer_t & ss/*, int serialized_state_size, SerFun s_fun, DesFun d_fun*/)
-		:	//m_storages(storage_count, storage_factory<hash_map_t>().create_storage(serialized_state_size, s_fun, d_fun)),
-			/*m_nodeSerializeFun([=](void * dst, const search_node_t & node){
-				char * cur_ptr = (char*)dst;
-				memcpy(cur_ptr, &get<0>(node), sizeof(size_t));
-				memcpy(cur_ptr + sizeof(size_t), &get<1>(node), sizeof(size_t));
-				memcpy(cur_ptr + 2 * sizeof(size_t), &get<3>(node), sizeof(int));
-				s_fun(cur_ptr + 2 * sizeof(size_t)+sizeof(int), get<2>(node));
-			}), m_nodeDeserializeFun([=](const void * src, search_node_t & node){
-				const char * cur_ptr = (const char*)src;
-				memcpy(&get<0>(node), cur_ptr, sizeof(size_t));
-				memcpy(&get<1>(node), cur_ptr + sizeof(size_t), sizeof(size_t));
-				memcpy(&get<3>(node), cur_ptr + 2 * sizeof(size_t), sizeof(int));
-				d_fun(cur_ptr + 2 * sizeof(size_t)+sizeof(int), get<2>(node));
-			}),*/
-				m_searchNodes(node_streamer_t(ss)/*, serialized_state_size + sizeof(size_t)* 2 + sizeof(int), m_nodeSerializeFun, m_nodeDeserializeFun*/), m_nodeCount(0), m_stateStreamer(ss)
+	search_database(const state_streamer_t & ss)
+		:m_searchNodes(node_streamer_t(ss)), m_nodeCount(0), m_stateStreamer(ss)
 	{
 		for (int i = 0; i < storage_count; ++i)
-			m_storages.emplace_back(m_stateStreamer/*, serialized_state_size, s_fun, d_fun*/);
+			m_storages.emplace_back(m_stateStreamer);
 	}
 
 	bool contains(const state_t & state) const
@@ -240,13 +226,20 @@ public:
 		return res;
 	}
 
-	float density() const
+	std::vector<hashset_stats_t> storages_stats() const
+	{
+		std::vector<hashset_stats_t> res;
+		for (auto & storage : m_storages)
+			res.push_back(storage.get_stats());
+		return res;
+	}
+	/*float density() const
 	{
 		float res(0.0f);
 		for (auto & storage : m_storages)
 			res += storage.bucket_factor();
 		return res / m_storages.size();
-	}
+	}*/
 public:
 	//std::function<void(void*, const search_node_t&)> m_nodeSerializeFun;
 	//std::function<void(const void*, search_node_t&)> m_nodeDeserializeFun;

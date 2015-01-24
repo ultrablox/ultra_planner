@@ -40,7 +40,15 @@ struct direct_hasher
 class map_wrapper : public index_wrapper_base
 {
 public:
-	using chain_info_t = std::pair<size_t, size_t>;
+	struct chain_info_t
+	{
+		chain_info_t(size_t _first = std::numeric_limits<size_t>::max(), size_t _last = std::numeric_limits<size_t>::max(), size_t _block_count = 0)
+		:first(_first), last(_last), block_count(_block_count)
+		{}
+
+		size_t first, last, block_count;
+	};
+
 	//using map_t = std::map<size_t, chain_info_t>;
 	using map_t = std::unordered_map<size_t, chain_info_t>;
 	//using map_t = T<size_t, chain_info_t>;
@@ -57,7 +65,7 @@ public:
 	{
 		auto it = m_map.find(expected_block_min_hash(hash_val));
 		if (it == m_map.end())
-			return chain_info_t(std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max());
+			return chain_info_t(std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max(), 0);
 		else
 			return it->second;
 	}
@@ -67,7 +75,7 @@ public:
 		m_map.insert(make_pair(expected_block_min_hash(hash_val), chain_id));
 	}
 
-	void update_mapping(size_t hash_val, chain_info_t chain_id)
+	void update_mapping(size_t hash_val, const chain_info_t & chain_id)
 	{
 		m_map[expected_block_min_hash(hash_val)] = chain_id;
 	}
@@ -79,8 +87,39 @@ public:
 			res.push_back(make_pair(it.first, it.second));
 		return res;
 	}
+
+	void compute_stats(int & max_chain_length, double & average_chain_length) const
+	{
+		max_chain_length = 0;
+		average_chain_length = 0.0f;
+
+		for (auto & el : m_map)
+		{
+			max_chain_length = max(max_chain_length, (int)el.second.block_count);
+			average_chain_length += el.second.block_count;
+		}
+		
+		average_chain_length = average_chain_length / m_map.size();
+	}
 private:
 	map_t m_map;
+};
+
+struct hashset_stats_t
+{
+	int max_chain_length;
+	double average_chain_length;
+	float density;
+	size_t block_count;
+
+	friend std::ostream & operator<<(std::ostream & os, const hashset_stats_t & stats)
+	{
+		os << "Max chain length: " << stats.max_chain_length << std::endl;
+		os << "Average chain length: " << stats.average_chain_length << std::endl;
+		os << "Density: " << stats.density * 100 << "%" << std::endl;
+		os << "Block Count: " << stats.block_count << std::endl;
+		return os;
+	}
 };
 
 template<typename T, typename S, typename H, template<typename> class W, template<typename> class SG, unsigned int BlockSize>//65536U //4096U // 8192U
@@ -346,18 +385,19 @@ protected:
 			//Check if insertion will overflow current blocks
 			if (m_totalElements + 1 > m_blockIds.size() * m_hb.m_maxItemsInBlock)
 			{
-				limits.second = m_hb.m_blocks.size();
-				block_t new_block(limits.second);
+				limits.last = m_hb.m_blocks.size();
+				block_t new_block(limits.last);
 				new_block.prev = *m_blockIds.rbegin();
 				m_hb.m_blocks[*m_blockIds.rbegin()].next = new_block.id;
 				m_hb.m_blocks.push_back(std::move(new_block));
 				m_blockIds.push_back(new_block.id);
 
+				++limits.block_count;
 				m_hb.m_index.update_mapping(hash_val, limits);
 			}
 
 			//m_hb.print_debug();
-			++m_hb.m_blocks[limits.second].item_count;
+			++m_hb.m_blocks[limits.last].item_count;
 			
 			//Move tail right by 1 position
 			auto old_end_it = end();
@@ -446,7 +486,8 @@ public:
 		if (chain_id.first == std::numeric_limits<size_t>::max())
 		{
 			chain_id.first = m_blocks.size();
-			chain_id.second = chain_id.first;		
+			chain_id.last = chain_id.first;		
+			chain_id.block_count = 1;
 			m_blocks.push_back(std::move(block_t(chain_id.first)));
 			m_index.create_mapping(hash_val, chain_id);
 		}
@@ -468,9 +509,15 @@ public:
 		return m_size;
 	}
 
-	float bucket_factor() const
+	hashset_stats_t get_stats() const
 	{
-		return (float)m_size / (block_count() * (block_t::DataSize / m_serializedElementSize));
+		hashset_stats_t res;
+		res.density = (float)m_size / (block_count() * (block_t::DataSize / m_serializedElementSize));
+		res.block_count = m_blocks.size();
+
+		m_index.compute_stats(res.max_chain_length, res.average_chain_length);
+
+		return res;
 	}
 
 	iterator find(const value_type & val)

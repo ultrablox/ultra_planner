@@ -35,7 +35,7 @@ void test_merge()
 
 		auto keyer = [](const int & val){ return val; };
 		auto equaler = [](const int v1, const int v2){ return v1 == v2; };
-		auto last_it = UltraCore::unique(ext_cont, main_cont.begin(), main_cont.end(), keyer, keyer, equaler);
+		auto last_it = UltraCore::unique(ext_cont.begin(), ext_cont.end(), main_cont.begin(), main_cont.end(), keyer, keyer, equaler);
 		main_cont.erase(last_it, main_cont.end());
 
 		assert_test(xres == main_cont, "unique(2 containers)");
@@ -59,7 +59,7 @@ void test_merge()
 
 		auto keyer = [](const int & val){ return val; };
 		auto equaler = [](const int v1, const int v2){ return false; };
-		auto last_it = UltraCore::unique(ext_cont, main_cont.begin(), main_cont.end(), keyer, keyer, equaler);
+		auto last_it = UltraCore::unique(ext_cont.begin(), ext_cont.end(), main_cont.begin(), main_cont.end(), keyer, keyer, equaler);
 		main_cont.erase(last_it, main_cont.end());
 
 		assert_test(xres == main_cont, "unique(2 containers)");

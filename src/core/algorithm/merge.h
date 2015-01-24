@@ -59,15 +59,15 @@ namespace UltraCore
 	integer keys. Removes all elements from second container which are presented
 	in second container.
 	*/
-	template<typename C1, typename Iter, typename ExtKey, typename MainKey, typename Equality>
-	Iter unique(const C1 & ext_cont, Iter first, Iter last, ExtKey extKeyGetter, MainKey mainKeyGetter, Equality eq)
+	template<typename It, typename Iter, typename ExtKey, typename MainKey, typename Equality>
+	Iter unique(It ext_begin, It ext_end, Iter first, Iter last, ExtKey extKeyGetter, MainKey mainKeyGetter, Equality eq)
 	{
 		//auto first = main_cont.begin(), last = main_cont.end();
 		auto result = first;
 
-		auto ext_it = ext_cont.begin();
+		auto ext_it = ext_begin;
 
-		while(ext_it != ext_cont.end())
+		while (ext_it != ext_end)
 		{
 			//Move main iterator
 			while((first != last) && (mainKeyGetter(*first) < extKeyGetter(*ext_it)))
@@ -78,11 +78,11 @@ namespace UltraCore
 				break;
 
 			//Move external iterator
-			while((ext_it != ext_cont.end()) && (extKeyGetter(*ext_it) < mainKeyGetter(*first)))
+			while ((ext_it != ext_end) && (extKeyGetter(*ext_it) < mainKeyGetter(*first)))
 				++ext_it;
 
 			//Check we havent reached end
-			if(ext_it == ext_cont.end())
+			if (ext_it == ext_end)
 				break;
 
 			//If keys are not equal - iterate again
@@ -94,7 +94,7 @@ namespace UltraCore
 			//Determine external group with same keys
 			auto ext_group_end_it = ext_it;
 			//while (key == extKeyGetter(*ext_group_end_it))
-			while ((ext_group_end_it != ext_cont.end()) && (key == extKeyGetter(*ext_group_end_it)))
+			while ((ext_group_end_it != ext_end) && (key == extKeyGetter(*ext_group_end_it)))
 				++ext_group_end_it;	
 				
 
@@ -102,7 +102,7 @@ namespace UltraCore
 			bool is_duplication;
 			while((first != last) && (mainKeyGetter(*first) == key))
 			{
-				auto ext_eq_it = std::find_if(ext_it, ext_group_end_it, [=](const typename C1::value_type & val){
+				auto ext_eq_it = std::find_if(ext_it, ext_group_end_it, [=](const typename It::value_type & val){
 					return eq(val, *first);
 				});
 

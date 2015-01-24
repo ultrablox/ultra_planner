@@ -5,7 +5,7 @@
 #include "../database/search_database.h"
 
 //template<typename N, bool ExtMemory>
-template<typename Gr, bool ExtMemory>
+template<typename Gr, bool ExtMemory, bool RAMBuffered>
 class search_engine_base
 {
 protected:
@@ -15,7 +15,7 @@ protected:
 	using state_streamer_t = typename Gr::vertex_streamer_t;
 
 	//typedef simple_search_database<state_t> search_database_t;
-	typedef search_database<state_t, state_streamer_t, std::hash<state_t>, ExtMemory> search_database_t;
+	typedef search_database<state_t, state_streamer_t, std::hash<state_t>, ExtMemory, RAMBuffered> search_database_t;
 
 	//Id + parent search node id + state + init->current path length
 	typedef typename search_database_t::search_node_t search_node_t;
@@ -26,8 +26,7 @@ public:
 	struct stats_t
 	{
 		size_t state_count;
-		size_t database_block_count;
-		float database_density;
+		std::vector<hashset_stats_t> storage_stats;
 	};
 
 	//enum class state_state_t {Unknown, Discovered, Expanded};
@@ -74,6 +73,16 @@ protected:
 			});
 		}
 	}
+
+	bool finalize(std::vector<state_t> & solution_path)
+	{
+		if (!m_goalNodes.empty())
+			solution_path = backtrace_path(m_goalNodes[0]);
+
+		m_finished = true;
+
+		return !m_goalNodes.empty();
+	}
 public:
 	bool finished() const
 	{
@@ -85,16 +94,16 @@ public:
 	{
 		StatsT res;
 		res.state_count = m_database.state_count();
-		res.database_block_count = m_database.block_count();
-		res.database_density = m_database.density();
+		res.storage_stats = m_database.storages_stats();
 		return res;
 	}
 
 	friend std::ostream & operator<<(std::ostream & os, const stats_t & stats)
 	{
 		os << "node_count: " << stats.state_count << std::endl;
-		os << "Database hashset block count: " << stats.database_block_count << std::endl;
-		os << "Database density: " << stats.database_density << std::endl;
+		//os << "Database hashset block count: " << stats.database_block_count << std::endl;
+		//os << "Database density: " << stats.database_density << std::endl;
+		os << stats.storage_stats[0];
 		return os;
 	}
 protected:
