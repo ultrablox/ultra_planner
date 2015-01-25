@@ -231,7 +231,7 @@ private:
 private:
 	std::map<priority_component_t, layer_container_t*, comparator_t> m_primaryData;
 	complex_vector<combined_value_t, combined_val_streamer_t> m_secondaryData;
-	const value_streamer & m_nodeStreamer;
+	const value_streamer m_nodeStreamer;
 };
 
 #endif

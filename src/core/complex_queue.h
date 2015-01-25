@@ -80,7 +80,7 @@ public:
 		return m_baseContainer.empty();
 	}
 private:
-	const streamer_t & m_streamer;
+	const streamer_t m_streamer;
 	base_container_t m_baseContainer;
 	size_t m_valsPerBlock;
 };
