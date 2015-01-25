@@ -8,6 +8,8 @@
 
 #ifdef WIN32
     #include <windows.h>
+
+    void onWriteComplete(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
 #else
     #include <unistd.h>
     #include <sys/types.h>
@@ -19,7 +21,7 @@
 
 using namespace std;
 
-void onWriteComplete(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
+
 
 /*
 Linear container of fixed-length data elements.

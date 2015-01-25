@@ -100,6 +100,7 @@ class direct_complex_hashset : public complex_hashset_base<T, S, H, file_storage
 	using _Base = complex_hashset_base<T, S, H, file_storage_wrapper, direct_hashset::ext_storage_generator, BlockSize>;
 	using block_t = typename _Base::block_t;
 	using combined_value_t = typename _Base::combined_value_t;
+	using chain_info_t = map_wrapper::chain_info_t;
 public:
 	//template<typename SerFun, typename DesFun>
 	direct_complex_hashset(const S & ss/*, int serialized_element_size, SerFun s_fun, DesFun d_fun*/)
@@ -136,12 +137,12 @@ public:
 		auto it = begin;
 		while (it != end)
 		{
-			size_t group_start_hash = m_index.expected_block_min_hash(hash_fun(*it));
+			size_t group_start_hash = this->m_index.expected_block_min_hash(hash_fun(*it));
 			auto last_it = std::find_if_not(it, end, [&](const typename It::value_type & el){
-				return group_start_hash == m_index.expected_block_min_hash(hash_fun(el));
+				return group_start_hash == this->m_index.expected_block_min_hash(hash_fun(el));
 			});
 
-			auto chain = m_index.chain_with_hash(group_start_hash);
+			auto chain = this->m_index.chain_with_hash(group_start_hash);
 			block_descrs.push_back(block_descr_t(chain.first, std::distance(begin, it), std::distance(begin, last_it), group_start_hash, chain.block_count));
 
 			it = last_it;
@@ -151,9 +152,9 @@ public:
 		{
 			//vector<combined_value_t> elements_buffer(get<2>(bd) - get<1>(bd) + get<4>(bd) * m_maxItemsInBlock);
 
-			resize_if_less(m_elementsBuffer, get<2>(bd) -get<1>(bd) +get<4>(bd) * m_maxItemsInBlock);
+			resize_if_less(m_elementsBuffer, get<2>(bd) -get<1>(bd) +get<4>(bd) * this->m_maxItemsInBlock);
 			auto chain = merge_into_chain(get<0>(bd), begin + get<1>(bd), begin + get<2>(bd), hash_fun, val_fun, success_fun, m_elementsBuffer);
-			m_index.update_mapping(get<3>(bd), chain);
+			this->m_index.update_mapping(get<3>(bd), chain);
 		}
 
 		//Create new blocks for all elements with hash less then min value (or all - if empty)
@@ -301,7 +302,7 @@ public:
 			while (it != end)
 			{
 				append_to_block(m_writeQueue[local_block_id], hash_fun(*it), val_fun(*it));
-				if (m_writeQueue[local_block_id].item_count == m_maxItemsInBlock)
+				if (m_writeQueue[local_block_id].item_count == this->m_maxItemsInBlock)
 				{
 					last_block_global_id = m_writeQueue[local_block_id].id;
 					size_t new_block_id = request_block();
@@ -385,7 +386,7 @@ public:
 			{
 				auto & el = *el_it;
 				append_to_block(m_writeQueue[local_block_id], el.first, el.second);
-				if (m_writeQueue[local_block_id].item_count == m_maxItemsInBlock)
+				if (m_writeQueue[local_block_id].item_count == this->m_maxItemsInBlock)
 				{
 					size_t last_local_block_id = local_block_id;
 
