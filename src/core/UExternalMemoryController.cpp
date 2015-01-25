@@ -34,7 +34,7 @@ UExternalMemoryController::UExternalMemoryController(const std::string & ignored
 #endif
 	for (auto drive : drive_letters)
 	{
-		for (int i = 0; i < 1; ++i)
+		for (int i = 0; i < 4; ++i)
 		{
 			size_t disc_space_size = 16ULL * 1024 * 1024 * 1024;
 		#ifdef WIN32

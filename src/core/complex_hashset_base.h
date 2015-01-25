@@ -79,12 +79,18 @@ public:
 
 	void create_mapping(size_t hash_val, chain_info_t chain_id)
 	{
+		if ((chain_id.first == std::numeric_limits<size_t>::max()) || (chain_id.last == std::numeric_limits<size_t>::max()))
+			throw runtime_error("Invalid chain");
+
 		m_map.insert(make_pair(expected_block_min_hash(hash_val), chain_id));
 		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
 	}
 
 	void update_mapping(size_t hash_val, const chain_info_t & chain_id)
 	{
+		if ((chain_id.first == std::numeric_limits<size_t>::max()) || (chain_id.last == std::numeric_limits<size_t>::max()))
+			throw runtime_error("Invalid chain");
+
 		m_map[expected_block_min_hash(hash_val)] = chain_id;
 		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
 	}
@@ -127,12 +133,13 @@ public:
 
 	//typedef stxxl::VECTOR_GENERATOR<chain_info_t, 16U, 8192U, 4096U, stxxl::FR, stxxl::random>::result vector_t;
 	//static_assert(8192 % sizeof(chain_info_t) == 0, "Invalid element size");
-	typedef stxxl::unordered_map<size_t, chain_info_t, std::hash<size_t>, CompareLess, 8192, 1024> unordered_map_type;
+	typedef stxxl::unordered_map<size_t, chain_info_t, std::hash<size_t>, CompareLess/*, 4096U, 256*/> unordered_map_type;
 
 	ext_map_wrapper(size_t max_items_per_block)
-		:index_wrapper_base(max_items_per_block), m_map(new unordered_map_type)
+		:index_wrapper_base(max_items_per_block), m_map(new unordered_map_type), m_maxChainLen(0)
 	{
 		m_map->insert(make_pair(0, 0));
+		m_map->erase(0);
 	}
 
 
@@ -443,6 +450,8 @@ protected:
 		block_chain_t(complex_hashset_base & hb, chain_info_t chain_info)
 			:m_hb(hb), limits(chain_info), m_totalElements(0)
 		{
+			if ((limits.first == std::numeric_limits<size_t>::max()) || (limits.last == std::numeric_limits<size_t>::max()))
+				throw runtime_error("Invalid chain");
 			//cout << "Creating chain " << limits.first << "->" << limits.second << std::endl;
 			size_t block_id = limits.first, last_block_id;
 			do
@@ -581,13 +590,15 @@ public:
 		
 		chain_info_t chain_id = m_index.chain_with_hash(hash_val);
 
+		bool created_new = false;
 		if (chain_id.first == std::numeric_limits<size_t>::max())
 		{
 			chain_id.first = m_blocks.size();
 			chain_id.last = chain_id.first;		
 			chain_id.block_count = 1;
-			m_blocks.push_back(std::move(block_t(chain_id.first)));
+			m_blocks.push_back(block_t(chain_id.first));
 			m_index.create_mapping(hash_val, chain_id);
+			created_new = true;
 		}
 
 		//auto res = write_to_block(chain_id, hash_val, val);
