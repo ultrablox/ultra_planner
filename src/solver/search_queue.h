@@ -3,6 +3,7 @@
 #define UltraSolver_search_queue_h
 
 #include <core/complex_vector.h>
+#include <core/complex_queue.h>
 #include <map>
 #include <vector>
 #include <functional>
@@ -16,7 +17,8 @@ class search_queue
 	typedef C comparator_t;
 	using value_streamer = S;
 	//typedef std::vector<value_t> layer_container_t;
-	typedef std::list<value_t> layer_container_t;
+	//typedef std::list<value_t> layer_container_t;
+	using layer_container_t = complex_queue<value_t, value_streamer>;
 	static const int MaxPrimaryLayers = 3;
 
 	//static_assert(std::is_pod<priority_component_t>::value, "Priority conmonent must be POD");
@@ -53,19 +55,8 @@ class search_queue
 	};
 public:
 
-	search_queue(const value_streamer & node_streamer/*, int serialized_value_size, std::function<void(char *, const value_t &)> ser_fun, std::function<void(const char *, value_t &)> des_fun*/)
-		:m_secondaryData(combined_val_streamer_t(node_streamer)/*, serialized_value_size + sizeof(priority_component_t),
-			[=](void * dst, const combined_value_t & val){
-				char * ptr = (char*)dst;
-				memcpy(ptr, &val.first, sizeof(combined_value_t));
-				ser_fun(ptr + sizeof(combined_value_t), val.second);
-			},
-			[=](const void * src, combined_value_t & val){
-				const char * ptr = (char*)src;
-				memcpy(&val.first, ptr, sizeof(combined_value_t));
-				des_fun(ptr + sizeof(combined_value_t), val.second);
-			}*/
-		)
+	search_queue(const value_streamer & node_streamer)
+		:m_secondaryData(combined_val_streamer_t(node_streamer)), m_nodeStreamer(node_streamer)
 	{
 
 	}
@@ -81,8 +72,8 @@ public:
 			extract_secondary_data();
 
 		auto it = m_primaryData.begin();
-		//return combined_value_t(it->first, *it->second.rbegin());
-		return combined_value_t(it->first, *it->second.begin());
+		//return combined_value_t(it->first, *it->second.begin());
+		return combined_value_t(it->first, it->second->top());
 	}
 
 	const size_t top(std::vector<value_t> & dest, size_t max_count, bool more_than_one_group = false, priority_component_t * first_node_data = nullptr) const
@@ -102,7 +93,7 @@ public:
 				break;
 		}
 */
-		if (m_primaryData.empty())
+/*		if (m_primaryData.empty())
 			return 0;
 
 		if (first_node_data && (requested != max_count))
@@ -110,7 +101,7 @@ public:
 
 		auto group_it = m_primaryData.begin();
 		for (auto it = group_it->second.begin(); (it != group_it->second.end()) && (max_count > 0); ++it, --max_count)
-			dest.push_back(*it);
+			dest.push_back(*it);*/
 
 		return requested - max_count;
 	}
@@ -124,16 +115,20 @@ public:
 	{
 		auto group_it = m_primaryData.find(val.first);
 		if (group_it != m_primaryData.end())
-			group_it->second.push_back(val.second);
+			group_it->second->push(val.second);//group_it->second.push_back(val.second);
 		else
 		{
 			if (m_primaryData.empty())
-				m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
+			{
+				//m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
+				m_primaryData.insert(make_pair(val.first, new layer_container_t(m_nodeStreamer, val.second)));
+			}
 			else if (m_primaryData.size() < MaxPrimaryLayers)
-				m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
+				m_primaryData.insert(make_pair(val.first, new layer_container_t(m_nodeStreamer, val.second)));//m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
 			else if (val.first < m_primaryData.rbegin()->first)
 			{
-				m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
+				//m_primaryData.insert(make_pair(val.first, layer_container_t(1, val.second)));
+				m_primaryData.insert(make_pair(val.first, new layer_container_t(m_nodeStreamer, val.second)));
 				
 				if (m_primaryData.size() > MaxPrimaryLayers)
 				{
@@ -142,12 +137,13 @@ public:
 
 					//cout << "Erasing search queue layer (" << rit->second.size() << " nodes)..." << std::endl;
 
-					for (auto & node : rit->second)
-						m_secondaryData.push_back(combined_value_t(rit->first, std::move(node)));
+					//for (auto & node : rit->second)
+					//	m_secondaryData.push_back(combined_value_t(rit->first, std::move(node)));
 
 
 					std::advance(rit, 1);
 					auto it = rit.base();
+					delete it->second;
 					m_primaryData.erase(it);
 
 					return make_pair(true, m_primaryData.rbegin()->first);
@@ -172,9 +168,10 @@ public:
 		
 		auto top_it = m_primaryData.begin();
 		//top_it->second.pop_back();
-		top_it->second.erase(top_it->second.begin());
+		//top_it->second.erase(top_it->second.begin());
+		top_it->second->pop();
 
-		if (top_it->second.empty())
+		if (top_it->second->empty())
 			m_primaryData.erase(top_it);
 	}
 
@@ -197,7 +194,7 @@ public:
 			}
 		}*/
 
-		auto group_it = m_primaryData.begin();
+/*		auto group_it = m_primaryData.begin();
 		if (group_it->second.size() <= count)
 			m_primaryData.erase(group_it);
 		else
@@ -205,7 +202,7 @@ public:
 			auto it = group_it->second.begin();
 			std::advance(it, count);
 			group_it->second.erase(group_it->second.begin(), it);
-		}
+		}*/
 	}
 
 	int layer_count() const
@@ -232,8 +229,9 @@ private:
 		throw runtime_error("Not implemented");
 	}
 private:
-	std::map<priority_component_t, layer_container_t, comparator_t> m_primaryData;
+	std::map<priority_component_t, layer_container_t*, comparator_t> m_primaryData;
 	complex_vector<combined_value_t, combined_val_streamer_t> m_secondaryData;
+	const value_streamer & m_nodeStreamer;
 };
 
 #endif

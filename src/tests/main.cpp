@@ -40,6 +40,7 @@ void test_cached_file();
 void test_merge();
 void test_rubik_core();
 void test_bdd_map();
+void test_complex_queue();
 
 int main()
 {
@@ -52,6 +53,7 @@ int main()
 	test_bdd_map();
 	test_cached_file();
 	test_complex_vector();
+	test_complex_queue();
 	test_complex_hashmap();
 	
 

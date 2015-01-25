@@ -286,6 +286,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\core\bdd_map.h" />
     <ClInclude Include="..\..\..\..\src\core\buffered_complex_hashset.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_queue.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_vector.h" />
     <ClInclude Include="..\..\..\..\src\core\direct_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h" />

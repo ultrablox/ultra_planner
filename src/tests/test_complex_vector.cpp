@@ -1,12 +1,14 @@
 
 #include "helpers.h"
 #include <core/complex_vector.h>
+#include <core/complex_queue.h>
 #include <core/direct_complex_hashset.h>
 #include <core/buffered_complex_hashset.h>
 #include <random>
 #include <chrono>
 #include <unordered_set>
 #include <array>
+#include <queue>
 
 using namespace std;
 using namespace std::chrono;
@@ -280,5 +282,31 @@ void test_complex_hashmap()
 
 		assert_test(hset.size() == correct_set.size(), "Complex hashset insert range");
 		
+	}
+}
+
+void test_complex_queue()
+{
+	complex_element_streamer streamer;
+	complex_queue<complex_element, complex_element_streamer> cq(streamer);
+
+	std::queue<complex_element> correct_queue;
+
+	auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
+
+	//Push
+	for (int i = 0; i < 2000; ++i)
+	{
+		int val = gen();
+		correct_queue.push(val);
+		cq.push(val);
+	}
+
+	//Pop and compare
+	for (int i = 0; i < 2000; ++i)
+	{
+		assert_test(correct_queue.front() == cq.top(), "Complex queue front + pop");
+		correct_queue.pop();
+		cq.pop();
 	}
 }
