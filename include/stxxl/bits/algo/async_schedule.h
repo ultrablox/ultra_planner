@@ -20,6 +20,7 @@
 // DOI: 10.1137/S0097539703431573
 
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/namespace.h>
 
 STXXL_BEGIN_NAMESPACE
@@ -41,36 +42,34 @@ inline void compute_prefetch_schedule(
     compute_prefetch_schedule(static_cast<const int_type*>(first), last, out_first, m, D);
 }
 
-template <typename run_type>
+template <typename RunType>
 void compute_prefetch_schedule(
-    const run_type& input,
+    const RunType& input,
     int_type* out_first,
     int_type m,
     int_type D)
 {
     const int_type L = input.size();
-    int_type* disks = new int_type[L];
+    simple_vector<int_type> disks(L);
     for (int_type i = 0; i < L; ++i)
-        disks[i] = input[i].bid.storage->get_physical_device_id();
-    compute_prefetch_schedule(disks, disks + L, out_first, m, D);
-    delete[] disks;
+        disks[i] = input[i].bid.storage->get_device_id();
+    compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
 
-template <typename bid_iterator_type>
+template <typename BidIteratorType>
 void compute_prefetch_schedule(
-    bid_iterator_type input_begin,
-    bid_iterator_type input_end,
+    BidIteratorType input_begin,
+    BidIteratorType input_end,
     int_type* out_first,
     int_type m,
     int_type D)
 {
     const int_type L = input_end - input_begin;
-    int_type* disks = new int_type[L];
+    simple_vector<int_type> disks(L);
     int_type i = 0;
-    for (bid_iterator_type it = input_begin; it != input_end; ++it, ++i)
-        disks[i] = it->storage->get_physical_device_id();
-    compute_prefetch_schedule(disks, disks + L, out_first, m, D);
-    delete[] disks;
+    for (BidIteratorType it = input_begin; it != input_end; ++it, ++i)
+        disks[i] = it->storage->get_device_id();
+    compute_prefetch_schedule(disks.begin(), disks.end(), out_first, m, D);
 }
 
 STXXL_END_NAMESPACE

@@ -16,10 +16,9 @@
 
 #include <stxxl/bits/io/request_with_state.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup iolayer
+//! \addtogroup reqlayer
 //! \{
 
 //! Request which serves an I/O by calling the synchronous routine of the file.
@@ -27,6 +26,8 @@ class serving_request : public request_with_state
 {
     template <class base_file_type>
     friend class fileperblock_file;
+    friend class request_queue_impl_qwqr;
+    friend class request_queue_impl_1q;
 
 public:
     serving_request(
@@ -38,8 +39,7 @@ public:
         request_type t);
 
 protected:
-    void serve();
-    void completed();
+    virtual void serve();
 
 public:
     const char * io_type() const;

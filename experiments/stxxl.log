@@ -1,2 +1,2 @@
 [STXXL-MSG] STXXL v1.4.99 (prerelease/) (git c92521a91aedb950d57cd7e0f596cc622f2e67c8)
-[STXXL-MSG] Disk 'C:/temp/stxxl_0.tmp' is allocated, space: 16384 MiB, I/O implementation: wincall queue=0
+[STXXL-MSG] Disk 'D:/stxxl_0.tmp' is allocated, space: 16384 MiB, I/O implementation: wincall queue=0 devid=0

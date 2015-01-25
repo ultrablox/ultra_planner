@@ -30,7 +30,6 @@
 #include <stxxl/bits/compat/type_traits.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
@@ -142,18 +141,18 @@ inline stxxl::uint64 atouint64(const char* s)
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename Tp>
-inline const Tp&
-STXXL_MIN(const Tp& a, const Tp& b)
+template <typename Type>
+inline const Type&
+STXXL_MIN(const Type& a, const Type& b)
 {
-    return std::min<Tp>(a, b);
+    return std::min<Type>(a, b);
 }
 
-template <typename Tp>
-inline const Tp&
-STXXL_MAX(const Tp& a, const Tp& b)
+template <typename Type>
+inline const Type&
+STXXL_MAX(const Type& a, const Type& b)
 {
-    return std::max<Tp>(a, b);
+    return std::max<Type>(a, b);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -197,14 +196,14 @@ unsigned int ilog2_ceil(const IntegerType& i)
 template <typename Integral, typename Integral2>
 inline
 typename compat::remove_const<Integral>::type
-div_ceil(Integral __n, Integral2 __d)
+div_ceil(Integral n, Integral2 d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
-    typedef __typeof__ (std::div(__n, __d)) div_type;
-    div_type result = std::div(__n, __d);
+    typedef __typeof__ (std::div(n, d)) div_type;
+    div_type result = std::div(n, d);
     return result.quot + (result.rem != 0);
 #else
-    return __n / __d + ((__n % __d) != 0);
+    return n / d + ((n % d) != 0);
 #endif
 }
 
@@ -228,7 +227,7 @@ div_ceil(Integral __n, Integral2 __d)
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline uint64 longhash1(uint64 key_)
+inline size_t longhash1(uint64 key_)
 {
     key_ += ~(key_ << 32);
     key_ ^= (key_ >> 22);
@@ -238,13 +237,13 @@ inline uint64 longhash1(uint64 key_)
     key_ ^= (key_ >> 15);
     key_ += ~(key_ << 27);
     key_ ^= (key_ >> 31);
-    return key_;
+    return (size_t)key_;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <class T>
-inline void swap_1D_arrays(T* a, T* b, unsigned_type size)
+template <class Type>
+inline void swap_1D_arrays(Type* a, Type* b, unsigned_type size)
 {
     for (unsigned_type i = 0; i < size; ++i)
         std::swap(a[i], b[i]);

@@ -24,6 +24,7 @@
 #include <stxxl/bits/io/mem_file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/wbtl_file.h>
+#include <stxxl/bits/io/linuxaio_file.h>
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/iostats.h>
@@ -31,13 +32,6 @@
 
 //! \c STXXL library namespace
 STXXL_BEGIN_NAMESPACE
-
-//! \defgroup iolayer I/O Primitives Layer
-//! Group of classes which enable abstraction from operating system calls and support
-//! system-independent interfaces for asynchronous I/O.
-//! \{
-
-//! \}
 
     STXXL_END_NAMESPACE
 

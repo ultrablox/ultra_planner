@@ -17,7 +17,6 @@
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
-
 #include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
@@ -26,11 +25,9 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/common/utils.h>
 
-
 #ifndef STXXL_VERBOSE_STABLE_KSORT
 #define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1
 #endif
-
 
 STXXL_BEGIN_NAMESPACE
 
@@ -41,51 +38,52 @@ STXXL_BEGIN_NAMESPACE
  */
 namespace stable_ksort_local {
 
-template <class type_, class type_key>
-void classify_block(type_* begin, type_* end, type_key*& out, int_type* bucket, unsigned_type offset, unsigned shift)
+template <class Type, class TypeKey>
+void classify_block(Type* begin, Type* end, TypeKey*& out,
+                    int_type* bucket, typename Type::key_type offset,
+                    unsigned shift)
 {
-    for (type_* p = begin; p < end; p++, out++)      // count & create references
+    for (Type* p = begin; p < end; p++, out++)      // count & create references
     {
         out->ptr = p;
-        typename type_::key_type key = p->key();
-        int_type ibucket = (key - offset) >> shift;
+        typename Type::key_type key = p->key();
+        int_type ibucket = (int_type)((key - offset) >> shift);
         out->key = key;
         bucket[ibucket]++;
     }
 }
 
-template <typename type>
+template <typename Type>
 struct type_key
 {
-    typedef typename type::key_type key_type;
+    typedef typename Type::key_type key_type;
     key_type key;
-    type* ptr;
+    Type* ptr;
 
     type_key() { }
-    type_key(key_type k, type* p) : key(k), ptr(p)
+    type_key(key_type k, Type* p) : key(k), ptr(p)
     { }
 };
 
-template <typename type>
-bool operator < (const type_key<type>& a, const type_key<type>& b)
+template <typename Type>
+bool operator < (const type_key<Type>& a, const type_key<Type>& b)
 {
     return a.key < b.key;
 }
 
-template <typename type>
-bool operator > (const type_key<type>& a, const type_key<type>& b)
+template <typename Type>
+bool operator > (const type_key<Type>& a, const type_key<Type>& b)
 {
     return a.key > b.key;
 }
 
-
-template <typename BIDType_, typename AllocStrategy_>
+template <typename BIDType, typename AllocStrategy>
 class bid_sequence
 {
 public:
-    typedef BIDType_ bid_type;
+    typedef BIDType bid_type;
     typedef bid_type& reference;
-    typedef AllocStrategy_ alloc_strategy;
+    typedef AllocStrategy alloc_strategy;
     typedef typename simple_vector<bid_type>::size_type size_type;
     typedef typename simple_vector<bid_type>::iterator iterator;
 
@@ -130,23 +128,24 @@ public:
     }
 };
 
-template <typename ExtIterator_>
+template <typename ExtIterator>
 void distribute(
-    bid_sequence<typename ExtIterator_::vector_type::block_type::bid_type,
-                 typename ExtIterator_::vector_type::alloc_strategy_type>* bucket_bids,
+    bid_sequence<typename ExtIterator::vector_type::block_type::bid_type,
+                 typename ExtIterator::vector_type::alloc_strategy_type>* bucket_bids,
     int64* bucket_sizes,
     const int_type nbuckets,
     const int_type lognbuckets,
-    ExtIterator_ first,
-    ExtIterator_ last,
+    ExtIterator first,
+    ExtIterator last,
     const int_type nread_buffers,
     const int_type nwrite_buffers)
 {
-    typedef typename ExtIterator_::vector_type::value_type value_type;
+    typedef typename ExtIterator::vector_type::value_type value_type;
     typedef typename value_type::key_type key_type;
-    typedef typename ExtIterator_::block_type block_type;
-    typedef buf_istream<typename ExtIterator_::block_type,
-                        typename ExtIterator_::bids_container_iterator> buf_istream_type;
+    typedef typename ExtIterator::block_type block_type;
+    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
+
+    typedef buf_istream<block_type, bids_container_iterator> buf_istream_type;
 
     int_type i = 0;
 
@@ -168,13 +167,11 @@ void distribute(
     for (i = 0; i < nbuckets; i++)
         bucket_blocks[i] = out.get_free_block();
 
-
-    ExtIterator_ cur = first - first.block_offset();
+    ExtIterator cur = first - first.block_offset();
 
     // skip part of the block before first untouched
     for ( ; cur != first; cur++)
         ++in;
-
 
     const int_type shift = sizeof(key_type) * 8 - lognbuckets;
     // search in the the range [_begin,_end)
@@ -182,7 +179,7 @@ void distribute(
     for ( ; cur != last; cur++)
     {
         key_type cur_key = in.current().key();
-        int_type ibucket = cur_key >> shift;
+        int_type ibucket = (int_type)(cur_key >> shift);
 
         int_type block_offset = bucket_block_offsets[ibucket];
         in >> (bucket_blocks[ibucket]->elem[block_offset++]);
@@ -220,15 +217,16 @@ void distribute(
 //! \remark Elements must provide a method key() which returns the integer key.
 //! \remark Not yet fully implemented, it assumes that the keys are uniformly
 //! distributed between [0,std::numeric_limits<key_type>::max().
-template <typename ExtIterator_>
-void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
+template <typename ExtIterator>
+void stable_ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 {
     STXXL_MSG("Warning: stable_ksort is not yet fully implemented, it assumes that the keys are uniformly distributed between [0,std::numeric_limits<key_type>::max()]");
-    typedef typename ExtIterator_::vector_type::value_type value_type;
+    typedef typename ExtIterator::vector_type::value_type value_type;
     typedef typename value_type::key_type key_type;
-    typedef typename ExtIterator_::block_type block_type;
+    typedef typename ExtIterator::block_type block_type;
+    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
     typedef typename block_type::bid_type bid_type;
-    typedef typename ExtIterator_::vector_type::alloc_strategy_type alloc_strategy;
+    typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy;
     typedef stable_ksort_local::bid_sequence<bid_type, alloc_strategy> bucket_bids_type;
     typedef stable_ksort_local::type_key<value_type> type_key_;
 
@@ -247,7 +245,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type nmaxbuckets = m - min_num_read_write_buffers;
     const unsigned int lognbuckets = ilog2_floor(nmaxbuckets);
     const unsigned_type nbuckets = unsigned_type(1) << lognbuckets;
-    const uint64 est_bucket_size = div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
+    const unsigned_type est_bucket_size = (unsigned_type)div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
         STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
@@ -305,7 +303,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])
         // ... and decrease max_bucket_size_bl
-        const int_type max_bucket_size_act_bl = div_ceil(max_bucket_size_act, block_type::size);
+        const int_type max_bucket_size_act_bl = (int_type)div_ceil(max_bucket_size_act, block_type::size);
         STXXL_VERBOSE_STABLE_KSORT("Reducing required number of required blocks per bucket from " <<
                                    max_bucket_size_bl << " to " << max_bucket_size_act_bl);
         max_bucket_size_rec = max_bucket_size_act;
@@ -313,7 +311,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         const unsigned_type nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
         STXXL_VERBOSE_STABLE_KSORT("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
 
-        typedef buf_ostream<block_type, typename ExtIterator_::bids_container_iterator> buf_ostream_type;
+        typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
 
         disk_queues::get_instance()->set_priority_op(request_queue::READ);
@@ -336,19 +334,17 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         block_type* blocks2 = new block_type[max_bucket_size_bl];
         request_ptr* reqs1 = new request_ptr[max_bucket_size_bl];
         request_ptr* reqs2 = new request_ptr[max_bucket_size_bl];
-        type_key_* refs1 = new type_key_[max_bucket_size_rec];
-        type_key_* refs2 = new type_key_[max_bucket_size_rec];
+        type_key_* refs1 = new type_key_[(size_t)max_bucket_size_rec];
+        type_key_* refs2 = new type_key_[(size_t)max_bucket_size_rec];
 
         // submit reading first 2 buckets (Peter's scheme)
-        unsigned_type nbucket_blocks = div_ceil(bucket_sizes[0], block_type::size);
+        unsigned_type nbucket_blocks = (unsigned_type)div_ceil(bucket_sizes[0], block_type::size);
         for (i = 0; i < nbucket_blocks; i++)
             reqs1[i] = blocks1[i].read(bucket_bids[0][i]);
 
-
-        nbucket_blocks = div_ceil(bucket_sizes[1], block_type::size);
+        nbucket_blocks = (unsigned_type)div_ceil(bucket_sizes[1], block_type::size);
         for (i = 0; i < nbucket_blocks; i++)
             reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
-
 
         key_type offset = 0;
         const unsigned log_k1 = STXXL_MAX<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
@@ -363,7 +359,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
         for (unsigned_type k = 0; k < nbuckets; k++)
         {
-            nbucket_blocks = div_ceil(bucket_sizes[k], block_type::size);
+            nbucket_blocks = (unsigned_type)div_ceil(bucket_sizes[k], block_type::size);
             const unsigned log_k1_k = STXXL_MAX<unsigned>(ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
             k1 = (unsigned_type)(1) << log_k1_k;
@@ -377,15 +373,18 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             for (i = 0; i < nbucket_blocks - 1; i++)
             {
                 reqs1[i]->wait();
-                stable_ksort_local::classify_block(blocks1[i].begin(), blocks1[i].end(), ref_ptr, bucket1, offset1, shift1 /*,k1*/);
+                stable_ksort_local::classify_block(blocks1[i].begin(), blocks1[i].end(),
+                                                   ref_ptr, bucket1, offset1, shift1 /*,k1*/);
             }
             // last block might be non-full
-            const unsigned_type last_block_size = bucket_sizes[k] - int64(nbucket_blocks - 1) * block_type::size;
+            const unsigned_type last_block_size =
+                (unsigned_type)(bucket_sizes[k] - (nbucket_blocks - 1) * block_type::size);
             reqs1[i]->wait();
 
             //STXXL_MSG("block_type::size: "<<block_type::size<<" last_block_size:"<<last_block_size);
 
-            classify_block(blocks1[i].begin(), blocks1[i].begin() + last_block_size, ref_ptr, bucket1, offset1, shift1);
+            classify_block(blocks1[i].begin(), blocks1[i].begin() + last_block_size,
+                           ref_ptr, bucket1, offset1, shift1);
 
             exclusive_prefix_sum(bucket1, k1);
             classify(refs1, refs1 + bucket_sizes[k], refs2, bucket1, offset1, shift1);
@@ -411,7 +410,6 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 for (type_key_* p = d; p < dEnd; p++)
                     out << (*(p->ptr));
 
-
                 delete[] bucket2;
                 c = cEnd;
                 d = dEnd;
@@ -420,7 +418,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             const unsigned_type bucket2submit = k + 2;
             if (bucket2submit < nbuckets)
             {
-                nbucket_blocks = div_ceil(bucket_sizes[bucket2submit], block_type::size);
+                nbucket_blocks = (unsigned_type)div_ceil(bucket_sizes[bucket2submit], block_type::size);
                 for (i = 0; i < nbucket_blocks; i++)
                     reqs1[i] = blocks1[i].read(bucket_bids[bucket2submit][i]);
             }
@@ -460,7 +458,6 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                   dist_end - begin << " s");
     STXXL_VERBOSE("Time in I/O wait(ds): " << io_wait_after_d << " s");
     STXXL_VERBOSE(*stats::get_instance());
-    STXXL_UNUSED(begin + dist_end + end + io_wait_after_d);
 }
 
 //! \}

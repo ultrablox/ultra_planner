@@ -56,12 +56,13 @@ std::vector<const USearchNode*> USearchEngine::openList()
 */
 //=========================AStarSearchEngine========================
 AStarSearchEngine::AStarSearchEngine(USolver * p_solver, const UTransitionSystem & transition_system, const UHeuristic * heuristic, const UMetric * metric)
-	:USearchEngine(p_solver, transition_system), m_pHeuristic(heuristic), m_pMetric(metric), pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size), m_searchQueue(pool), m_state(state_t::Preparing)
+:USearchEngine(p_solver, transition_system), m_pHeuristic(heuristic), m_pMetric(metric),/* pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size), m_searchQueue(pool),*/ m_state(state_t::Preparing)
 {
 }
 
 void AStarSearchEngine::execute(const UStateReference & initial_state_ref, bool search_optimal)
 {
+	/*
 	m_pSolver->setMetric(m_pMetric);
 	//m_pSolver->bufExpandNew()[NodeEstimationT()].push_back(initial_node_ref);
 	m_pSolver->nodeFactory().createNode(initial_state_ref);
@@ -143,17 +144,7 @@ void AStarSearchEngine::execute(const UStateReference & initial_state_ref, bool 
 				}
 			}
 		}
-
-
-
-
-		/*if(get_internal_memory_usage() > 5000.0)
-		{
-			cout << "Memory overflow, clearing buffers...";
-			m_pSolver->clearBuffers();
-			cout << " done.\n";
-		}*/
-	}
+	}*/
 }
 
 bool AStarSearchEngine::bestGoalNode(const USearchNode * n1, const USearchNode * n2) const
@@ -173,10 +164,10 @@ std::vector<UStateReference> AStarSearchEngine::pickBestNodes(size_t min_count, 
 {
 	//Take at least 2 best groups
 	int num_of_processed_groups(0);
-	NodeEstimationT last_group_id = m_searchQueue.top().estimation;
+	//NodeEstimationT last_group_id = m_searchQueue.top().estimation;
 
 	vector<UStateReference> res;
-	for(; (max_count > 0) && (!m_searchQueue.empty()) && (num_of_processed_groups < 1); --max_count)
+	/*for(; (max_count > 0) && (!m_searchQueue.empty()) && (num_of_processed_groups < 1); --max_count)
 	{
 		auto node = m_searchQueue.top();
 
@@ -195,6 +186,6 @@ std::vector<UStateReference> AStarSearchEngine::pickBestNodes(size_t min_count, 
 
 		m_searchQueue.pop();
 	}
-
+	*/
 	return res;
 }

@@ -10,6 +10,7 @@
 #include <stxxl.h>
 #include "cached_file.h"
 #include <core/utils/helpers.h>
+#include <stxxl/unordered_map>
 //#include <tbb/parallel_for.h>
 #include <thread>
 
@@ -17,6 +18,16 @@
 class index_wrapper_base
 {
 public:
+	struct chain_info_t
+	{
+		chain_info_t(size_t _first = std::numeric_limits<size_t>::max(), size_t _last = std::numeric_limits<size_t>::max(), size_t _block_count = 0)
+		:first(_first), last(_last), block_count(_block_count)
+		{}
+
+		size_t first, last, block_count;
+		//size_t _placeholder;
+	};
+
 	index_wrapper_base(size_t max_items_per_block)
 		:m_blockItemCount(max_items_per_block)
 	{}
@@ -24,6 +35,11 @@ public:
 	size_t expected_block_min_hash(size_t hash_val) const
 	{
 		return hash_val - (hash_val % m_blockItemCount);
+	}
+
+	size_t oredered_bucket_index(size_t hash_val) const
+	{
+		return expected_block_min_hash(hash_val) / m_blockItemCount;
 	}
 private:
 	size_t m_blockItemCount;
@@ -40,15 +56,6 @@ struct direct_hasher
 class map_wrapper : public index_wrapper_base
 {
 public:
-	struct chain_info_t
-	{
-		chain_info_t(size_t _first = std::numeric_limits<size_t>::max(), size_t _last = std::numeric_limits<size_t>::max(), size_t _block_count = 0)
-		:first(_first), last(_last), block_count(_block_count)
-		{}
-
-		size_t first, last, block_count;
-	};
-
 	//using map_t = std::map<size_t, chain_info_t>;
 	using map_t = std::unordered_map<size_t, chain_info_t>;
 	//using map_t = T<size_t, chain_info_t>;
@@ -73,11 +80,13 @@ public:
 	void create_mapping(size_t hash_val, chain_info_t chain_id)
 	{
 		m_map.insert(make_pair(expected_block_min_hash(hash_val), chain_id));
+		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
 	}
 
 	void update_mapping(size_t hash_val, const chain_info_t & chain_id)
 	{
 		m_map[expected_block_min_hash(hash_val)] = chain_id;
+		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
 	}
 
 	vector<pair<size_t, chain_info_t>> chains() const
@@ -90,19 +99,107 @@ public:
 
 	void compute_stats(int & max_chain_length, double & average_chain_length) const
 	{
-		max_chain_length = 0;
-		average_chain_length = 0.0f;
+		max_chain_length = m_maxChainLen;
+	}
 
-		for (auto & el : m_map)
-		{
-			max_chain_length = max(max_chain_length, (int)el.second.block_count);
-			average_chain_length += el.second.block_count;
-		}
-		
-		average_chain_length = average_chain_length / m_map.size();
+	size_t size() const
+	{
+		return m_map.size();
 	}
 private:
 	map_t m_map;
+	int m_maxChainLen;
+};
+
+
+class ext_map_wrapper : public index_wrapper_base
+{
+public:
+	struct CompareLess
+	{
+		bool operator () (const size_t& a, const size_t& b) const
+		{
+			return a < b;
+		}
+		static size_t min_value() { return std::numeric_limits<size_t>::min(); }
+		static size_t max_value() { return std::numeric_limits<size_t>::max(); }
+	};
+
+	//typedef stxxl::VECTOR_GENERATOR<chain_info_t, 16U, 8192U, 4096U, stxxl::FR, stxxl::random>::result vector_t;
+	//static_assert(8192 % sizeof(chain_info_t) == 0, "Invalid element size");
+	typedef stxxl::unordered_map<size_t, chain_info_t, std::hash<size_t>, CompareLess, 8192, 1024> unordered_map_type;
+
+	ext_map_wrapper(size_t max_items_per_block)
+		:index_wrapper_base(max_items_per_block), m_map(new unordered_map_type)
+	{
+		m_map->insert(make_pair(0, 0));
+	}
+
+
+	/*chain_info_t chain_with_hash(size_t hash_val) const
+	{
+		size_t idx = oredered_bucket_index(hash_val);
+		if (idx < m_map.size())
+			return chain_info_t();
+		else
+			return m_map[idx];
+	}
+
+	void create_mapping(size_t hash_val, chain_info_t chain_id)
+	{
+		size_t idx = oredered_bucket_index(hash_val);
+		if (idx < m_map.size())
+			m_map.resize(idx + 1);	
+		
+		m_map[idx] = chain_id;
+		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
+	}
+
+	void update_mapping(size_t hash_val, const chain_info_t & chain_id)
+	{
+		size_t idx = oredered_bucket_index(hash_val);
+		m_map[idx] = chain_id;
+		//m_map[expected_block_min_hash(hash_val)] = chain_id;
+		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
+	}*/
+
+	chain_info_t chain_with_hash(size_t hash_val) const
+	{
+		//if (m_map->empty())
+		//	return chain_info_t();
+		size_t key = expected_block_min_hash(hash_val);
+		auto it = m_map->find(key);
+		if (it == m_map->end())
+			return chain_info_t(std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max(), 0);
+		else
+			return it->second;
+	}
+
+	void create_mapping(size_t hash_val, chain_info_t chain_id)
+	{
+		m_map->insert(make_pair(expected_block_min_hash(hash_val), chain_id));
+		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
+	}
+
+	void update_mapping(size_t hash_val, const chain_info_t & chain_id)
+	{
+		(*m_map)[expected_block_min_hash(hash_val)] = chain_id;
+		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
+	}
+
+
+	void compute_stats(int & max_chain_length, double & average_chain_length) const
+	{
+		max_chain_length = m_maxChainLen;
+	}
+
+	size_t size() const
+	{
+		return m_map->size();
+	}
+private:
+	unordered_map_type * m_map;
+	int m_maxChainLen;
 };
 
 struct hashset_stats_t
@@ -132,7 +229,8 @@ protected:
 	typedef std::pair<size_t, value_type> combined_value_t;
 	
 	//typedef std::map<size_t, size_t> map_t;	//Maps hash_value => block index where it should be
-	using index_t = map_wrapper;// <std::map>;
+	//using index_t = map_wrapper;// <std::map>;
+	using index_t = ext_map_wrapper;
 	using chain_info_t = typename index_t::chain_info_t;
 
 	//using bucket_t = map_t;
@@ -516,6 +614,7 @@ public:
 		res.block_count = m_blocks.size();
 
 		m_index.compute_stats(res.max_chain_length, res.average_chain_length);
+		res.average_chain_length = (double)m_blocks.size() / m_index.size();
 
 		return res;
 	}

@@ -21,7 +21,6 @@
 #include <string>
 #include <stxxl/bits/unused.h>
 
-
 #define _STXXL_PRNT_COUT        (1 << 0)
 #define _STXXL_PRNT_CERR        (1 << 1)
 #define _STXXL_PRNT_LOG         (1 << 2)
@@ -34,13 +33,11 @@
 #define _STXXL_PRINT_FLAGS_ERROR    (_STXXL_PRNT_CERR | _STXXL_PRNT_ERRLOG)
 #define _STXXL_PRINT_FLAGS_VERBOSE  (_STXXL_PRINT_FLAGS_DEFAULT | _STXXL_PRNT_TIMESTAMP | _STXXL_PRNT_THREAD_ID)
 
-
 STXXL_BEGIN_NAMESPACE
 
 void print_msg(const char* label, const std::string& msg, unsigned flags);
 
 STXXL_END_NAMESPACE
-
 
 #define _STXXL_PRINT(label, message, flags)                                  \
     do {                                                                     \
@@ -49,8 +46,13 @@ STXXL_END_NAMESPACE
         stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
     } while (false)
 
-#define _STXXL_NOT_VERBOSE do { } while (false)
-
+#define _STXXL_NOT_VERBOSE(message)  \
+    do {                             \
+        if (0) {                     \
+            std::ostringstream str_; \
+            str_ << message;         \
+        }                            \
+    } while (false)
 
 #ifdef STXXL_FORCE_VERBOSE_LEVEL
 #undef STXXL_VERBOSE_LEVEL
@@ -67,21 +69,19 @@ STXXL_END_NAMESPACE
 #define STXXL_VERBOSE_LEVEL -1
 #endif
 
-
 #if STXXL_VERBOSE_LEVEL > -10
  #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
 #else
 // Please do not report STXXL problems with STXXL_MSG disabled!
- #define STXXL_MSG(x) _STXXL_NOT_VERBOSE
+ #define STXXL_MSG(x) _STXXL_NOT_VERBOSE(x)
 #endif
 
 #if STXXL_VERBOSE_LEVEL > -100
  #define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", x, _STXXL_PRINT_FLAGS_ERROR)
 #else
 // Please do not report STXXL problems with STXXL_ERRMSG disabled!
- #define STXXL_ERRMSG(x) _STXXL_NOT_VERBOSE
+ #define STXXL_ERRMSG(x) _STXXL_NOT_VERBOSE(x)
 #endif
-
 
 // STXXL_VERBOSE0 should be used for current debugging activity only,
 // and afterwards be replaced by STXXL_VERBOSE1 or higher.
@@ -90,13 +90,13 @@ STXXL_END_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > -1
  #define STXXL_VERBOSE0(x) _STXXL_PRINT("STXXL-VERBOSE0", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
- #define STXXL_VERBOSE0(x) _STXXL_NOT_VERBOSE
+ #define STXXL_VERBOSE0(x) _STXXL_NOT_VERBOSE(x)
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 0
  #define STXXL_VERBOSE1(x) _STXXL_PRINT("STXXL-VERBOSE1", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
- #define STXXL_VERBOSE1(x) _STXXL_NOT_VERBOSE
+ #define STXXL_VERBOSE1(x) _STXXL_NOT_VERBOSE(x)
 #endif
 
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x)
@@ -104,15 +104,29 @@ STXXL_END_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > 1
  #define STXXL_VERBOSE2(x) _STXXL_PRINT("STXXL-VERBOSE2", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
- #define STXXL_VERBOSE2(x) _STXXL_NOT_VERBOSE
+ #define STXXL_VERBOSE2(x) _STXXL_NOT_VERBOSE(x)
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 2
  #define STXXL_VERBOSE3(x) _STXXL_PRINT("STXXL-VERBOSE3", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
- #define STXXL_VERBOSE3(x) _STXXL_NOT_VERBOSE
+ #define STXXL_VERBOSE3(x) _STXXL_NOT_VERBOSE(x)
 #endif
 
+// STXXL_VERBOSE[0123]_THIS prefixes "[0xaddress]" and then calls the version
+// without _THIS.
+
+#define STXXL_VERBOSE0_THIS(x) \
+    STXXL_VERBOSE0("[" << static_cast<void*>(this) << "] " << x)
+
+#define STXXL_VERBOSE1_THIS(x) \
+    STXXL_VERBOSE1("[" << static_cast<void*>(this) << "] " << x)
+
+#define STXXL_VERBOSE2_THIS(x) \
+    STXXL_VERBOSE2("[" << static_cast<void*>(this) << "] " << x)
+
+#define STXXL_VERBOSE3_THIS(x) \
+    STXXL_VERBOSE3("[" << static_cast<void*>(this) << "] " << x)
 
 // STXXL_CHECK is an assertion macro for unit tests, which contrarily to
 // assert() also works in release builds. These macros should ONLY be used in

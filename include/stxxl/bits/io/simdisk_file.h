@@ -30,13 +30,10 @@
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/disk_queued_file.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \weakgroup fileimpl
 //! \{
-
- #define AVERAGE_SPEED (15 * 1024 * 1024)
 
 class simdisk_geometry : private noncopyable
 {
@@ -61,14 +58,15 @@ class simdisk_geometry : private noncopyable
 #endif
             int _first_sector,
             int _sectors,
-            double _rate) :
+            double _rate)
+            :
 #if 0
-            last_cyl(_last_cyl),
-            sect_per_track(_sect_per_track),
+              last_cyl(_last_cyl),
+              sect_per_track(_sect_per_track),
 #endif
-            first_sector(_first_sector),
-            sectors(_sectors),
-            sustained_data_rate(_rate)
+              first_sector(_first_sector),
+              sectors(_sectors),
+              sustained_data_rate(_rate)
         { }
     };
     struct ZoneCmp
@@ -101,8 +99,9 @@ public:
 
     inline ~simdisk_geometry()
     { }
-};
 
+    static const double s_average_speed;
+};
 
 class IC35L080AVVA07 : public simdisk_geometry              // IBM series 120GXP
 {
@@ -121,13 +120,23 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param queue_id disk queue identifier
     //! \param allocator_id linked disk_allocator
-    inline sim_disk_file(const std::string& filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
+    //! \param device_id physical device identifier
+    inline sim_disk_file(
+        const std::string& filename,
+        int mode,
+        int queue_id = DEFAULT_QUEUE,
+        int allocator_id = NO_ALLOCATOR,
+        unsigned int device_id = DEFAULT_DEVICE_ID)
+        : file(device_id),
+          ufs_file_base(filename, mode),
+          disk_queued_file(queue_id, allocator_id)
     {
         std::cout << "Please, make sure that '" << filename <<
             "' is resided on swap memory partition!" <<
             std::endl;
     }
-    void serve(const request* req) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes,
+               request::request_type type);
     void set_size(offset_type newsize);
     const char * io_type() const;
 };

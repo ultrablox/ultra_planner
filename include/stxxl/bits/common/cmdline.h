@@ -26,9 +26,12 @@
 
 STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup support
+//! \{
+
 /**
- * \brief Command line parser which automatically fills variables and prints
- * nice usage messages.
+ * Command line parser which automatically fills variables and prints nice
+ * usage messages.
  *
  * This is a straightforward command line parser in C++, which will recognize
  * short options -s, long options --long and parameters, both required and
@@ -197,13 +200,46 @@ protected:
     };
 
     //! specialization of argument for SI/IEC suffixes byte size options or parameters
-    struct argument_bytes : public argument
+    struct argument_bytes32 : public argument
+    {
+        uint32& m_dest;
+
+        //! contructor filling most attributes
+        argument_bytes32(char key, const std::string& longkey, const std::string& keytype,
+                         const std::string& desc, bool required, uint32& dest)
+            : argument(key, longkey, keytype, desc, required),
+              m_dest(dest)
+        { }
+
+        virtual const char * type_name() const
+        { return "bytes"; }
+
+        //! parse byte size using SI/IEC parser from stxxl.
+        virtual bool process(int& argc, const char* const*& argv)
+        {
+            if (argc == 0) return false;
+            uint64 dest;
+            if (parse_SI_IEC_size(argv[0], dest) &&
+                (uint64)(m_dest = (uint32)dest) == dest) {
+                --argc, ++argv;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        virtual void print_value(std::ostream& os) const
+        { os << m_dest; }
+    };
+
+    //! specialization of argument for SI/IEC suffixes byte size options or parameters
+    struct argument_bytes64 : public argument
     {
         uint64& m_dest;
 
         //! contructor filling most attributes
-        argument_bytes(char key, const std::string& longkey, const std::string& keytype,
-                       const std::string& desc, bool required, uint64& dest)
+        argument_bytes64(char key, const std::string& longkey, const std::string& keytype,
+                         const std::string& desc, bool required, uint64& dest)
             : argument(key, longkey, keytype, desc, required),
               m_dest(dest)
         { }
@@ -303,9 +339,9 @@ protected:
     arglist_type m_paramlist;
 
     //! formatting width for options, '-s, --switch <#>'
-    size_t m_opt_maxlong;
+    int m_opt_maxlong;
     //! formatting width for parameters, 'param <#>'
-    size_t m_param_maxlong;
+    int m_param_maxlong;
 
     //! argv[0] for usage.
     const char* m_progname;
@@ -328,13 +364,15 @@ private:
     //! update maximum formatting width for new option
     void calc_opt_max(const argument* arg)
     {
-        m_opt_maxlong = STXXL_MAX(arg->option_text().size() + 2, m_opt_maxlong);
+        m_opt_maxlong = STXXL_MAX((int)arg->option_text().size() + 2,
+                                  m_opt_maxlong);
     }
 
     //! update maximum formatting width for new parameter
     void calc_param_max(const argument* arg)
     {
-        m_param_maxlong = STXXL_MAX(arg->param_text().size() + 2, m_param_maxlong);
+        m_param_maxlong = STXXL_MAX((int)arg->param_text().size() + 2,
+                                    m_param_maxlong);
     }
 
 public:
@@ -416,10 +454,19 @@ public:
     }
 
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 64-bit dest
+    void add_bytes(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, stxxl::uint32& dest)
+    {
+        m_optlist.push_back(
+            new argument_bytes32(key, longkey, keytype, desc, false, dest)
+            );
+        calc_opt_max(m_optlist.back());
+    }
+
+    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 64-bit dest
     void add_bytes(char key, const std::string& longkey, const std::string& keytype, const std::string& desc, stxxl::uint64& dest)
     {
         m_optlist.push_back(
-            new argument_bytes(key, longkey, keytype, desc, false, dest)
+            new argument_bytes64(key, longkey, keytype, desc, false, dest)
             );
         calc_opt_max(m_optlist.back());
     }
@@ -454,6 +501,10 @@ public:
     void add_uint(char key, const std::string& longkey, const std::string& desc, unsigned int& dest)
     { return add_uint(key, longkey, "", desc, dest); }
 
+    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 32-bit dest
+    void add_bytes(char key, const std::string& longkey, const std::string& desc, stxxl::uint32& dest)
+    { return add_bytes(key, longkey, "", desc, dest); }
+
     //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 64-bit dest
     void add_bytes(char key, const std::string& longkey, const std::string& desc, stxxl::uint64& dest)
     { return add_bytes(key, longkey, "", desc, dest); }
@@ -487,10 +538,19 @@ public:
     }
 
     //! add SI/IEC suffixes byte size parameter [name] with description and store to dest
+    void add_param_bytes(const std::string& name, const std::string& desc, uint32& dest)
+    {
+        m_paramlist.push_back(
+            new argument_bytes32(0, name, "", desc, true, dest)
+            );
+        calc_param_max(m_paramlist.back());
+    }
+
+    //! add SI/IEC suffixes byte size parameter [name] with description and store to dest
     void add_param_bytes(const std::string& name, const std::string& desc, uint64& dest)
     {
         m_paramlist.push_back(
-            new argument_bytes(0, name, "", desc, true, dest)
+            new argument_bytes64(0, name, "", desc, true, dest)
             );
         calc_param_max(m_paramlist.back());
     }
@@ -535,10 +595,19 @@ public:
     }
 
     //! add optional SI/IEC suffixes byte size parameter [name] with description and store to dest
+    void add_opt_param_bytes(const std::string& name, const std::string& desc, uint32& dest)
+    {
+        m_paramlist.push_back(
+            new argument_bytes32(0, name, "", desc, false, dest)
+            );
+        calc_param_max(m_paramlist.back());
+    }
+
+    //! add optional SI/IEC suffixes byte size parameter [name] with description and store to dest
     void add_opt_param_bytes(const std::string& name, const std::string& desc, uint64& dest)
     {
         m_paramlist.push_back(
-            new argument_bytes(0, name, "", desc, false, dest)
+            new argument_bytes64(0, name, "", desc, false, dest)
             );
         calc_param_max(m_paramlist.back());
     }
@@ -585,6 +654,8 @@ public:
     //! print nicely formatted result of processing
     void print_result(std::ostream& os = std::cout);
 };
+
+//! \}
 
 STXXL_END_NAMESPACE
 

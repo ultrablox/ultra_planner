@@ -27,7 +27,6 @@
 #define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE2
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup mnglayer
@@ -169,8 +168,8 @@ public:
 
 //! Contains per block information for \c stxxl::typed_block , not intended for direct use.
 template <typename Type, unsigned RawSize, unsigned NBids, typename MetaInfoType = void>
-class block_w_info :
-    public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids - sizeof(MetaInfoType)) / sizeof(Type)), RawSize, NBids>
+class block_w_info
+    : public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids - sizeof(MetaInfoType)) / sizeof(Type)), RawSize, NBids>
 {
 public:
     //! Type of per block information element.
@@ -183,8 +182,8 @@ public:
 };
 
 template <typename Type, unsigned RawSize, unsigned NBids>
-class block_w_info<Type, RawSize, NBids, void>:
-    public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids) / sizeof(Type)), RawSize, NBids>
+class block_w_info<Type, RawSize, NBids, void>
+    : public block_w_bids<Type, ((RawSize - sizeof(BID<RawSize>)* NBids) / sizeof(Type)), RawSize, NBids>
 {
 public:
     typedef void info_type;
@@ -235,8 +234,8 @@ class expand_struct : public add_filler<Type, RawSize - sizeof(Type)>
 //! function variable for example), because Linux POSIX library limits the stack size for the
 //! main thread to (2MB - system page size)
 template <unsigned RawSize, typename Type, unsigned NRef = 0, typename MetaInfoType = void>
-class typed_block :
-    public mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize>
+class typed_block
+    : public mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize>
 {
     typedef mng_local::expand_struct<mng_local::block_w_info<Type, RawSize, NRef, MetaInfoType>, RawSize> Base;
 
@@ -263,7 +262,7 @@ public:
         STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
         STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] typed_block is constructed");
 #if 0
-        assert(((long)this) % BLOCK_ALIGN == 0);
+        assert(((long)this) % STXXL_BLOCK_ALIGN == 0);
 #endif
     }
 
@@ -282,7 +281,7 @@ public:
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr write(const bid_type& bid,
-                      completion_handler on_cmpl = default_completion_handler())
+                      completion_handler on_cmpl = completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid));
         return bid.storage->awrite(this, bid.offset, raw_size, on_cmpl);
@@ -294,7 +293,7 @@ public:
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr read(const bid_type& bid,
-                     completion_handler on_cmpl = default_completion_handler())
+                     completion_handler on_cmpl = completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid));
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
@@ -303,9 +302,11 @@ public:
     static void* operator new (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
-        STXXL_VERBOSE1("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
+        STXXL_VERBOSE_TYPED_BLOCK("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
 
-        void* result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
+        void* result = aligned_alloc<STXXL_BLOCK_ALIGN>(
+            bytes - meta_info_size, meta_info_size);
+
 #if STXXL_WITH_VALGRIND || STXXL_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
 #endif
@@ -315,9 +316,11 @@ public:
     static void* operator new[] (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
-        STXXL_VERBOSE1("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
+        STXXL_VERBOSE_TYPED_BLOCK("typed::block operator new[]: bytes=" << bytes << ", meta_info_size=" << meta_info_size);
 
-        void* result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
+        void* result = aligned_alloc<STXXL_BLOCK_ALIGN>(
+            bytes - meta_info_size, meta_info_size);
+
 #if STXXL_WITH_VALGRIND || STXXL_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
 #endif
@@ -331,12 +334,12 @@ public:
 
     static void operator delete (void* ptr)
     {
-        aligned_dealloc<BLOCK_ALIGN>(ptr);
+        aligned_dealloc<STXXL_BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete[] (void* ptr)
     {
-        aligned_dealloc<BLOCK_ALIGN>(ptr);
+        aligned_dealloc<STXXL_BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete (void*, void*)

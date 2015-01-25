@@ -22,12 +22,10 @@
 
 #define STXXL_VERBOSE_WPOOL(msg) STXXL_VERBOSE1("write_pool[" << static_cast<void*>(this) << "]" << msg)
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
-
 
 //! Implements dynamically resizable buffered writing pool.
 template <class BlockType>
@@ -46,8 +44,8 @@ public:
 
         busy_entry() : block(NULL) { }
         busy_entry(const busy_entry& a) : block(a.block), req(a.req), bid(a.bid) { }
-        busy_entry(block_type*& bl, request_ptr& r, bid_type& bi) :
-            block(bl), req(r), bid(bi) { }
+        busy_entry(block_type*& bl, request_ptr& r, bid_type& bi)
+            : block(bl), req(r), bid(bi) { }
 
         operator request_ptr () { return req; }
     };
@@ -79,7 +77,7 @@ public:
     }
 
     //! Waits for completion of all ongoing write requests and frees memory.
-    virtual ~write_pool()
+    ~write_pool()
     {
         STXXL_VERBOSE_WPOOL("::~write_pool free_blocks.size()=" << free_blocks.size() <<
                             " busy_blocks.size()=" << busy_blocks.size());
@@ -275,7 +273,6 @@ protected:
 //! \}
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

@@ -35,10 +35,12 @@
 // 3. stxxl::srandom_number32(); // seed the global state of stxxl::random_number32
 // 4. create all the other prngs used.
 
-
 STXXL_BEGIN_NAMESPACE
 
 extern unsigned ran32State;
+
+//! \addtogroup support
+//! \{
 
 //! Fast uniform [0, 2^32) pseudo-random generator with period 2^32, random
 //! bits: 32.
@@ -241,11 +243,11 @@ struct random_uniform_slow
 };
 
 //! Uniform [0, N) pseudo-random generator
-template <class UniformRGen_ = random_uniform_fast>
+template <class UniformRGen = random_uniform_fast>
 struct random_number
 {
     typedef unsigned value_type;
-    UniformRGen_ uniform;
+    UniformRGen uniform;
 
     random_number(unsigned seed = 0) : uniform(seed)
     { }
@@ -282,6 +284,8 @@ struct random_number64
 #if STXXL_MSVC
 #pragma warning(pop) // assignment operator could not be generated
 #endif
+
+//! \}
 
 STXXL_END_NAMESPACE
 

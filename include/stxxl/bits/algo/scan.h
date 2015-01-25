@@ -20,14 +20,13 @@
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlalgo
 //! \{
 
 /*!
- * \brief External equivalent of std::for_each, see \ref design_algo_foreach.
+ * External equivalent of std::for_each, see \ref design_algo_foreach.
  *
  * stxxl::for_each applies the function object \c functor to each element in
  * the range [first, last); \c functor's return value, if any, is
@@ -48,12 +47,18 @@ STXXL_BEGIN_NAMESPACE
  * \warning nested stxxl::for_each are not supported
  */
 template <typename ExtIterator, typename UnaryFunction>
-UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers = 0)
+UnaryFunction for_each(ExtIterator begin, ExtIterator end,
+                       UnaryFunction functor, int_type nbuffers = 0)
 {
     if (begin == end)
         return functor;
 
-    typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
+    typedef typename ExtIterator::value_type value_type;
+
+    typedef buf_istream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_istream_type;
 
     begin.flush();     // flush container
 
@@ -68,14 +73,14 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
     // leave part of the block before begin untouched (e.g. copy)
     for ( ; cur != begin; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
     }
 
     // apply functor to the range [begin,end)
     for ( ; cur != end; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
         functor(tmp);
     }
@@ -83,10 +88,10 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
     // leave part of the block after end untouched
     if (end.block_offset())
     {
-        ExtIterator _last_block_end = end - end.block_offset() + ExtIterator::block_type::size;
-        for ( ; cur != _last_block_end; ++cur)
+        ExtIterator last_block_end = end - end.block_offset() + ExtIterator::block_type::size;
+        for ( ; cur != last_block_end; ++cur)
         {
-            typename ExtIterator::value_type tmp;
+            value_type tmp;
             in >> tmp;
         }
     }
@@ -94,9 +99,8 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
     return functor;
 }
 
-
 /*!
- * \brief External equivalent of std::for_each (mutating), see \ref design_algo_foreachm
+ * External equivalent of std::for_each (mutating), see \ref design_algo_foreachm
  *
  * stxxl::for_each_m applies the function object \c functor to each element in
  * the range [first, last); \c functor's return value, if any, is
@@ -118,13 +122,23 @@ UnaryFunction for_each(ExtIterator begin, ExtIterator end, UnaryFunction functor
  * \warning nested stxxl::for_each_m are not supported
  */
 template <typename ExtIterator, typename UnaryFunction>
-UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction functor, int_type nbuffers = 0)
+UnaryFunction for_each_m(ExtIterator begin, ExtIterator end,
+                         UnaryFunction functor, int_type nbuffers = 0)
 {
     if (begin == end)
         return functor;
 
-    typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
-    typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
+    typedef typename ExtIterator::value_type value_type;
+
+    typedef buf_istream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_istream_type;
+
+    typedef buf_ostream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_ostream_type;
 
     begin.flush();     // flush container
 
@@ -143,7 +157,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     // leave part of the block before begin untouched (e.g. copy)
     for ( ; cur != begin; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
         out << tmp;
     }
@@ -151,7 +165,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     // apply functor to the range [begin,end)
     for ( ; cur != end; ++cur)
     {
-        typename ExtIterator::value_type tmp;
+        value_type tmp;
         in >> tmp;
         functor(tmp);
         out << tmp;
@@ -163,7 +177,7 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
         ExtIterator _last_block_end = end - end.block_offset() + ExtIterator::block_type::size;
         for ( ; cur != _last_block_end; ++cur)
         {
-            typename ExtIterator::value_type tmp;
+            value_type tmp;
             in >> tmp;
             out << tmp;
         }
@@ -172,9 +186,8 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
     return functor;
 }
 
-
 /*!
- * \brief External equivalent of std::generate, see \ref design_algo_generate.
+ * External equivalent of std::generate, see \ref design_algo_generate.
  *
  * Generate assigns the result of invoking \c generator, a function object that
  * takes no arguments, to each element in the range [first, last). To overlap
@@ -191,11 +204,14 @@ UnaryFunction for_each_m(ExtIterator begin, ExtIterator end, UnaryFunction funct
  * \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D, or zero for automaticl 2*D)
  */
 template <typename ExtIterator, typename Generator>
-void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type nbuffers = 0)
+void generate(ExtIterator begin, ExtIterator end,
+              Generator generator, int_type nbuffers = 0)
 {
     typedef typename ExtIterator::block_type block_type;
-    typedef buf_ostream<block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
+    typedef buf_ostream<
+            block_type, typename ExtIterator::bids_container_iterator
+            > buf_ostream_type;
 
     while (begin.block_offset())    //  go to the beginning of the block
     //  of the external vector
@@ -250,9 +266,8 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
     begin.flush();
 }
 
-
 /*!
- * \brief External equivalent of std::find, see \ref design_algo_find.
+ * External equivalent of std::find, see \ref design_algo_find.
  *
  * Returns the first iterator \a i in the range [first, last) such that <tt>*i
  * == value</tt>. Returns last if no such iterator exists.  To overlap I/O and
@@ -271,12 +286,16 @@ void generate(ExtIterator begin, ExtIterator end, Generator generator, int_type 
  *         such exists then \c end
  */
 template <typename ExtIterator, typename EqualityComparable>
-ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable& value, int_type nbuffers = 0)
+ExtIterator find(ExtIterator begin, ExtIterator end,
+                 const EqualityComparable& value, int_type nbuffers = 0)
 {
     if (begin == end)
         return end;
 
-    typedef buf_istream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_istream_type;
+    typedef buf_istream<
+            typename ExtIterator::block_type,
+            typename ExtIterator::bids_container_iterator
+            > buf_istream_type;
 
     begin.flush();     // flush container
 

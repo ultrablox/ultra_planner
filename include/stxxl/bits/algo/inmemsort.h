@@ -23,13 +23,12 @@
 
 #include <algorithm>
 
-
 STXXL_BEGIN_NAMESPACE
 
-template <typename ExtIterator_, typename StrictWeakOrdering_>
-void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp)
+template <typename ExtIterator, typename StrictWeakOrdering>
+void stl_in_memory_sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp)
 {
-    typedef typename ExtIterator_::block_type block_type;
+    typedef typename ExtIterator::block_type block_type;
 
     STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
     first.flush();
@@ -40,7 +39,6 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
 
     for (i = 0; i < nblocks; ++i)
         reqs[i] = blocks[i].read(*(first.bid() + i));
-
 
     wait_all(reqs.begin(), nblocks);
 
@@ -56,7 +54,6 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
 
     wait_all(reqs.begin(), nblocks);
 }
-
 
 STXXL_END_NAMESPACE
 

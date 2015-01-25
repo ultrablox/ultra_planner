@@ -23,12 +23,10 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/noncopyable.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
-
 
 class set_switch_handler
 {
@@ -36,13 +34,15 @@ class set_switch_handler
     completion_handler on_compl;
 
 public:
-    set_switch_handler(onoff_switch& switch__, const completion_handler& on_compl)
-        : switch_(switch__), on_compl(on_compl)
+    set_switch_handler(onoff_switch& _switch, const completion_handler& on_compl)
+        : switch_(_switch), on_compl(on_compl)
     { }
 
     void operator () (request* req)
     {
-        on_compl(req);  //call before setting switch to on, otherwise, user has no way to wait for the completion handler to be executed
+        // call before setting switch to on, otherwise, user has no way to wait
+        // for the completion handler to be executed
+        on_compl(req);
         switch_.on();
     }
 };
@@ -51,9 +51,13 @@ public:
 //!
 //! \c block_prefetcher overlaps I/Os with consumption of read data.
 //! Utilizes optimal asynchronous prefetch scheduling (by Peter Sanders et.al.)
-template <typename block_type, typename bid_iterator_type>
+template <typename BlockType, typename BidIteratorType>
 class block_prefetcher : private noncopyable
 {
+public:
+    typedef BlockType block_type;
+    typedef BidIteratorType bid_iterator_type;
+
     typedef typename block_type::bid_type bid_type;
 
 protected:
@@ -105,16 +109,15 @@ public:
         bid_iterator_type _cons_end,
         int_type* _pref_seq,
         int_type _prefetch_buf_size,
-        completion_handler do_after_fetch = default_completion_handler()
-        ) :
-        consume_seq_begin(_cons_begin),
-        consume_seq_end(_cons_end),
-        seq_length(_cons_end - _cons_begin),
-        prefetch_seq(_pref_seq),
-        nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size), seq_length)),
-        nextconsume(0),
-        nreadblocks(nextread),
-        do_after_fetch(do_after_fetch)
+        completion_handler do_after_fetch = completion_handler())
+        : consume_seq_begin(_cons_begin),
+          consume_seq_end(_cons_end),
+          seq_length(_cons_end - _cons_begin),
+          prefetch_seq(_pref_seq),
+          nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size), seq_length)),
+          nextconsume(0),
+          nreadblocks(nextread),
+          do_after_fetch(do_after_fetch)
     {
         STXXL_VERBOSE1("block_prefetcher: seq_length=" << seq_length);
         STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size=" << _prefetch_buf_size);
@@ -186,7 +189,6 @@ public:
         if (nextconsume >= seq_length)
             return false;
 
-
         buffer = wait(nextconsume++);
 
         return true;
@@ -211,7 +213,6 @@ public:
         for (int_type i = 0; i < nreadblocks; ++i)
             if (read_reqs[i].valid())
                 read_reqs[i]->wait();
-
 
         delete[] read_reqs;
         delete[] read_bids;

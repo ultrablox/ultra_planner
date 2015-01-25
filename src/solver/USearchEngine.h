@@ -36,7 +36,7 @@ const unsigned int mem_for_pools = 16 * 1024 * 1024;
 class AStarSearchEngine : public USearchEngine
 {
 	typedef stxxl::PRIORITY_QUEUE_GENERATOR<UNodeEstimatedRef, QueueGreater, 128*1024*1024, 1024*1024>::result queue_type;
-	typedef queue_type::block_type block_type;
+	//typedef queue_type::block_type block_type;
 	enum class state_t {Preparing, SearchingFirst, SearchingBest, Finished};
 public:
 	AStarSearchEngine(USolver * p_solver, const UTransitionSystem & transition_system, const UHeuristic * heuristic, const UMetric * metric);
@@ -52,8 +52,8 @@ private:
 	const UHeuristic * m_pHeuristic;
 	const UMetric * m_pMetric;
 
-	stxxl::read_write_pool<block_type> pool;
-	queue_type m_searchQueue;
+	//stxxl::read_write_pool<block_type> pool;
+	//queue_type m_searchQueue;
 	state_t m_state;
 };
 

@@ -28,7 +28,6 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \defgroup stlcont_stack stack
@@ -40,7 +39,7 @@ template <class ValueType,
           unsigned BlocksPerPage = 4,
           unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-          class SizeType = stxxl::int64>
+          class SizeType = stxxl::uint64>
 struct stack_config_generator
 {
     typedef ValueType value_type;
@@ -49,7 +48,6 @@ struct stack_config_generator
     enum { block_size = BlockSize };
     typedef SizeType size_type;
 };
-
 
 //! External stack container.
 //! <b> Introduction </b> to stack container: see \ref tutorial_stack tutorial. \n
@@ -93,14 +91,14 @@ public:
     //! \{
 
     //! Default constructor: creates empty stack.
-    normal_stack() :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        front_page(cache.begin() + blocks_per_page),
-        back_page(cache.begin()),
-        bids(0)
+    normal_stack()
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          front_page(cache.begin() + blocks_per_page),
+          back_page(cache.begin()),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
     }
@@ -128,31 +126,30 @@ public:
     //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
-    template <class stack_type>
-    normal_stack(const stack_type& stack_) :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        front_page(cache.begin() + blocks_per_page),
-        back_page(cache.begin()),
-        bids(0)
+    template <class StackType>
+    normal_stack(const StackType& stack_)
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          front_page(cache.begin() + blocks_per_page),
+          back_page(cache.begin()),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
 
-        stack_type stack_copy = stack_;
-        const size_type sz = stack_copy.size();
-        size_type i;
+        StackType stack_copy = stack_;
+        size_t sz = stack_copy.size();
 
         std::vector<value_type> tmp(sz);
 
-        for (i = 0; i < sz; ++i)
-        {
+        for (size_t i = 0; i < sz; ++i) {
             tmp[sz - i - 1] = stack_copy.top();
             stack_copy.pop();
         }
-        for (i = 0; i < sz; ++i)
-            this->push(tmp[i]);
+
+        for (size_t i = 0; i < sz; ++i)
+            push(tmp[i]);
     }
 
     virtual ~normal_stack()
@@ -220,7 +217,6 @@ public:
             {
                 requests[i] = (back_page + i)->write(*cur_bid);
             }
-
 
             std::swap(back_page, front_page);
 
@@ -292,12 +288,10 @@ private:
         if (offset < blocks_per_page * block_type::size)
             return &((*(back_page + offset / block_type::size))[offset % block_type::size]);
 
-
         unsigned_type unbiased_offset = offset - blocks_per_page * block_type::size;
         return &((*(front_page + unbiased_offset / block_type::size))[unbiased_offset % block_type::size]);
     }
 };
-
 
 //! Efficient implementation that uses prefetching and overlapping using internal buffers.
 //!
@@ -339,15 +333,15 @@ public:
     //! \{
 
     //! Default constructor: creates empty stack.
-    grow_shrink_stack() :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        cache_buffers(cache.begin()),
-        overlap_buffers(cache.begin() + blocks_per_page),
-        requests(blocks_per_page),
-        bids(0)
+    grow_shrink_stack()
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          cache_buffers(cache.begin()),
+          overlap_buffers(cache.begin() + blocks_per_page),
+          requests(blocks_per_page),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
     }
@@ -378,32 +372,32 @@ public:
     //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
-    template <class stack_type>
-    grow_shrink_stack(const stack_type& stack_) :
-        m_size(0),
-        cache_offset(0),
-        current_element(NULL),
-        cache(blocks_per_page * 2),
-        cache_buffers(cache.begin()),
-        overlap_buffers(cache.begin() + blocks_per_page),
-        requests(blocks_per_page),
-        bids(0)
+    template <class StackType>
+    grow_shrink_stack(const StackType& stack_)
+        : m_size(0),
+          cache_offset(0),
+          current_element(NULL),
+          cache(blocks_per_page * 2),
+          cache_buffers(cache.begin()),
+          overlap_buffers(cache.begin() + blocks_per_page),
+          requests(blocks_per_page),
+          bids(0)
     {
         bids.reserve(blocks_per_page);
 
-        stack_type stack_copy = stack_;
-        const size_type sz = stack_copy.size();
-        size_type i;
+        StackType stack_copy = stack_;
+        size_t sz = stack_copy.size();
 
         std::vector<value_type> tmp(sz);
 
-        for (i = 0; i < sz; ++i)
+        for (size_t i = 0; i < sz; ++i)
         {
             tmp[sz - i - 1] = stack_copy.top();
             stack_copy.pop();
         }
-        for (i = 0; i < sz; ++i)
-            this->push(tmp[i]);
+
+        for (size_t i = 0; i < sz; ++i)
+            push(tmp[i]);
     }
     virtual ~grow_shrink_stack()
     {
@@ -512,7 +506,6 @@ public:
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
 
-
             std::swap(cache_buffers, overlap_buffers);
 
             if (bids.size() > blocks_per_page)
@@ -582,9 +575,8 @@ public:
     //! read_write_pool for prefetching and buffered writing.
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
-    grow_shrink_stack2(
-        pool_type& pool_,
-        unsigned_type prefetch_aggressiveness = 0)
+    grow_shrink_stack2(pool_type& pool_,
+                       unsigned_type prefetch_aggressiveness = 0)
         : m_size(0),
           cache_offset(0),
           cache(new block_type),
@@ -604,17 +596,16 @@ public:
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     STXXL_DEPRECATED(
-        grow_shrink_stack2(
-            prefetch_pool<block_type>& p_pool_,
-            write_pool<block_type>& w_pool_,
-            unsigned_type prefetch_aggressiveness = 0)
-        ) :
-        m_size(0),
-        cache_offset(0),
-        cache(new block_type),
-        pref_aggr(prefetch_aggressiveness),
-        owned_pool(new pool_type(p_pool_, w_pool_)),
-        pool(owned_pool)
+        grow_shrink_stack2(prefetch_pool<block_type>& p_pool_,
+                           write_pool<block_type>& w_pool_,
+                           unsigned_type prefetch_aggressiveness = 0)
+        )
+        : m_size(0),
+          cache_offset(0),
+          cache(new block_type),
+          pref_aggr(prefetch_aggressiveness),
+          owned_pool(new pool_type(p_pool_, w_pool_)),
+          pool(owned_pool)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
@@ -817,7 +808,6 @@ private:
     }
 };
 
-
 //! A stack that migrates from internal memory to external when its size exceeds a certain threshold.
 //!
 //! For semantics of the methods see documentation of the STL \c std::stack.
@@ -846,8 +836,8 @@ private:
 
     //! Copy-construction from a another stack of any type.
     //! \warning not implemented yet!
-    template <class stack_type>
-    migrating_stack(const stack_type& stack_);
+    template <class StackType>
+    migrating_stack(const StackType& stack_);
 
 public:
     //! \name Constructors/Destructors
@@ -971,7 +961,7 @@ public:
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
-//! \brief Stack type generator \n
+//! Stack type generator \n
 //! <b> Introduction </b> to stack container: see \ref tutorial_stack tutorial. \n
 //! <b> Design and Internals </b> of stack container: see \ref design_stack.
 //!
@@ -1001,7 +991,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!
 //! \tparam AllocStr one of allocation strategies: striping, RC, SR, or FR. Default is \b RC.
 //!
-//! \tparam SizeType size type, default is \b stxxl::int64.
+//! \tparam SizeType size type, default is \b stxxl::uint64.
 //!
 //! The configured stack type is available as STACK_GENERATOR<>::result.
 //!
@@ -1016,7 +1006,7 @@ template <
     unsigned_type MigrCritSize = (2* BlocksPerPage* BlockSize),
 
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-    class SizeType = stxxl::int64
+    class SizeType = stxxl::uint64
     >
 class STACK_GENERATOR
 {
@@ -1036,7 +1026,6 @@ public:
 //! \}
 
 STXXL_END_NAMESPACE
-
 
 namespace std {
 

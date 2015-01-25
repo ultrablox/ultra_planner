@@ -34,8 +34,10 @@
   #include <sys/time.h>
 #endif
 
-
 STXXL_BEGIN_NAMESPACE
+
+//! \addtogroup support
+//! \{
 
 //! Returns number of seconds since the epoch, high resolution.
 inline double
@@ -55,7 +57,7 @@ timestamp()
 #else
     struct timeval tp;
     gettimeofday(&tp, NULL);
-    return double(tp.tv_sec) + tp.tv_usec / 1000000.;
+    return double(tp.tv_sec) + double(tp.tv_usec) / 1000000.;
 #endif
 }
 
@@ -156,16 +158,24 @@ public:
     //! on destruction: tell the time
     ~scoped_print_timer()
     {
-        if (m_bytes == 0)
-            STXXL_MSG("Finished " << m_message
-                                  << " after " << m_timer.seconds() << " seconds");
-        else
-            STXXL_MSG("Finished " << m_message
-                                  << " after " << m_timer.seconds() << " seconds. "
-                                  << "Processed " << format_IEC_size(m_bytes) << "B"
-                                  << " @ " << format_IEC_size(uint64(m_bytes / m_timer.seconds())) << "B/s");
+        if (m_bytes == 0) {
+            STXXL_MSG("Finished "
+                      << m_message
+                      << " after " << m_timer.seconds() << " seconds");
+        }
+        else {
+            double bps = (double)m_bytes / m_timer.seconds();
+
+            STXXL_MSG("Finished "
+                      << m_message
+                      << " after " << m_timer.seconds() << " seconds. "
+                      << "Processed " << format_IEC_size(m_bytes) << "B"
+                      << " @ " << format_IEC_size((uint64)bps) << "B/s");
+        }
     }
 };
+
+//! \}
 
 STXXL_END_NAMESPACE
 

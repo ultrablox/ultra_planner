@@ -21,8 +21,10 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
 
-
 STXXL_BEGIN_NAMESPACE
+
+//! \addtogroup support
+//! \{
 
 /*!
  * High-performance smart pointer used as a wrapping reference counting
@@ -515,6 +517,8 @@ public:
 };
 
 #endif
+
+//! \}
 
 STXXL_END_NAMESPACE
 

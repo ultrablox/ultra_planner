@@ -39,22 +39,21 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/is_sorted.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlalgo
 //! \{
 
-
 /*! \internal
  */
 namespace sort_local {
 
-template <typename block_type, typename bid_type>
+template <typename BlockType, typename BidType>
 struct read_next_after_write_completed
 {
+    typedef BlockType block_type;
     block_type* block;
-    bid_type bid;
+    BidType bid;
     request_ptr* req;
     void operator () (request* /*completed_req*/)
     {
@@ -62,20 +61,22 @@ struct read_next_after_write_completed
     }
 };
 
-
 template <
-    typename block_type,
-    typename run_type,
-    typename input_bid_iterator,
-    typename value_cmp>
+    typename BlockType,
+    typename RunType,
+    typename InputBidIterator,
+    typename ValueCmp>
 void
 create_runs(
-    input_bid_iterator it,
-    run_type** runs,
+    InputBidIterator it,
+    RunType** runs,
     int_type nruns,
     int_type _m,
-    value_cmp cmp)
+    ValueCmp cmp)
 {
+    typedef BlockType block_type;
+    typedef RunType run_type;
+
     typedef typename block_type::bid_type bid_type;
     STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m);
 
@@ -103,7 +104,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks1[i].elem));
+        STXXL_VERBOSE1("stxxl::create_runs posting read " << Blocks1[i].elem);
         bids1[i] = *(it++);
         read_reqs1[i] = Blocks1[i].read(bids1[i]);
     }
@@ -112,7 +113,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks2[i].elem));
+        STXXL_VERBOSE1("stxxl::create_runs posting read " << Blocks2[i].elem);
         bids2[i] = *(it++);
         read_reqs2[i] = Blocks2[i].read(bids2[i]);
     }
@@ -122,10 +123,8 @@ create_runs(
         run_type* run = runs[k];
         run_size = run->size();
         assert(run_size == m2);
-            #ifndef NDEBUG
         int_type next_run_size = runs[k + 1]->size();
-            #endif
-        assert((next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
+        STXXL_ASSERT((next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
 
         STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
         wait_all(read_reqs1, run_size);
@@ -147,7 +146,7 @@ create_runs(
         int_type runplus2size = (k < nruns - 2) ? runs[k + 2]->size() : 0;
         for (i = 0; i < m2; ++i)
         {
-            STXXL_VERBOSE1("stxxl::create_runs posting write " << long(Blocks1[i].elem));
+            STXXL_VERBOSE1("stxxl::create_runs posting write " << Blocks1[i].elem);
             (*run)[i].value = Blocks1[i][0];
             if (i >= runplus2size) {
                 write_reqs[i] = Blocks1[i].write((*run)[i].bid);
@@ -185,7 +184,7 @@ create_runs(
 
     for (i = 0; i < run_size; ++i)
     {
-        STXXL_VERBOSE1("stxxl::create_runs posting write " << long(Blocks1[i].elem));
+        STXXL_VERBOSE1("stxxl::create_runs posting write " << Blocks1[i].elem);
         (*run)[i].value = Blocks1[i][0];
         write_reqs[i] = Blocks1[i].write((*run)[i].bid);
     }
@@ -204,13 +203,13 @@ create_runs(
     delete[] next_run_reads;
 }
 
-
-template <typename block_type, typename run_type, typename value_cmp>
-bool check_sorted_runs(run_type** runs,
+template <typename BlockType, typename RunType, typename ValueCmp>
+bool check_sorted_runs(RunType** runs,
                        unsigned_type nruns,
                        unsigned_type m,
-                       value_cmp cmp)
+                       ValueCmp cmp)
 {
+    typedef BlockType block_type;
     typedef typename block_type::value_type value_type;
 
     STXXL_MSG("check_sorted_runs  Runs: " << nruns);
@@ -304,10 +303,13 @@ bool check_sorted_runs(run_type** runs,
     return true;
 }
 
-
-template <typename block_type, typename run_type, typename value_cmp>
-void merge_runs(run_type** in_runs, int_type nruns, run_type* out_run, unsigned_type _m, value_cmp cmp)
+template <typename BlockType, typename RunType, typename ValueCmp>
+void merge_runs(RunType** in_runs, int_type nruns,
+                RunType* out_run, unsigned_type _m, ValueCmp cmp)
 {
+    typedef BlockType block_type;
+    typedef RunType run_type;
+    typedef ValueCmp value_cmp;
     typedef typename run_type::value_type trigger_entry_type;
     typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
     typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
@@ -320,7 +322,7 @@ void merge_runs(run_type** in_runs, int_type nruns, run_type* out_run, unsigned_
     typename run_type::iterator copy_start = consume_seq.begin();
     for (int_type i = 0; i < nruns; i++)
     {
-        // TODO: try to avoid copy
+        // \todo: try to avoid copy
         copy_start = std::copy(
             in_runs[i]->begin(),
             in_runs[i]->end(),
@@ -348,7 +350,7 @@ void merge_runs(run_type** in_runs, int_type nruns, run_type* out_run, unsigned_
         consume_seq,
         prefetch_seq,
         n_opt_prefetch_buffers,
-        disks_number);
+        config::get_instance()->get_max_device_id());
 #else
     for (unsigned_type i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;
@@ -499,23 +501,24 @@ void merge_runs(run_type** in_runs, int_type nruns, run_type* out_run, unsigned_
         for (unsigned_type j = 0; j < sz; ++j)
             bm->delete_block((*in_runs[i])[j].bid);
 
-
         delete in_runs[i];
     }
 }
 
-
-template <typename block_type,
-          typename alloc_strategy,
-          typename input_bid_iterator,
-          typename value_cmp>
-simple_vector<sort_helper::trigger_entry<block_type> >*
-sort_blocks(input_bid_iterator input_bids,
+template <typename BlockType,
+          typename AllocStrategy,
+          typename InputBidIterator,
+          typename ValueCmp>
+simple_vector<sort_helper::trigger_entry<BlockType> >*
+sort_blocks(InputBidIterator input_bids,
             unsigned_type _n,
             unsigned_type _m,
-            value_cmp cmp
-            )
+            ValueCmp cmp)
 {
+    typedef BlockType block_type;
+    typedef AllocStrategy alloc_strategy;
+    typedef InputBidIterator input_bid_iterator;
+    typedef ValueCmp value_cmp;
     typedef typename block_type::bid_type bid_type;
     typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
     typedef simple_vector<trigger_entry_type> run_type;
@@ -537,7 +540,6 @@ sort_blocks(input_bid_iterator input_bids,
 
     for (i = 0; i < full_runs; i++)
         runs[i] = new run_type(m2);
-
 
     if (partial_runs)
         runs[i] = new run_type(_n - full_runs * m2);
@@ -643,7 +645,6 @@ sort_blocks(input_bid_iterator input_bids,
                   after_runs_creation - begin << " s");
     STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
     STXXL_VERBOSE(*stats::get_instance());
-    STXXL_UNUSED(begin + after_runs_creation + end + io_wait_after_rf);
 
     return result;
 }
@@ -651,7 +652,7 @@ sort_blocks(input_bid_iterator input_bids,
 } // namespace sort_local
 
 /*!
- * \brief Sort records comparison-based, see \ref design_algo_sort.
+ * Sort records comparison-based, see \ref design_algo_sort.
  *
  * stxxl::sort sorts the elements in [first, last) into ascending order,
  * meaning that if \c i and \c j are any two valid iterators in [first, last)
@@ -674,10 +675,13 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
-    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator::block_type> > run_type;
-
     typedef typename ExtIterator::vector_type::value_type value_type;
     typedef typename ExtIterator::block_type block_type;
+    typedef typename ExtIterator::bid_type bid_type;
+    typedef typename ExtIterator::vector_type::alloc_strategy_type alloc_strategy_type;
+    typedef typename ExtIterator::bids_container_iterator bids_container_iterator;
+
+    typedef simple_vector<sort_helper::trigger_entry<block_type> > run_type;
 
     unsigned_type n = 0;
 
@@ -700,8 +704,8 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
             if (last.block_offset())              // first and last element are
             // not the first elements of their block
             {
-                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
+                block_type* first_block = new block_type;
+                block_type* last_block = new block_type;
                 typename ExtIterator::bid_type first_bid, last_bid;
                 request_ptr req;
 
@@ -709,7 +713,6 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 mng->new_block(FR(), first_bid);                // try to overlap
                 mng->new_block(FR(), last_bid);
                 req->wait();
-
 
                 req = last_block->read(*last.bid());
 
@@ -721,7 +724,6 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 req->wait();
 
-
                 req = first_block->write(first_bid);
                 for (i = last.block_offset(); i < block_type::size; ++i)
                 {
@@ -729,7 +731,6 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 }
 
                 req->wait();
-
 
                 req = last_block->write(last_bid);
 
@@ -740,22 +741,19 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 req->wait();
 
-
                 delete first_block;
                 delete last_block;
 
                 run_type* out =
                     sort_local::sort_blocks<
-                        typename ExtIterator::block_type,
-                        typename ExtIterator::vector_type::alloc_strategy_type,
-                        typename ExtIterator::bids_container_iterator>
-                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                        block_type, alloc_strategy_type, bids_container_iterator
+                        >(first.bid(), n,
+                          M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
-
-                first_block = new typename ExtIterator::block_type;
-                last_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
+                first_block = new block_type;
+                last_block = new block_type;
+                block_type* sorted_first_block = new block_type;
+                block_type* sorted_last_block = new block_type;
                 request_ptr* reqs = new request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
@@ -794,7 +792,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 typename run_type::iterator it = out->begin();
                 ++it;
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
                 ++cur_bid;
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
@@ -810,21 +808,19 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 req->wait();
 
-
                 delete last_block;
             }
             else
             {
                 // first element is
                 // not the first element of its block
-                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
-                typename ExtIterator::bid_type first_bid;
+                block_type* first_block = new block_type;
+                bid_type first_bid;
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
                 mng->new_block(FR(), first_bid);                // try to overlap
                 req->wait();
-
 
                 unsigned_type i = 0;
                 for ( ; i < first.block_offset(); ++i)
@@ -840,20 +836,17 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 req->wait();
 
-
                 delete first_block;
 
                 run_type* out =
                     sort_local::sort_blocks<
-                        typename ExtIterator::block_type,
-                        typename ExtIterator::vector_type::alloc_strategy_type,
-                        typename ExtIterator::bids_container_iterator>
-                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                        block_type, alloc_strategy_type, bids_container_iterator
+                        >(first.bid(), n,
+                          M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
+                first_block = new block_type;
 
-                first_block = new typename ExtIterator::block_type;
-
-                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
+                block_type* sorted_first_block = new block_type;
 
                 request_ptr* reqs = new request_ptr[2];
 
@@ -876,7 +869,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 typename run_type::iterator it = out->begin();
                 ++it;
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
                 ++cur_bid;
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
@@ -900,15 +893,14 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
             if (last.block_offset())            // last is
             // not the first element of its block
             {
-                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
-                typename ExtIterator::bid_type last_bid;
+                block_type* last_block = new block_type;
+                bid_type last_bid;
                 request_ptr req;
                 unsigned_type i;
 
                 req = last_block->read(*last.bid());
                 mng->new_block(FR(), last_bid);
                 req->wait();
-
 
                 for (i = last.block_offset(); i < block_type::size; ++i)
                 {
@@ -923,19 +915,16 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
                 req->wait();
 
-
                 delete last_block;
 
                 run_type* out =
                     sort_local::sort_blocks<
-                        typename ExtIterator::block_type,
-                        typename ExtIterator::vector_type::alloc_strategy_type,
-                        typename ExtIterator::bids_container_iterator>
-                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                        block_type, alloc_strategy_type, bids_container_iterator
+                        >(first.bid(), n,
+                          M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
-
-                last_block = new typename ExtIterator::block_type;
-                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
+                last_block = new block_type;
+                block_type* sorted_last_block = new block_type;
                 request_ptr* reqs = new request_ptr[2];
 
                 reqs[0] = last_block->read(last_bid);
@@ -956,7 +945,7 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 *last.bid() = last_bid;
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
                 {
@@ -977,13 +966,13 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
                 n = last.bid() - first.bid();
 
                 run_type* out =
-                    sort_local::sort_blocks<typename ExtIterator::block_type,
-                                            typename ExtIterator::vector_type::alloc_strategy_type,
-                                            typename ExtIterator::bids_container_iterator>
-                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                    sort_local::sort_blocks<
+                        block_type, alloc_strategy_type, bids_container_iterator
+                        >(first.bid(), n,
+                          M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
+                bids_container_iterator cur_bid = first.bid();
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
                 {

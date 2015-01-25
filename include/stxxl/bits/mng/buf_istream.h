@@ -18,27 +18,24 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/algo/async_schedule.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup schedlayer
 //! \{
 
-
 // a paranoid check
 #define BUF_ISTREAM_CHECK_END
-
 
 //! Buffered input stream.
 //!
 //! Reads data records from the stream of blocks.
 //! \remark Reading performed in the background, i.e. with overlapping of I/O and computation
-template <typename BlockType, typename BIDIteratorType>
+template <typename BlockType, typename BidIteratorType>
 class buf_istream : private noncopyable
 {
 public:
     typedef BlockType block_type;
-    typedef BIDIteratorType bid_iterator_type;
+    typedef BidIteratorType bid_iterator_type;
 
 private:
     buf_istream() { }
@@ -55,34 +52,33 @@ protected:
 
 public:
     typedef typename block_type::reference reference;
-    typedef buf_istream<block_type, bid_iterator_type> _Self;
+    typedef buf_istream<block_type, bid_iterator_type> self_type;
 
     //! Constructs input stream object.
-    //! \param _begin \c bid_iterator pointing to the first block of the stream
-    //! \param _end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
+    //! \param begin \c bid_iterator pointing to the first block of the stream
+    //! \param end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
     //! \param nbuffers number of buffers for internal use
-    buf_istream(bid_iterator_type _begin, bid_iterator_type _end, int_type nbuffers) :
-        current_elem(0)
+    buf_istream(bid_iterator_type begin, bid_iterator_type end, unsigned_type nbuffers)
+        : current_elem(0)
 #ifdef BUF_ISTREAM_CHECK_END
-        , not_finished(true)
+          , not_finished(true)
 #endif
     {
-        //int_type i;
         const unsigned_type ndisks = config::get_instance()->disks_number();
-        const int_type seq_length = _end - _begin;
+        const unsigned_type mdevid = config::get_instance()->get_max_device_id();
+        const int_type seq_length = end - begin;
         prefetch_seq = new int_type[seq_length];
 
         // obvious schedule
-        //for(int_type i = 0; i< seq_length; ++i)
+        //for(int_type i = 0; i < seq_length; ++i)
         //	prefetch_seq[i] = i;
 
         // optimal schedule
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
-        compute_prefetch_schedule(_begin, _end, prefetch_seq,
-                                  nbuffers, ndisks);
+        compute_prefetch_schedule(begin, end, prefetch_seq,
+                                  nbuffers, mdevid);
 
-
-        prefetcher = new prefetcher_type(_begin, _end, prefetch_seq, nbuffers);
+        prefetcher = new prefetcher_type(begin, end, prefetch_seq, nbuffers);
 
         current_blk = prefetcher->pull_block();
     }
@@ -91,7 +87,7 @@ public:
     //! \param record reference to the block record type,
     //!        contains value of the next record in the stream after the call of the operator
     //! \return reference to itself (stream object)
-    _Self& operator >> (reference record)
+    self_type& operator >> (reference record)
     {
 #ifdef BUF_ISTREAM_CHECK_END
         assert(not_finished);
@@ -126,7 +122,7 @@ public:
 
     //! Moves to the next record in the stream.
     //! \return reference to itself after the advance
-    _Self& operator ++ ()
+    self_type& operator ++ ()
     {
 #ifdef BUF_ISTREAM_CHECK_END
         assert(not_finished);

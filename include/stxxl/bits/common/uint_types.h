@@ -28,8 +28,7 @@
 STXXL_BEGIN_NAMESPACE
 
 /*!
- * \brief Construct an 40-bit or 48-bit unsigned integer stored in five or six
- * bytes.
+ * Construct an 40-bit or 48-bit unsigned integer stored in five or six bytes.
  *
  * The purpose of this class is to provide integers with smaller data storage
  * footprints when more than 32-bit, but less than 64-bit indexes are
@@ -65,29 +64,29 @@ private:
     high_type high;
 
     //! return highest value storable in lower part, also used as a mask.
-    static low_type low_max()
+    static unsigned_type low_max()
     {
         return std::numeric_limits<low_type>::max();
     }
 
     //! number of bits in the lower integer part, used a bit shift value.
-    static const int low_bits = 8 * sizeof(low_type);
+    static const size_t low_bits = 8 * sizeof(low_type);
 
     //! return highest value storable in higher part, also used as a mask.
-    static high_type high_max()
+    static unsigned_type high_max()
     {
         return std::numeric_limits<high_type>::max();
     }
 
     //! number of bits in the higher integer part, used a bit shift value.
-    static const int high_bits = 8 * sizeof(high_type);
+    static const size_t high_bits = 8 * sizeof(high_type);
 
 public:
     //! number of binary digits (bits) in uint_pair
-    static const int digits = low_bits + high_bits;
+    static const size_t digits = low_bits + high_bits;
 
     //! number of bytes in uint_pair
-    static const int bytes = sizeof(low_type) + sizeof(high_type);
+    static const size_t bytes = sizeof(low_type) + sizeof(high_type);
 
     //! empty constructor, does not even initialize to zero!
     inline uint_pair()
@@ -123,13 +122,13 @@ public:
         if (a >= 0)
             low = a;
         else
-            low = a, high = high_max();
+            low = a, high = (high_type)high_max();
     }
 
     //! construct from an uint64 (unsigned long long)
     inline uint_pair(const uint64& a)
-        : low(a & low_max()),
-          high((a >> low_bits) & high_max())
+        : low((low_type)(a & low_max())),
+          high((high_type)((a >> low_bits) & high_max()))
     {
         // check for overflow
         assert((a >> (low_bits + high_bits)) == 0);
@@ -167,7 +166,7 @@ public:
     inline uint_pair& operator -- ()
     {
         if (UNLIKELY(low == 0))
-            --high, low = low_max();
+            --high, low = (low_type)low_max();
         else
             --low;
         return *this;
@@ -177,8 +176,8 @@ public:
     inline uint_pair& operator += (const uint_pair& b)
     {
         uint64 add = low + b.low;
-        low = add & low_max();
-        high += b.high + ((add >> low_bits) & high_max());
+        low = (low_type)(add & low_max());
+        high = (high_type)(high + b.high + ((add >> low_bits) & high_max()));
         return *this;
     }
 
@@ -245,11 +244,16 @@ public:
 __attribute__ ((packed));
 #endif
 
+//! \addtogroup support
+//! \{
+
 //! Construct a 40-bit unsigned integer stored in five bytes.
 typedef uint_pair<uint8> uint40;
 
 //! Construct a 48-bit unsigned integer stored in six bytes.
 typedef uint_pair<uint16> uint48;
+
+//! \}
 
 STXXL_END_NAMESPACE
 

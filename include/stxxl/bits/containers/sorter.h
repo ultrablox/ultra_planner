@@ -30,8 +30,7 @@ STXXL_BEGIN_NAMESPACE
 //! <b> Design and Internals </b> of sorter container: see \ref design_sorter
 
 /**
- * \brief External Sorter: use stream package objects to keep a sorted
- * container.
+ * External Sorter: use stream package objects to keep a sorted container.
  *
  * This sorter container combines the two functions of runs_creator and
  * runs_merger from the stream packages into a two-phase container.
@@ -84,6 +83,9 @@ public:
     typedef stream::runs_merger<typename runs_creator_type::sorted_runs_type,
                                 cmp_type, alloc_strategy_type> runs_merger_type;
 
+    //! size type
+    typedef typename runs_merger_type::size_type size_type;
+
 protected:
     // *** Object Attributes
 
@@ -99,7 +101,6 @@ protected:
 public:
     //! \name Constructors
     //! \{
-
 
     //! Constructor allocation memory_to_use bytes in ram for sorted runs.
     sorter(const cmp_type& cmp, unsigned_type memory_to_use)
@@ -230,7 +231,7 @@ public:
     //! \{
 
     //! Number of items pushed or items remaining to be read.
-    unsigned_type size() const
+    size_type size() const
     {
         if (m_state == STATE_INPUT)
             return m_runs_creator.size();

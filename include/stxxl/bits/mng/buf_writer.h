@@ -20,7 +20,6 @@
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/noncopyable.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \defgroup schedlayer Block Scheduling Sublayer
@@ -30,16 +29,16 @@ STXXL_BEGIN_NAMESPACE
 //! via prefetching and buffered writing
 //! \{
 
-
 //! Encapsulates asynchronous buffered block writing engine.
 //!
 //! \c buffered_writer overlaps I/Os with filling of output buffer.
-template <typename block_type>
+template <typename BlockType>
 class buffered_writer : private noncopyable
 {
-protected:
+    typedef BlockType block_type;
     typedef typename block_type::bid_type bid_type;
 
+protected:
     const unsigned_type nwriteblocks;
     block_type* write_buffers;
     bid_type* write_bids;
@@ -72,12 +71,13 @@ public:
     //! \param write_buf_size number of write buffers to use
     //! \param write_batch_size number of blocks to accumulate in
     //!        order to flush write requests (bulk buffered writing)
-    buffered_writer(unsigned_type write_buf_size, unsigned_type write_batch_size) :
-        nwriteblocks((write_buf_size > 2) ? write_buf_size : 2),
-        writebatchsize(write_batch_size ? write_batch_size : 1)
+    buffered_writer(unsigned_type write_buf_size, unsigned_type write_batch_size)
+        : nwriteblocks((write_buf_size > 2) ? write_buf_size : 2),
+          writebatchsize(write_batch_size ? write_batch_size : 1)
     {
         write_buffers = new block_type[nwriteblocks];
         write_reqs = new request_ptr[nwriteblocks];
+
         write_bids = new bid_type[nwriteblocks];
 
         for (unsigned_type i = 0; i < nwriteblocks; i++)
@@ -186,7 +186,7 @@ public:
     }
 
     //! Flushes not yet written buffers and frees used memory.
-    virtual ~buffered_writer()
+    ~buffered_writer()
     {
         int_type ibuffer;
         while (!batch_write_blocks.empty())

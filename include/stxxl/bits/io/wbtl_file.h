@@ -26,7 +26,6 @@
 
 #include <stxxl/bits/io/disk_queued_file.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
@@ -89,7 +88,8 @@ public:
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
-    void serve(const request* req) throw (io_error);
+    void serve(void* buffer, offset_type offset, size_type bytes,
+               request::request_type type);
     void discard(offset_type offset, offset_type size);
     const char * io_type() const;
 

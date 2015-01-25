@@ -20,18 +20,17 @@
 
 #include <stxxl/bits/namespace.h>
 
-
 STXXL_BEGIN_NAMESPACE
 
-template <typename must_be_int = int>
+template <typename MustBeInt = int>
 class settings
 {
 public:
     static bool native_merge;
 };
 
-template <typename must_be_int>
-bool settings<must_be_int>::native_merge = true;
+template <typename MustBeInt>
+bool settings<MustBeInt>::native_merge = false;
 
 typedef settings<> SETTINGS;
 
