@@ -133,7 +133,7 @@ public:
 
 	//typedef stxxl::VECTOR_GENERATOR<chain_info_t, 16U, 8192U, 4096U, stxxl::FR, stxxl::random>::result vector_t;
 	//static_assert(8192 % sizeof(chain_info_t) == 0, "Invalid element size");
-	typedef stxxl::unordered_map<size_t, chain_info_t, std::hash<size_t>, CompareLess/*, 4096U, 256*/> unordered_map_type;
+	typedef stxxl::unordered_map<size_t, chain_info_t, std::hash<size_t>, CompareLess, 4096U, 1024> unordered_map_type;
 
 	ext_map_wrapper(size_t max_items_per_block)
 		:index_wrapper_base(max_items_per_block), m_map(new unordered_map_type), m_maxChainLen(0)
@@ -562,7 +562,7 @@ public:
 	};
 
 	complex_hashset_base(const value_streamer_t & vs)
-		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0), m_index(m_maxItemsInBlock * 256*1024)
+		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0), m_index(m_maxItemsInBlock * 128*1024)
 	{
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");

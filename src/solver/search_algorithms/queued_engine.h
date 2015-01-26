@@ -28,7 +28,7 @@ public:
 	{
 		int queue_layers_count;
 		size_t secondary_nodes_count;
-		float best_priority;
+		float best_priority, max_distance_from_initial;
 	};
 
 	stats_t get_stats() const
@@ -37,6 +37,7 @@ public:
 		res.queue_layers_count = m_searchQueue.layer_count();
 		res.secondary_nodes_count = m_searchQueue.secondary_nodes_count();
 		res.best_priority = get<0>(m_bestPriority) + get<1>(m_bestPriority);
+		res.max_distance_from_initial = m_farestDistance;
 		return res;
 	}
 
@@ -46,6 +47,7 @@ public:
 		os << "Search queue layer count: " << stats.queue_layers_count << std::endl;
 		os << "Search queue secondary node count: " << stats.secondary_nodes_count << std::endl;
 		os << "Best priority: " << stats.best_priority << std::endl;
+		os << "Max distance from initial: " << stats.max_distance_from_initial << std::endl;
 		return os;
 	}
 protected:
@@ -85,6 +87,8 @@ protected:
 		}
 		else
 		{
+			m_farestDistance = max(m_farestDistance, (float)get<3>(node));
+
 			comparison_t new_prior(meta_data, get<3>(node));
 			
 			if (m_firstNode)
@@ -123,6 +127,7 @@ protected:
 	comparison_t m_bestPriority;
 	Cmp<comparison_t> m_cmp;
 	bool m_firstNode;
+	float m_farestDistance;
 };
 
 
