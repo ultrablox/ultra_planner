@@ -284,6 +284,7 @@
     <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\core\avl_tree.h" />
     <ClInclude Include="..\..\..\..\src\core\bdd_map.h" />
     <ClInclude Include="..\..\..\..\src\core\buffered_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_queue.h" />

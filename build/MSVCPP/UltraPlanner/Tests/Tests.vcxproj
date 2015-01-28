@@ -270,6 +270,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\tests\helpers.cpp" />
+    <ClCompile Include="..\..\..\..\src\tests\test_avl_tree.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_bdd_map.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_bitset.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_complex_vector.cpp" />

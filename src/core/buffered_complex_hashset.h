@@ -79,10 +79,13 @@ namespace buffered_hashset
 Internal memory - standard std::vector.
 External - buffered stxxl vector.
 */
-template<typename T, typename S, typename H = std::hash<T>, bool UseIntMemory = true, unsigned int BlockSize = 4096U>//65536U //4096U // 8192U
-class buffered_complex_hashset : public complex_hashset_base<T, S, H, vector_storage_wrapper, buffered_hashset::int_storage_generator, BlockSize>
+
+//std::conditional<UseIntMemory, buffered_hashset::int_storage_generator, buffered_hashset::ext_storage_generator>::type
+
+template<typename T, typename S, typename H = std::hash<T>, bool UseIntMemory = true, unsigned int BlockSize = 8192U>//65536U //4096U // 8192U
+class buffered_complex_hashset : public complex_hashset_base<T, S, H, vector_storage_wrapper, buffered_hashset::ext_storage_generator, BlockSize>
 {
-	using _Base = complex_hashset_base<T, S, H, vector_storage_wrapper, buffered_hashset::int_storage_generator, BlockSize>;
+	using _Base = complex_hashset_base<T, S, H, vector_storage_wrapper, buffered_hashset::ext_storage_generator, BlockSize>;
 //	
 	
 public:

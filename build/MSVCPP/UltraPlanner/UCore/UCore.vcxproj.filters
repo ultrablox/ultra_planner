@@ -143,5 +143,8 @@
     <ClInclude Include="..\..\..\..\src\core\complex_queue.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\avl_tree.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

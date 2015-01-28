@@ -41,11 +41,15 @@ void test_merge();
 void test_rubik_core();
 void test_bdd_map();
 void test_complex_queue();
+void test_avl_tree();
+void test_range_map();
 
 int main()
 {
 	test_bitset();
 	test_merge();
+	test_avl_tree();
+	test_range_map();
 	
 	test_puzzle_core();
 	test_rubik_core();

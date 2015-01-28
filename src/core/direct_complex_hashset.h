@@ -475,19 +475,7 @@ public:
 		}
 	}
 
-	size_t request_block()
-	{
-		if (m_freedBlocks.empty())
-			return this->m_blockCount++;
-		else
-		{
-			size_t res = m_freedBlocks.front();
-			m_freedBlocks.pop();
-			return res;
-		}
-	}
 private:
-	std::queue<size_t> m_freedBlocks;
 
 	std::vector<block_t> m_writeQueue;
 	int m_writeQueueIndex;
