@@ -102,8 +102,8 @@ private:
 				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1), -1.0f));
 			});*/
 
-			graph.forall_adj_verts(get<2>(*it), [&](const state_t & state){
-				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1)/*, -1.0f*/));
+			graph.forall_adj_verts(it->state, [&](const state_t & state){
+				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, it->id, state, it->length + 1)/*, -1.0f*/));
 			});
 		}
 
@@ -205,10 +205,10 @@ private:
 			_Base::m_database.add_range(m_expandBuffer.begin(), m_expandBuffer.end(), [](const expanded_node_t & exp_node){
 				return get<0>(exp_node);
 			}, [](const expanded_node_t & exp_node){
-				return get<2>(get<1>(exp_node));
+				return get<1>(exp_node).state;
 			}, [=](const expanded_node_t & expanded_node){
-				search_node_t new_node = this->create_node(get<2>(get<1>(expanded_node)), get<1>(get<1>(expanded_node)));
-				this->enqueue(is_goal, new_node, est_fun(get<2>(get<1>(expanded_node))));
+				search_node_t new_node = this->create_node(get<1>(expanded_node).state, get<1>(expanded_node).parent_id);
+				this->enqueue(is_goal, new_node, est_fun(get<1>(expanded_node).state));
 			});
 
 			m_expandBuffer.clear();

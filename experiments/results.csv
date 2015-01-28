@@ -1,7 +1,0 @@
-;A*;;;
-problem_name;wall_time;plan_length;node_count;
-ed_1.txt;0.031001;16.0;1098.0;
-ed_2.txt;0.70604;24.0;36066.0;
-ed_3.txt;3.37919;30.0;185730.0;
-ed_4.txt;5.04129;45.0;275888.0;
-ed_5.txt;

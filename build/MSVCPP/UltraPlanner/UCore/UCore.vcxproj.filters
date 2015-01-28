@@ -146,5 +146,11 @@
     <ClInclude Include="..\..\..\..\src\core\avl_tree.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\byte_range.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_stack.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

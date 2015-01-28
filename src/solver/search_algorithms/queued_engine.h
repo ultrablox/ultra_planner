@@ -80,16 +80,16 @@ protected:
 	template<typename IsGoalFun>
 	std::pair<bool, comparison_t> enqueue(IsGoalFun is_goal, search_node_t node, element_meta_t meta_data)
 	{
-		if (is_goal(get<2>(node)))
+		if (is_goal(node.state))
 		{
 			_Base::m_goalNodes.push_back(node);
 			return make_pair(false, comparison_t());
 		}
 		else
 		{
-			m_farestDistance = max(m_farestDistance, (float)get<3>(node));
+			m_farestDistance = max(m_farestDistance, (float)node.length);
 
-			comparison_t new_prior(meta_data, get<3>(node));
+			comparison_t new_prior(meta_data, node.length);
 			
 			if (m_firstNode)
 			{
@@ -108,11 +108,12 @@ protected:
 
 	search_node_t dequeue(comparison_t * meta_data = nullptr)
 	{
-		if(meta_data)
-			*meta_data = std::move(m_searchQueue.top().first);
-
-		search_node_t cur_node = std::move(m_searchQueue.top().second);
-		m_searchQueue.pop();
+		search_node_t cur_node;
+		m_searchQueue.pop_and_call([&](const comparison_t & pri, const search_node_t & top_node){
+			if (meta_data)
+				*meta_data = pri;
+			cur_node = top_node;
+		});
 
 		return cur_node;
 	}

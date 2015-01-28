@@ -100,7 +100,7 @@ class direct_complex_hashset : public complex_hashset_base<T, S, H, file_storage
 	using _Base = complex_hashset_base<T, S, H, file_storage_wrapper, direct_hashset::ext_storage_generator, BlockSize>;
 	using block_t = typename _Base::block_t;
 	using combined_value_t = typename _Base::combined_value_t;
-	using chain_info_t = map_wrapper::chain_info_t;
+	using chain_info_t = range_map_wrapper::chain_info_t;
 public:
 	//template<typename SerFun, typename DesFun>
 	direct_complex_hashset(const S & ss/*, int serialized_element_size, SerFun s_fun, DesFun d_fun*/)

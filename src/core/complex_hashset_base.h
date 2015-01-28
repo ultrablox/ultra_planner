@@ -11,12 +11,13 @@
 #include "cached_file.h"
 #include <core/utils/helpers.h>
 #include <core/avl_tree.h>
+#include <core/byte_range.h>
 #include <stxxl/unordered_map>
 //#include <tbb/parallel_for.h>
 #include <thread>
 
 
-class index_wrapper_base
+class range_map_wrapper
 {
 public:
 	struct chain_info_t
@@ -28,166 +29,6 @@ public:
 		size_t first, last, block_count;
 		//size_t _placeholder;
 	};
-
-	index_wrapper_base(size_t max_items_per_block)
-		:m_blockItemCount(max_items_per_block)
-	{}
-
-	size_t expected_block_min_hash(size_t hash_val) const
-	{
-		return hash_val - (hash_val % m_blockItemCount);
-	}
-
-	size_t oredered_bucket_index(size_t hash_val) const
-	{
-		return expected_block_min_hash(hash_val) / m_blockItemCount;
-	}
-private:
-	size_t m_blockItemCount;
-};
-/*
-struct direct_hasher
-{
-	size_t operator()(size_t val) const
-	{
-		return val;
-	}
-};*/
-
-class map_wrapper : public index_wrapper_base
-{
-public:
-	//using map_t = std::map<size_t, chain_info_t>;
-	using map_t = std::unordered_map<size_t, chain_info_t>;
-	//using map_t = T<size_t, chain_info_t>;
-
-	map_wrapper(size_t max_items_per_block)
-		:index_wrapper_base(max_items_per_block)
-	{}
-
-	/*
-	Returns block index for given hash. Or size_t::max() if
-	such a block does not exists.
-	*/
-	chain_info_t chain_with_hash(size_t hash_val) const
-	{
-		auto it = m_map.find(expected_block_min_hash(hash_val));
-		if (it == m_map.end())
-			return chain_info_t(std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max(), 0);
-		else
-			return it->second;
-	}
-
-	void create_mapping(size_t hash_val, chain_info_t chain_id)
-	{
-		if ((chain_id.first == std::numeric_limits<size_t>::max()) || (chain_id.last == std::numeric_limits<size_t>::max()))
-			throw runtime_error("Invalid chain");
-
-		m_map.insert(make_pair(expected_block_min_hash(hash_val), chain_id));
-		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
-	}
-
-	void update_mapping(size_t hash_val, const chain_info_t & chain_id)
-	{
-		if ((chain_id.first == std::numeric_limits<size_t>::max()) || (chain_id.last == std::numeric_limits<size_t>::max()))
-			throw runtime_error("Invalid chain");
-
-		m_map[expected_block_min_hash(hash_val)] = chain_id;
-		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
-	}
-
-	vector<pair<size_t, chain_info_t>> chains() const
-	{
-		vector<pair<size_t, chain_info_t>> res;
-		for (auto it : m_map)
-			res.push_back(make_pair(it.first, it.second));
-		return res;
-	}
-
-	void compute_stats(int & max_chain_length, double & average_chain_length) const
-	{
-		max_chain_length = m_maxChainLen;
-	}
-
-	size_t size() const
-	{
-		return m_map.size();
-	}
-private:
-	map_t m_map;
-	int m_maxChainLen;
-};
-
-
-class ext_map_wrapper : public index_wrapper_base
-{
-public:
-	struct CompareLess
-	{
-		bool operator () (const size_t& a, const size_t& b) const
-		{
-			return a < b;
-		}
-		static size_t min_value() { return std::numeric_limits<size_t>::min(); }
-		static size_t max_value() { return std::numeric_limits<size_t>::max(); }
-	};
-
-	//typedef stxxl::VECTOR_GENERATOR<chain_info_t, 16U, 8192U, 4096U, stxxl::FR, stxxl::random>::result vector_t;
-	//static_assert(8192 % sizeof(chain_info_t) == 0, "Invalid element size");
-	typedef stxxl::unordered_map<size_t, chain_info_t, std::hash<size_t>, CompareLess, 4096U, 1024> unordered_map_type;
-
-	ext_map_wrapper(size_t max_items_per_block)
-		:index_wrapper_base(max_items_per_block), m_map(new unordered_map_type), m_maxChainLen(0)
-	{
-		m_map->insert(make_pair(0, 0));
-		m_map->erase(0);
-	}
-
-	chain_info_t chain_with_hash(size_t hash_val) const
-	{
-		//if (m_map->empty())
-		//	return chain_info_t();
-		size_t key = expected_block_min_hash(hash_val);
-		auto it = m_map->find(key);
-		if (it == m_map->end())
-			return chain_info_t(std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max(), 0);
-		else
-			return it->second;
-	}
-
-	void create_mapping(size_t hash_val, chain_info_t chain_id)
-	{
-		m_map->insert(make_pair(expected_block_min_hash(hash_val), chain_id));
-		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
-	}
-
-	void update_mapping(size_t hash_val, const chain_info_t & chain_id)
-	{
-		(*m_map)[expected_block_min_hash(hash_val)] = chain_id;
-		m_maxChainLen = max(m_maxChainLen, (int)chain_id.block_count);
-	}
-
-
-	void compute_stats(int & max_chain_length, double & average_chain_length) const
-	{
-		max_chain_length = m_maxChainLen;
-	}
-
-	size_t size() const
-	{
-		return m_map->size();
-	}
-private:
-	unordered_map_type * m_map;
-	int m_maxChainLen;
-};
-
-class range_map_wrapper : public index_wrapper_base
-{
-public:
-	range_map_wrapper(size_t max_items_per_block)
-		:index_wrapper_base(max_items_per_block)
-	{}
 
 	void compute_stats(int & max_chain_length) const
 	{
@@ -223,6 +64,7 @@ public:
 
 private:
 	range_map<size_t, chain_info_t> m_rtree;
+	size_t m_blockItemCount;
 };
 
 
@@ -252,66 +94,12 @@ protected:
 	typedef H hasher_t;
 	typedef std::pair<size_t, value_type> combined_value_t;
 	
-	//typedef std::map<size_t, size_t> map_t;	//Maps hash_value => block index where it should be
-	//using index_t = map_wrapper;// <std::map>;
-	//using index_t = ext_map_wrapper;
-	using index_t = range_map_wrapper;
+	using index_t = range_map_wrapper; 	//Maps hash_value => block chain where it should be
 	using chain_info_t = typename index_t::chain_info_t;
 
-	//using bucket_t = map_t;
 	static const int MaxBlocksPerChain = 3;
 	struct block_t;
 	struct block_chain_t;
-
-	struct byte_range
-	{
-		byte_range(char * _start, size_t _size)
-		:start(_start), size(_size)
-		{}
-
-		/*byte_range(const byte_range & rhs)
-			:start(rhs.start), size(rhs.size)
-		{
-			cout << "xxx";
-		}*/
-
-		byte_range & operator=(const byte_range & rhs)
-		{
-			if (this->size != rhs.size)
-				throw out_of_range("Invalid byterange assignment");
-
-			memcpy(this->start, rhs.start, this->size);
-			return *this;
-		}
-
-		friend bool operator==(const byte_range & lhs, const byte_range & rhs)
-		{
-			return (lhs.size == rhs.size) && (memcmp(lhs.start, rhs.start, lhs.size) == 0);
-		}
-
-		friend bool operator==(const byte_range & lhs, size_t val)
-		{
-			return *((size_t*)lhs.start) == val;
-		}
-
-		friend bool operator<(const byte_range & lhs, size_t val)
-		{
-			return *((size_t*)lhs.start) < val;
-		}
-
-		friend bool operator>(size_t val, const byte_range & rhs)
-		{
-			return val > *((size_t*)rhs.start);
-		}
-
-		friend bool operator<=(size_t val, const byte_range & rhs)
-		{
-			return val <= *((size_t*)rhs.start);
-		}
-
-		char * start;
-		size_t size;
-	};
 
 	class block_iterator
 	{
@@ -683,7 +471,7 @@ public:
 	};
 
 	complex_hashset_base(const value_streamer_t & vs)
-		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(sizeof(size_t) + m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0), m_index(m_maxItemsInBlock * 128*1024)
+		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(sizeof(size_t) + m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0)
 	{
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");
@@ -829,32 +617,6 @@ public:
 		}
 	}
 protected:
-
-
-	/*map_t::const_iterator index_iterator(size_t hash_val) const
-	{
-		auto it = m_indicesTree.lower_bound(hash_val);
-
-		if (it == m_indicesTree.end())
-			it = m_indicesTree.end();//create_new = true;
-		else if (it->first == hash_val)
-		{
-			//block_id = it->second;
-		}
-		else
-		{
-			if (it == m_indicesTree.begin())
-				it = m_indicesTree.end();
-			else
-			{
-				--it;
-				//block_id = it->second;
-			}
-		}
-
-		return it;
-	}*/
-
 	bool insert_into_chain(chain_info_t & chain_id, size_t hash_val, const value_type & val)
 	{
 		block_chain_t chain(*this, chain_id);

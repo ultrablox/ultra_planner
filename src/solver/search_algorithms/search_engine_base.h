@@ -46,11 +46,11 @@ protected:
 		std::vector<state_t> res;
 		do
 		{
-			res.push_back(get<2>(node));
+			res.push_back(node.state);
 			node = m_database.parent_node(node);
-		} while (get<0>(node) != get<1>(node));
+		} while (node.id != node.parent_id);
 
-		res.push_back(get<2>(node));
+		res.push_back(node.state);
 
 		return std::vector<state_t>(res.rbegin(), res.rend());
 	}

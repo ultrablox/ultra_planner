@@ -4,6 +4,7 @@
 
 #include <core/complex_vector.h>
 #include <core/complex_queue.h>
+#include <core/complex_stack.h>
 #include <map>
 #include <vector>
 #include <functional>
@@ -18,8 +19,9 @@ class search_queue
 	using value_streamer = S;
 	//typedef std::vector<value_t> layer_container_t;
 	//typedef std::list<value_t> layer_container_t;
-	using layer_container_t = complex_queue<value_t, value_streamer>;
-	static const int MaxPrimaryLayers = 3;
+	//using layer_container_t = complex_queue<value_t, value_streamer>;
+	using layer_container_t = complex_stack<value_t, value_streamer>;
+	static const int MaxPrimaryLayers = 100;
 
 	//static_assert(std::is_pod<priority_component_t>::value, "Priority conmonent must be POD");
 
@@ -221,6 +223,19 @@ public:
 			return 0;
 		else
 			return m_primaryData.begin()->second.size();
+	}
+
+	template<typename Fun>
+	int pop_and_call(Fun fun)
+	{
+		auto it = m_primaryData.begin();
+		fun(it->first, it->second->top());
+		it->second->pop();
+
+		if (it->second->empty())
+			m_primaryData.erase(it);
+
+		return 0;
 	}
 private:
 	void extract_secondary_data()

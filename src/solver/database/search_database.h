@@ -52,7 +52,22 @@ class search_database
 	
 public:
 	//Id + parent search node id + state + init->current path length
-	typedef std::tuple<size_t, size_t, state_t, int> search_node_t;
+	//typedef std::tuple<size_t, size_t, state_t, int> search_node_t;
+	struct search_node_t
+	{
+		search_node_t(size_t _id = std::numeric_limits<size_t>::max(), size_t _parent_id = std::numeric_limits<size_t>::max(), const state_t & _state = state_t(), int _length = -1)
+			:id(_id), parent_id(_parent_id), state(_state), length(_length)
+		{}
+
+		friend bool operator==(const search_node_t & lhs, const search_node_t & rhs)
+		{
+			return (lhs.state == rhs.state);
+		}
+
+		size_t id, parent_id;
+		state_t state;
+		int length;
+	};
 	
 	class node_streamer_t
 	{
@@ -65,19 +80,19 @@ public:
 		void serialize(void * dst, const search_node_t & node) const
 		{
 			char * cur_ptr = (char*)dst;
-			memcpy(cur_ptr, &get<0>(node), sizeof(size_t));
-			memcpy(cur_ptr + sizeof(size_t), &get<1>(node), sizeof(size_t));
-			memcpy(cur_ptr + 2 * sizeof(size_t), &get<3>(node), sizeof(int));
-			m_baseStreamer.serialize(cur_ptr + 2 * sizeof(size_t)+sizeof(int), get<2>(node));
+			memcpy(cur_ptr, &node.id, sizeof(size_t));
+			memcpy(cur_ptr + sizeof(size_t), &node.parent_id, sizeof(size_t));
+			memcpy(cur_ptr + 2 * sizeof(size_t), &node.length, sizeof(int));
+			m_baseStreamer.serialize(cur_ptr + 2 * sizeof(size_t) + sizeof(int), node.state);
 		}
 
 		void deserialize(const void * src, search_node_t & node) const
 		{
 			const char * cur_ptr = (const char*)src;
-			memcpy(&get<0>(node), cur_ptr, sizeof(size_t));
-			memcpy(&get<1>(node), cur_ptr + sizeof(size_t), sizeof(size_t));
-			memcpy(&get<3>(node), cur_ptr + 2 * sizeof(size_t), sizeof(int));
-			m_baseStreamer.deserialize(cur_ptr + 2 * sizeof(size_t)+sizeof(int), get<2>(node));
+			memcpy(&node.id, cur_ptr, sizeof(size_t));
+			memcpy(&node.parent_id, cur_ptr + sizeof(size_t), sizeof(size_t));
+			memcpy(&node.length, cur_ptr + 2 * sizeof(size_t), sizeof(int));
+			m_baseStreamer.deserialize(cur_ptr + 2 * sizeof(size_t)+sizeof(int), node.state);
 		}
 
 		size_t serialized_size() const
@@ -193,7 +208,7 @@ public:
 
 	search_node_t create_node(const state_t & state, size_t parent_id)
 	{
-		int path_len = m_searchNodes.empty() ? 0 : get<3>(m_searchNodes[parent_id]) + 1;
+		int path_len = m_searchNodes.empty() ? 0 : m_searchNodes[parent_id].length + 1;
 		return create_node(state, parent_id, path_len);
 	}
 
@@ -207,7 +222,7 @@ public:
 
 	search_node_t parent_node(const search_node_t & node) const
 	{
-		return m_searchNodes[get<1>(node)];
+		return m_searchNodes[node.parent_id];
 	}
 
 	size_t state_count() const
