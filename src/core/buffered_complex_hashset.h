@@ -64,7 +64,7 @@ namespace buffered_hashset
 	struct ext_storage_generator
 	{
 		using block_t = B;
-		using result = typename stxxl::VECTOR_GENERATOR<block_t, 1U, 262144U, sizeof(block_t), stxxl::FR, stxxl::random>::result; //131072U //262144U //65536U //1048576U
+		using result = typename stxxl::VECTOR_GENERATOR<block_t, 1U, 65536U, sizeof(block_t), stxxl::FR, stxxl::random>::result; //131072U //262144U //65536U //1048576U
 	};
 
 	template<typename B>

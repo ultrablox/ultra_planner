@@ -174,7 +174,10 @@ public:
 		top_it->second->pop();
 
 		if (top_it->second->empty())
+		{
+			delete top_it->second;
 			m_primaryData.erase(top_it);
+		}
 	}
 
 	void pop(size_t count)
@@ -233,7 +236,10 @@ public:
 		it->second->pop();
 
 		if (it->second->empty())
+		{
+			delete it->second;
 			m_primaryData.erase(it);
+		}
 
 		return 0;
 	}

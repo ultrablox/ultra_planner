@@ -78,8 +78,7 @@ public:
 		{
 			search_node_t cur_node = this->dequeue(&current_data);
 
-			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){
-				//Check that node is not expanded or discovered by trying to add
+			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){			
 				this->m_database.add(state, [=](const state_t & state){
 					this->enqueue(is_goal_fun, this->m_database.create_node(state, cur_node.id, cur_node.length + 1), h_fun(state));
 				});
@@ -91,9 +90,9 @@ public:
 };
 
 template<typename Gr, template<typename> class Cmp, typename H, bool ExtMemory>
-class buffered_heuristic_engine : public queued_search_engine<Gr, float, Cmp, ExtMemory, false>
+class buffered_heuristic_engine : public queued_search_engine<Gr, float, Cmp, ExtMemory, true>
 {
-	using _Base = queued_search_engine<Gr, float, Cmp, ExtMemory, false>;
+	using _Base = queued_search_engine<Gr, float, Cmp, ExtMemory, true>;
 	using graph_t = Gr;
 	typedef float estimation_t;
 	typedef H heuristic_t;
@@ -115,16 +114,27 @@ public:
 		float best_data = std::numeric_limits<float>::max();
 		comparison_t current_data;
 
+		bool db_flush_needed = false;
+		bool * p_flush_flag = &db_flush_needed;
+
 		while ((!_Base::m_searchQueue.empty()) && _Base::m_goalNodes.empty())
 		{
 			search_node_t cur_node = this->dequeue(&current_data);
 
-			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
-				//Check that node is not expanded or discovered by trying to add
-				this->m_database.add(state, [=](const state_t & state){
-					this->enqueue(is_goal_fun, this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1), h_fun(state));
+			db_flush_needed = false;
+
+			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){
+				estimation_t cur_est = h_fun(state);
+				this->m_database.add_delayed(state, [=](const state_t & state){
+					this->enqueue(is_goal_fun, this->m_database.create_node(state, cur_node.id, cur_node.length + 1), cur_est);
 				});
+
+				if (cur_node.length + 1 + cur_est < get<1>(current_data) +get<0>(current_data))
+					*p_flush_flag = true;
 			});
+
+			if (db_flush_needed)
+				this->m_database.flush();
 		}
 
 		return this->finalize(solution_path);

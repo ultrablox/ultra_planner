@@ -13,6 +13,7 @@
 #include <core/avl_tree.h>
 #include <core/byte_range.h>
 #include <stxxl/unordered_map>
+#include <unordered_map>
 //#include <tbb/parallel_for.h>
 #include <thread>
 
@@ -49,6 +50,12 @@ public:
 		return it.data();
 	}
 	
+	size_t interval_begin(size_t hash_val)
+	{
+		auto it = m_rtree.find(hash_val);
+		return *it;
+	}
+
 	void create_mapping(size_t hash_val, const chain_info_t & chain_id)
 	{
 		m_rtree.insert(hash_val, chain_id);
@@ -112,23 +119,23 @@ protected:
 		typedef value_type* pointer;
 		typedef value_type& reference;
 
-		block_iterator(block_chain_t & chain, size_t _element_id)
-			:m_chain(chain), m_elementId(_element_id)
+		block_iterator(block_chain_t * _chain = nullptr, size_t _element_id = std::numeric_limits<size_t>::max())
+			:m_pChain(_chain), m_elementId(_element_id)
 		{}
 
 		//Returns hash of current element
 		byte_range operator*() const
 		{
-			auto addr = m_chain.element_address(m_elementId);
-			block_t & cur_block = m_chain.m_hb.m_blocks[addr.first];
-			size_t offset = addr.second * m_chain.m_hb.m_serializedElementSize;
+			auto addr = m_pChain->element_address(m_elementId);
+			block_t & cur_block = m_pChain->m_hb.m_blocks[addr.first];
+			size_t offset = addr.second * m_pChain->m_hb.m_serializedElementSize;
 			
 			//if (addr.first == 2)
 			//	cout << offset << std::endl;
 			if (offset >= block_t::DataSize)
 				throw out_of_range("Out of block data");
 
-			return std::move(byte_range(cur_block.data + offset, m_chain.m_hb.m_serializedElementSize));
+			return std::move(byte_range(cur_block.data + offset, m_pChain->m_hb.m_serializedElementSize));
 		}
 
 		const size_t & hash() const
@@ -177,12 +184,12 @@ protected:
 
 		friend block_iterator operator+(const block_iterator & lhs, size_t delta)
 		{
-			return block_iterator(lhs.m_chain, lhs.m_elementId + delta);
+			return block_iterator(lhs.m_pChain, lhs.m_elementId + delta);
 		}
 
 		friend block_iterator operator-(const block_iterator & lhs, size_t delta)
 		{
-			return block_iterator(lhs.m_chain, lhs.m_elementId - delta);
+			return block_iterator(lhs.m_pChain, lhs.m_elementId - delta);
 		}
 
 		friend size_t operator-(const block_iterator & lhs, const block_iterator & rhs)
@@ -200,7 +207,7 @@ protected:
 	private:
 		//const block_t & block;
 		size_t m_elementId;
-		block_chain_t & m_chain;
+		block_chain_t * m_pChain;
 	};
 
 	struct block_t
@@ -302,12 +309,12 @@ protected:
 
 		block_iterator begin()
 		{
-			return block_iterator(*this, 0);
+			return block_iterator(this, 0);
 		}
 
 		block_iterator end()
 		{
-			return block_iterator(*this, m_totalElements);
+			return block_iterator(this, m_totalElements);
 		}
 
 		//Block Id (in global coordinates) + element Id
@@ -325,27 +332,24 @@ protected:
 			return make_pair(block_number, element_number);
 		}
 
+		void append_new_block()
+		{
+			//limits.last = m_hb.m_blocks.size();
+			limits.last = m_hb.request_block();
+			block_t & new_block = m_hb.m_blocks[limits.last];
+
+			new_block.prev = *m_blockIds.rbegin();
+			m_hb.m_blocks[*m_blockIds.rbegin()].next = new_block.id;
+			m_blockIds.push_back(new_block.id);
+
+			++limits.block_count;
+		}
+
 		block_iterator insert(block_iterator it, const byte_range & br)
 		{
 			//Check if insertion will overflow current blocks
 			if (m_totalElements + 1 > m_blockIds.size() * m_hb.m_maxItemsInBlock)
-			{
-				//limits.last = m_hb.m_blocks.size();
-				limits.last = m_hb.request_block();
-				block_t & new_block = m_hb.m_blocks[limits.last];
-
-				//new_block.next = limits.last;
-				//new_block.item_count = 0;
-
-				new_block.prev = *m_blockIds.rbegin();
-				m_hb.m_blocks[*m_blockIds.rbegin()].next = new_block.id;
-
-				//m_hb.m_blocks.push_back(std::move(new_block));
-				m_blockIds.push_back(new_block.id);
-
-				++limits.block_count;
-				//m_hb.m_index.update_mapping(hash_val, limits);
-			}
+				append_new_block();
 
 			//m_hb.print_debug();
 			++m_hb.m_blocks[limits.last].item_count;
@@ -385,6 +389,45 @@ protected:
 				//cout << (void*)br.start << std::endl;
 				dest_it = insert(dest_it, *it);
 			}
+		}
+
+		void resize(size_t new_size)
+		{
+			if (new_size > m_totalElements)
+			{
+				size_t max_elements_in_current_chain = m_hb.m_maxItemsInBlock * limits.block_count;
+				if (new_size <= max_elements_in_current_chain)
+				{
+					m_hb.m_blocks[limits.last].item_count += (new_size - m_totalElements);
+					m_totalElements = new_size;
+				}
+				else
+				{
+					size_t extra_size = new_size - max_elements_in_current_chain;
+					m_totalElements = max_elements_in_current_chain;
+
+					while (extra_size > 0)
+					{
+						append_new_block();
+						block_t & new_block = m_hb.m_blocks[limits.last];
+
+						if (extra_size > m_hb.m_maxItemsInBlock)
+						{
+							new_block.item_count = m_hb.m_maxItemsInBlock;
+							extra_size -= m_hb.m_maxItemsInBlock;
+							m_totalElements += m_hb.m_maxItemsInBlock;
+						}
+						else
+						{
+							new_block.item_count = extra_size;
+							m_totalElements += extra_size;
+							extra_size = 0;
+						}
+					}
+				}
+			}
+			else
+				m_totalElements = new_size;
 		}
 
 		void erase(block_iterator begin, block_iterator last_it)
@@ -471,7 +514,7 @@ public:
 	};
 
 	complex_hashset_base(const value_streamer_t & vs)
-		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(sizeof(size_t) + m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0)
+		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(sizeof(size_t)+m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0), m_delayedCounter(0)
 	{
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");
@@ -502,25 +545,164 @@ public:
 		//Find appropriate block, create if it does not exists
 		
 		chain_info_t & chain_id = m_index.chain_with_hash(hash_val);
+		block_chain_t chain(*this, chain_id);
 
-		/*bool created_new = false;
-		if (chain_id.first == std::numeric_limits<size_t>::max())
-		{
-			chain_id.first = m_blocks.size();
-			chain_id.last = chain_id.first;		
-			chain_id.block_count = 1;
-			m_blocks.push_back(block_t(chain_id.first));
-			m_index.create_mapping(hash_val, chain_id);
-			created_new = true;
-		}*/
+		m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
+		memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
 
-		//auto res = write_to_block(chain_id, hash_val, val);
-		auto res = insert_into_chain(chain_id, hash_val, val);
+		auto res = insert_into_chain(chain, hash_val, byte_range(&m_elementCache[0], m_serializedElementSize));
 		
 		if (res)
+		{			
+			try_ballance_chain(chain);
 			++m_size;
+		}
 
 		return res;
+	}
+
+	
+	struct delayed_insertion_request_t
+	{
+		using callback_t = std::function<void(const value_type & val)>;
+
+		delayed_insertion_request_t(size_t _hash_val, const value_type & _val, callback_t _callback, size_t serialized_element_size)
+			:val(_val), callback(_callback), hash_val(_hash_val), serialized_val(serialized_element_size)
+		{}
+
+		size_t hash_val;
+		value_type val;
+		callback_t callback;
+		std::vector<char> serialized_val;
+	};
+
+	struct delayed_request_cmp_t
+	{
+		bool operator()(const delayed_insertion_request_t & lhs, const delayed_insertion_request_t & rhs) const
+		{
+			return lhs.val == rhs.val;
+		}
+	};
+
+	using delayed_buffer_groupt_t = std::vector<delayed_insertion_request_t>;
+	using delayed_buffer_t = std::unordered_map<size_t, delayed_buffer_groupt_t>;
+
+	template<typename CallbackFun>
+	void insert_delayed(const value_type & val, size_t hash_val, CallbackFun fun)
+	{
+		if (m_blockCount < 64)
+		{
+			if (insert(val, hash_val))
+				fun(val);
+		}
+		else
+		{
+			size_t cur_point = m_index.interval_begin(hash_val);
+
+			auto & gr = m_delayedBuffer[cur_point];
+			gr.push_back(delayed_insertion_request_t(hash_val, val, fun, m_serializedElementSize));
+
+			if (gr.size() > m_maxItemsInBlock / 2)
+			{
+				flush_delayed_buffer_range(cur_point, gr);
+				m_delayedBuffer.erase(cur_point);
+			}
+			else
+			{
+				//cout << "Force flushing...";
+									/*auto first_range = m_delayedBuffer.begin();
+					flush_delayed_buffer_range(first_range->first, first_range->second);
+					m_delayedBuffer.erase(first_range);*/
+				if ((m_delayedBuffer.size() > 2000) || (m_delayedCounter++ > 10000))
+				{
+					m_delayedCounter = 0;
+					flush_delayed_buffer();
+				}
+
+				//cout << "...done" << std::endl;
+			}
+
+			/*auto group_it = m_delayedBuffer.find(cur_point);
+			if (group_it == m_delayedBuffer.end())
+				m_delayedBuffer.insert(delayed_buffer_groupt_t(delayed_insertion_request_t(hash_val, val, fun)));
+			else
+			{
+				auto & group = group_it->second;
+
+				
+			}*/
+		}
+	}
+
+	void flush_delayed_buffer()
+	{
+		if (m_delayedBuffer.empty())
+			return;
+
+		//cout << "Flushing...";
+		size_t els_count = 0, groups_count = 0;
+
+		for (auto & items : m_delayedBuffer)
+		{
+			++groups_count;
+			els_count += items.second.size();
+			flush_delayed_buffer_range(items.first, items.second);
+		}
+		m_delayedBuffer.clear();
+
+		//cout << 100.0f * (float)els_count / groups_count << "% gained" << std::endl;
+	}
+
+	template<typename RangeT>
+	void flush_delayed_buffer_range(size_t cur_point, RangeT & range)
+	{
+		//Apply internal merge
+		sort_wrapper(range.begin(), range.end(), [](const delayed_insertion_request_t & lhs, const delayed_insertion_request_t & rhs){
+			return lhs.hash_val < rhs.hash_val;
+		});
+
+		delayed_request_cmp_t cmp;
+		auto last_it = UltraCore::unique(range.begin(), range.end(), [](const delayed_insertion_request_t & req){
+			return req.hash_val;
+		}, cmp);
+
+		//Serialize candidates
+		for (auto it = range.begin(); it != last_it; ++it)
+		{
+			memcpy(&it->serialized_val[0], &it->hash_val, sizeof(size_t));
+			m_valueStreamer.serialize(&it->serialized_val[sizeof(size_t)], it->val);
+		}
+
+		/*if (last_it != range.end())
+			cout << "Internal merge removed " << std::distance(last_it, range.end()) << " elements." << std::endl;*/
+
+		//cout << "Flushing range with length " << std::distance(range.first, range.second) << std::endl;
+		chain_info_t & chain_id = m_index.chain_with_hash(cur_point);
+		block_chain_t chain(*this, chain_id);
+
+		bool something_added = false;
+
+		insert_into_chain(chain, range.begin(), last_it, [](const delayed_insertion_request_t & req){
+			return req.hash_val;
+		}, [=](const delayed_insertion_request_t & req){
+			return byte_range((char*)&req.serialized_val[0], m_serializedElementSize);
+		}, [&](const delayed_insertion_request_t & req){
+			req.callback(req.val);
+			++m_size;
+			something_added = true;
+		});
+
+		/*for_each(range.begin(), range.end(), [&](delayed_insertion_request_t & x){
+			if (insert_into_chain(chain, x.hash_val, x.val))
+			{
+				x.callback(x.val);
+				something_added = true;
+				++m_size;
+			}
+		});*/
+
+		if (something_added)
+			try_ballance_chain(chain);
 	}
 
 	size_t size() const
@@ -535,7 +717,7 @@ public:
 	hashset_stats_t get_stats() const
 	{
 		hashset_stats_t res;
-		res.density = (float)m_size / (block_count() * (block_t::DataSize / m_serializedElementSize));
+		res.density = (float)m_size / (block_count() * m_maxItemsInBlock);
 		res.block_count = m_blocks.size();
 
 		m_index.compute_stats(res.max_chain_length);
@@ -617,51 +799,88 @@ public:
 		}
 	}
 protected:
-	bool insert_into_chain(chain_info_t & chain_id, size_t hash_val, const value_type & val)
+	bool insert_into_chain(block_chain_t & chain, size_t hash_val, const byte_range & br)
 	{
-		block_chain_t chain(*this, chain_id);
-
 		auto it = find_first_ge(chain.begin(), chain.end(), hash_val);
 
-		m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
 
 		if (it != chain.end())	//If we found element with similar hash, check for duplication
 		{
 			for (; (it != chain.end()) && (*it == hash_val); ++it)
 			{
-				if (memcmp(&m_elementCache[sizeof(size_t)], it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
+				//if (memcmp(br.start + sizeof(size_t), it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
+				if (br == *it)
 					return false;
 			}
 		}
 
-		memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
-		chain.insert(it, byte_range(&m_elementCache[0], m_elementCache.size()));
+		chain.insert(it, br);
 
+		return true;
+	}
+
+	template<typename It, typename HashExtractor, typename ValueExtractor, typename Callback>
+	void insert_into_chain(block_chain_t & chain, It begin_it, It end_it, HashExtractor hash_fun, ValueExtractor ser_val_fun, Callback call_fun)
+	{
+		//Remove duplication amongst news
+		auto last_it = UltraCore::unique(chain.begin(), chain.end(), begin_it, end_it, [](const byte_range & br){
+			return br.begin_as<size_t>();
+		}, [=](const typename It::value_type & val){
+			return hash_fun(val);
+		}, [=](const byte_range & old_val, const typename It::value_type & new_val){
+			return old_val == ser_val_fun(new_val);
+		});
+		
+		//if (last_it != end_it)
+		//	cout << "Int unique removed " << 100.0f * (float)std::distance(last_it, end_it) / std::distance(begin_it, end_it) << "% values" << std::endl;
+		
+		//Add to chain what's left
+		size_t old_size = chain.element_count();
+		size_t merging_size = std::distance(begin_it, last_it);
+		chain.resize(chain.element_count() + merging_size);
+
+		//Copy values
+		auto dest_it = chain.begin() + old_size;
+		for (It it = begin_it; it != last_it; ++it, ++dest_it)
+		{
+			call_fun(*it);
+			*dest_it = ser_val_fun(*it);
+		}
+	
+		//Merge them
+		std::inplace_merge(chain.begin(), chain.begin() + old_size, chain.end(), [](const byte_range & left, const byte_range & right){
+			return left.begin_as<size_t>() < right.begin_as<size_t>();
+		});
+
+	}
+
+	void try_ballance_chain(block_chain_t & chain)
+	{
 		//Ballance
-		if (chain_id.block_count > MaxBlocksPerChain)
+		if (chain.limits.block_count > MaxBlocksPerChain)
 		{
 			//cout << "B" << std::endl;
 
 			int partitioned_block_number = chain.partitioned_block();
 			if (partitioned_block_number != 0)
 			{
-				
+
 				//Fast split the chain
 				chain_info_t new_chain_id;
 				new_chain_id.first = chain.m_blockIds[partitioned_block_number];
-				new_chain_id.last = chain_id.last;
+				new_chain_id.last = chain.limits.last;
 				new_chain_id.block_count = chain.m_blockIds.size() - partitioned_block_number;
 				m_blocks[new_chain_id.first].prev = new_chain_id.first;
 
-				chain_id.last = chain.m_blockIds[partitioned_block_number - 1];
-				chain_id.block_count = partitioned_block_number;
-				m_blocks[chain_id.last].next = chain_id.last;
+				chain.limits.last = chain.m_blockIds[partitioned_block_number - 1];
+				chain.limits.block_count = partitioned_block_number;
+				m_blocks[chain.limits.last].next = chain.limits.last;
 
 				m_index.create_mapping(m_blocks[new_chain_id.first].first_hash(), new_chain_id);
 			}
 			//Split chain
 			/*auto it = UltraCore::find_group_end(chain.begin(), chain.end(), chain.element_count() / 2, [](const byte_range & br){
-				return *((size_t*)br.start);
+			return *((size_t*)br.start);
 			});
 
 			size_t median_hash = it.hash();
@@ -680,8 +899,6 @@ protected:
 
 			m_index.create_mapping(median_hash, new_chain_id);*/
 		}
-
-		return true;
 	}
 
 	std::pair<iterator, bool> write_to_block(size_t block_id, size_t hash_val, const value_type & val)
@@ -855,6 +1072,10 @@ protected:
 	
 	std::queue<size_t> m_freedBlocks;
 	//std::vector<bucket_t> m_buckets;
+
+
+	delayed_buffer_t m_delayedBuffer;
+	size_t m_delayedCounter;
 };
 
 

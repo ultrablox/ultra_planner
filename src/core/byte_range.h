@@ -51,6 +51,12 @@ struct byte_range
 		return val <= *((size_t*)rhs.start);
 	}
 
+	template<typename T>
+	const T & begin_as() const
+	{
+		return *((T*)this->start);
+	}
+
 	char * start;
 	size_t size;
 };

@@ -119,7 +119,7 @@ public:
 		return (storage.find(state) != storage.end());
 	}
 
-	bool add(const state_t & state)
+	/*bool add(const state_t & state)
 	{
 		size_t hash_val = m_hasher(state);
 		auto & storage = m_storages[hash_val % storage_count];
@@ -129,15 +129,20 @@ public:
 			++m_nodeCount;
 
 		return res;
-	}
+	}*/
 
 	template<typename CallbackFun>
 	void add(const state_t & state, CallbackFun call_fun)
 	{
-		auto res = add(state);
-		if (res)
-			call_fun(state);
+		size_t hash_val = m_hasher(state);
+		auto & storage = m_storages[hash_val % storage_count];
+		bool res = storage.insert(state, hash_val);
 
+		if (res)
+		{
+			call_fun(state);
+			++m_nodeCount;
+		}
 		/*size_t hash_val = m_hasher(state);
 		std::vector<state_t> tmp_vec(1, state);
 		add_range(tmp_vec.begin(), tmp_vec.end(), [=](const state_t &){
@@ -145,6 +150,20 @@ public:
 		}, [=](const state_t & state){
 			return state;
 		}, call_fun);*/
+	}
+
+	template<typename CallbackFun>
+	void add_delayed(const state_t & state, CallbackFun call_fun)
+	{
+		size_t hash_val = m_hasher(state);
+		auto & storage = m_storages[hash_val % storage_count];
+		storage.insert_delayed(state, hash_val, call_fun);
+	}
+
+	void flush()
+	{
+		for (auto & str : m_storages)
+			str.flush_delayed_buffer();
 	}
 
 	/*
