@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
-    <LocalDebuggerCommandArguments>--command solve --algorithm A* --heuristic PDB --storage ext ed5.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--command solve --algorithm A* --heuristic PDB --storage ext ed_6.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

@@ -87,21 +87,22 @@ void test_merge()
 	}
 
 	//Merge
-	/*{
+	{
 		std::vector<int> src, dest;
 		fill_vector(dest, 20, 0, 100);
 		fill_vector(src, 10, 0, 100);
-		std::sort(src.begin(), src.end());
-		std::sort(dest.begin(), dest.end());
 
 		auto cmp = [](int e1, int e2){return e1 < e2; };
+		std::sort(src.begin(), src.end(), cmp);
+		std::sort(dest.begin(), dest.end(), cmp);
+
+		
 
 		vector<int> correct_res(dest.size() + src.size());
 		std::merge(src.begin(), src.end(), dest.begin(), dest.end(), correct_res.begin(), cmp);
 
 		dest.resize(dest.size() + src.size());
-
-		UltraCore::merge(dest.rbegin(), dest.rbegin() + src.size(), dest.rend(), src.rbegin(), src.rend(), cmp);
+		UltraCore::merge(dest.rbegin() + src.size(), dest.rend(), src.rbegin(), src.rend(), dest.rbegin(), [](int e1, int e2){return e1 > e2; });
 
 		assert_test(dest == correct_res, "merge");
 	}
@@ -115,10 +116,6 @@ void test_merge()
 
 		dest.push_back(74);
 
-
-
-		auto cmp = [](int e1, int e2){return e1 < e2; };
-
 		vector<int> correct_res;
 		correct_res.push_back(74);
 		correct_res.push_back(74);
@@ -126,13 +123,17 @@ void test_merge()
 		correct_res.push_back(74);
 		correct_res.push_back(54);
 
-		dest.resize(dest.size() + src.size());
 
+		auto cmp = [](int e1, int e2){return e1 < e2; };
+
+		
+		dest.resize(dest.size() + src.size());
 		//UltraCore::merge(dest.rbegin(), dest.rbegin() + src.size(), dest.rend(), src.rbegin(), src.rend(), cmp);
+		std::merge(dest.rbegin() + src.size(), dest.rend(), src.rbegin(), src.rend(), dest.rbegin(), cmp);
 
 
 		assert_test(dest == correct_res, "merge");
-	}*/
+	}
 
 
 	//Group end

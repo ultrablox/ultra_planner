@@ -80,16 +80,24 @@ protected:
 	template<typename IsGoalFun>
 	std::pair<bool, comparison_t> enqueue(IsGoalFun is_goal, search_node_t node, element_meta_t meta_data)
 	{
+		comparison_t new_prior(meta_data, node.length);
 		if (is_goal(node.state))
 		{
-			_Base::m_goalNodes.push_back(node);
-			return make_pair(false, comparison_t());
+			if (m_cmp(m_searchQueue.best_priority(), new_prior))
+			{
+				cout << "Goal found, but it is not optimal (length " << get<0>(new_prior) + get<1>(new_prior) << ")" << std::endl;
+				_Base::m_goalNodes.push_back(node);
+				return make_pair(false, comparison_t());
+			}
+			else
+			{
+				_Base::m_goalNodes.push_back(node);
+				return make_pair(false, comparison_t());
+			}			
 		}
 		else
 		{
 			m_farestDistance = max(m_farestDistance, (float)node.length);
-
-			comparison_t new_prior(meta_data, node.length);
 			
 			if (m_firstNode)
 			{

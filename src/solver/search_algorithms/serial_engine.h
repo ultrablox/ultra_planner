@@ -32,10 +32,10 @@ public:
 			search_node_t cur_node = this->dequeue();
 
 
-			graph.forall_adj_verts(get<2>(cur_node), [=](const state_t & state){
+			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
 				this->m_database.add(state, [=](const state_t & state){
-					search_node_t new_node = this->m_database.create_node(state, get<0>(cur_node), get<3>(cur_node) +1);
+					search_node_t new_node = this->m_database.create_node(state, cur_node.id, cur_node.length + 1);
 					enqueue(goal_check_fun, new_node, step);
 				});
 			});

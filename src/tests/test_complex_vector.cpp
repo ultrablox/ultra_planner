@@ -2,6 +2,7 @@
 #include "helpers.h"
 #include <core/complex_vector.h>
 #include <core/complex_queue.h>
+#include <core/complex_stack.h>
 #include <core/direct_complex_hashset.h>
 #include <core/buffered_complex_hashset.h>
 #include <random>
@@ -77,7 +78,8 @@ namespace std
 	public:
 		size_t operator()(const complex_element & el) const
 		{
-			return el.val() % 100;
+			//return el.val() % 100;
+			return el.val();
 		}
 	};
 };
@@ -199,15 +201,14 @@ void test_complex_hashmap()
 {
 	test_algorithm();
 
-	auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
+	
+	complex_element_streamer streamer;
 
 	{
+		auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
 		std::unordered_set<complex_element> correct_set;
-
-		complex_element_streamer streamer;
-		buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);
-
-		
+	
+		buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);	
 
 		int count = 0;
 		//Insertion test
@@ -218,7 +219,7 @@ void test_complex_hashmap()
 
 			auto r2 = correct_set.insert(val);
 
-			if (i >= 21)
+			if (i == 5)
 			{
 				++count;
 				//hset.print_debug();
@@ -233,6 +234,7 @@ void test_complex_hashmap()
 			assert_test(r1 == r2.second, "Complex hashset insertion");
 			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
 		}
+
 
 		assert_test(hset.size() == correct_set.size(), "Complex hashset size");
 
@@ -249,6 +251,64 @@ void test_complex_hashmap()
 			assert_test(r1 == r2, "Complex hashset find");
 		}
 	}
+
+
+	//Tets add delayed
+	{
+		buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);
+
+		{
+			auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
+
+			std::unordered_set<complex_element> correct_set;
+
+			buffered_complex_hashset<complex_element, complex_element_streamer, std::hash<complex_element>, true, 128U> hset(streamer);
+
+			int count = 0;
+			//Insertion test
+			for (int i = 0; i < 2000; ++i)
+			{
+				int val = gen();
+				//cout << "Inserting " << val << std::endl;
+				if (i == 321)
+					int x = 3;
+
+				auto r2 = correct_set.insert(val);
+				hset.insert_delayed(val);
+				if (i >= 214)
+				{ 
+					if (hset.find(324) == hset.end())
+						int y = 0;
+				}
+			}
+
+			//hset.insert_delayed(319);
+			auto itt = hset.find(324);
+
+			hset.flush_delayed_buffer();
+
+			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
+
+
+			itt = hset.find(324);
+
+			//Find test
+			for (int i = 0; i < 2000; ++i)
+			{
+				int val = gen();
+				auto it1 = correct_set.find(val);
+				auto it2 = hset.find(val);
+
+				bool r1 = (it1 == correct_set.end());
+				bool r2 = (it2 == hset.end());
+
+				assert_test(r1 == r2, "Complex hashset find");
+				if (r1 != r2)
+					cout << "Failed on " << val << std::endl;
+			}
+		}
+	}
+
 	//Test add_range
 	{
 		complex_element_streamer streamer;
@@ -307,6 +367,32 @@ void test_complex_queue()
 	{
 		assert_test(correct_queue.front() == cq.top(), "Complex queue front + pop");
 		correct_queue.pop();
+		cq.pop();
+	}
+}
+
+void test_complex_stack()
+{
+	complex_element_streamer streamer;
+	complex_stack<complex_element, complex_element_streamer> cq(streamer);
+
+	std::stack<complex_element> correct_stack;
+
+	auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
+
+	//Push
+	for (int i = 0; i < 2000; ++i)
+	{
+		int val = gen();
+		correct_stack.push(val);
+		cq.push(val);
+	}
+
+	//Pop and compare
+	for (int i = 0; i < 2000; ++i)
+	{
+		assert_test(correct_stack.top() == cq.top(), "Complex queue front + pop");
+		correct_stack.pop();
 		cq.pop();
 	}
 }

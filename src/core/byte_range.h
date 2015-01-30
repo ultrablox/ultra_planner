@@ -11,18 +11,44 @@ struct byte_range
 	:start(_start), size(_size)
 	{}
 
+	
 	/*byte_range(const byte_range & rhs)
-	:start(rhs.start), size(rhs.size)
+		:start(rhs.start), size(rhs.size)
 	{
-	cout << "xxx";
+		cout << "xxx";
+	}
+
+	byte_range(byte_range && rhs)
+	{
+		cout << "xxx";
 	}*/
 
 	byte_range & operator=(const byte_range & rhs)
 	{
-		if (this->size != rhs.size)
+		if ((this->start == nullptr) || (this->size != rhs.size))
 			throw std::out_of_range("Invalid byterange assignment");
 
 		memcpy(this->start, rhs.start, this->size);
+		return *this;
+	}
+
+	template<typename T>
+	byte_range(const T & rhs)
+	{
+		auto res = rhs.to_byte_range();
+		this->start = res.start;
+		this->size = res.size;
+	}
+
+	template<typename T>
+	byte_range & operator=(const T & rhs)
+	{
+		auto res = rhs.to_byte_range();
+
+		if ((this->start == nullptr) || (this->size != res.size))
+			throw std::out_of_range("Invalid byterange assignment");
+
+		memcpy(this->start, res.start, this->size);
 		return *this;
 	}
 
@@ -31,10 +57,10 @@ struct byte_range
 		return (lhs.size == rhs.size) && (memcmp(lhs.start, rhs.start, lhs.size) == 0);
 	}
 
-	friend bool operator==(const byte_range & lhs, size_t val)
+	/*friend bool operator==(const byte_range & lhs, size_t val)
 	{
 		return *((size_t*)lhs.start) == val;
-	}
+	}*/
 
 	friend bool operator<(const byte_range & lhs, size_t val)
 	{
@@ -57,8 +83,18 @@ struct byte_range
 		return *((T*)this->start);
 	}
 
+
 	char * start;
 	size_t size;
+};
+
+namespace std
+{
+	template<>
+	inline void swap<byte_range>(byte_range & lhs, byte_range & rhs)
+	{
+		int x = 0;
+	}
 };
 
 #endif

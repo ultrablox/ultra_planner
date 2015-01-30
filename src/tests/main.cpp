@@ -43,6 +43,7 @@ void test_bdd_map();
 void test_complex_queue();
 void test_avl_tree();
 void test_range_map();
+void test_complex_stack();
 
 int main()
 {
@@ -58,6 +59,7 @@ int main()
 	test_cached_file();
 	test_complex_vector();
 	test_complex_queue();
+	test_complex_stack();
 	test_complex_hashmap();
 	
 

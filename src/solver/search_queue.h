@@ -228,6 +228,12 @@ public:
 			return m_primaryData.begin()->second.size();
 	}
 
+	priority_component_t best_priority() const
+	{
+		auto it = m_primaryData.begin();
+		return it->first;
+	}
+
 	template<typename Fun>
 	int pop_and_call(Fun fun)
 	{

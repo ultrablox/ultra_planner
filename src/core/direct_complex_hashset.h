@@ -100,7 +100,7 @@ class direct_complex_hashset : public complex_hashset_base<T, S, H, file_storage
 	using _Base = complex_hashset_base<T, S, H, file_storage_wrapper, direct_hashset::ext_storage_generator, BlockSize>;
 	using block_t = typename _Base::block_t;
 	using combined_value_t = typename _Base::combined_value_t;
-	using chain_info_t = range_map_wrapper::chain_info_t;
+//	using chain_info_t = range_map_wrapper::chain_info_t;
 public:
 	//template<typename SerFun, typename DesFun>
 	direct_complex_hashset(const S & ss/*, int serialized_element_size, SerFun s_fun, DesFun d_fun*/)
@@ -137,15 +137,15 @@ public:
 		auto it = begin;
 		while (it != end)
 		{
-			size_t group_start_hash = this->m_index.expected_block_min_hash(hash_fun(*it));
+			/*size_t group_start_hash = this->m_index.expected_block_min_hash(hash_fun(*it));
 			auto last_it = std::find_if_not(it, end, [&](const typename It::value_type & el){
 				return group_start_hash == this->m_index.expected_block_min_hash(hash_fun(el));
 			});
 
 			auto chain = this->m_index.chain_with_hash(group_start_hash);
 			block_descrs.push_back(block_descr_t(chain.first, std::distance(begin, it), std::distance(begin, last_it), group_start_hash, chain.block_count));
-
-			it = last_it;
+			
+			it = last_it;*/
 		}
 
 		for (auto & bd : block_descrs)
@@ -302,7 +302,7 @@ public:
 			while (it != end)
 			{
 				append_to_block(m_writeQueue[local_block_id], hash_fun(*it), val_fun(*it));
-				if (m_writeQueue[local_block_id].item_count == this->m_maxItemsInBlock)
+				if (m_writeQueue[local_block_id].item_count() == this->m_maxItemsInBlock)
 				{
 					last_block_global_id = m_writeQueue[local_block_id].id;
 					size_t new_block_id = request_block();
@@ -336,7 +336,7 @@ public:
 				this->m_blocks.read_into(block_id, block);
 				
 
-				for (int i = 0; i < block.item_count; ++i)
+				for (int i = 0; i < block.item_count(); ++i)
 				{
 					combined_value_t & val = chain_elements_buffer[element_buffer_index++];
 					const char * base_ptr = block.data + i * this->m_serializedElementSize;
@@ -344,19 +344,19 @@ public:
 					this->m_valueStreamer.deserialize(base_ptr + sizeof(size_t), val.second);
 				}
 
-				m_writeQueue[local_block_id].item_count = 0;
+				m_writeQueue[local_block_id].set_item_count(0);
 				last_block_id = block_id;
 				block_id = m_writeQueue[local_block_id].next;
 			} while (block_id != last_block_id);
 
 			//Remove duplication amongst news
-			auto last_it = UltraCore::unique(chain_elements_buffer.begin(), chain_elements_buffer.begin() + element_buffer_index, begin, end, [](const combined_value_t & val){
+			auto last_it = begin;/* UltraCore::unique(chain_elements_buffer.begin(), chain_elements_buffer.begin() + element_buffer_index, begin, end, [](const combined_value_t & val){
 				return val.first;
 			}, [=](const typename It::value_type & val){
 				return hash_fun(val);
 			}, [=](const combined_value_t & old_val, const typename It::value_type & new_val){
 				return old_val.second == val_fun(new_val);
-			});
+			});*/
 
 			//Merge
 			size_t old_vals_count = element_buffer_index;
@@ -386,7 +386,7 @@ public:
 			{
 				auto & el = *el_it;
 				append_to_block(m_writeQueue[local_block_id], el.first, el.second);
-				if (m_writeQueue[local_block_id].item_count == this->m_maxItemsInBlock)
+				if (m_writeQueue[local_block_id].item_count() == this->m_maxItemsInBlock)
 				{
 					size_t last_local_block_id = local_block_id;
 

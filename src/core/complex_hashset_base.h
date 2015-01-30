@@ -12,24 +12,17 @@
 #include <core/utils/helpers.h>
 #include <core/avl_tree.h>
 #include <core/byte_range.h>
+#include <core/block_chain.h>
+#include <core/delayed_buffer.h>
 #include <stxxl/unordered_map>
 #include <unordered_map>
 //#include <tbb/parallel_for.h>
 #include <thread>
-
+#include <stdexcept>
 
 class range_map_wrapper
 {
 public:
-	struct chain_info_t
-	{
-		chain_info_t(size_t _first = std::numeric_limits<size_t>::max(), size_t _last = std::numeric_limits<size_t>::max(), size_t _block_count = 0)
-		:first(_first), last(_last), block_count(_block_count)
-		{}
-
-		size_t first, last, block_count;
-		//size_t _placeholder;
-	};
 
 	void compute_stats(int & max_chain_length) const
 	{
@@ -58,6 +51,7 @@ public:
 
 	void create_mapping(size_t hash_val, const chain_info_t & chain_id)
 	{
+		//cout << "mapping: " << hash_val << std::endl;
 		m_rtree.insert(hash_val, chain_id);
 	}
 
@@ -102,113 +96,16 @@ protected:
 	typedef std::pair<size_t, value_type> combined_value_t;
 	
 	using index_t = range_map_wrapper; 	//Maps hash_value => block chain where it should be
-	using chain_info_t = typename index_t::chain_info_t;
+	//using chain_info_t = typename index_t::chain_info_t;
 
 	static const int MaxBlocksPerChain = 3;
 	struct block_t;
 	struct block_chain_t;
 
-	class block_iterator
-	{
-		friend class complex_hashset_base;
-		friend class block_chain_t;
-	public:
-		typedef forward_iterator_tag iterator_category;
-		typedef byte_range value_type;
-		typedef ptrdiff_t difference_type;
-		typedef value_type* pointer;
-		typedef value_type& reference;
+	using block_iterator = block_iterator<block_chain_t>;
+	using block_reverse_iterator = block_reverse_iterator<block_chain_t>;
 
-		block_iterator(block_chain_t * _chain = nullptr, size_t _element_id = std::numeric_limits<size_t>::max())
-			:m_pChain(_chain), m_elementId(_element_id)
-		{}
-
-		//Returns hash of current element
-		byte_range operator*() const
-		{
-			auto addr = m_pChain->element_address(m_elementId);
-			block_t & cur_block = m_pChain->m_hb.m_blocks[addr.first];
-			size_t offset = addr.second * m_pChain->m_hb.m_serializedElementSize;
-			
-			//if (addr.first == 2)
-			//	cout << offset << std::endl;
-			if (offset >= block_t::DataSize)
-				throw out_of_range("Out of block data");
-
-			return std::move(byte_range(cur_block.data + offset, m_pChain->m_hb.m_serializedElementSize));
-		}
-
-		const size_t & hash() const
-		{
-			byte_range br = operator*();
-			
-			size_t* hash_ptr = (size_t*)br.start;
-			return *hash_ptr;
-		}
-
-		//Prefix
-		block_iterator& operator++()
-		{
-			++m_elementId;
-			return *this;
-		}
-
-		//Prefix
-		block_iterator& operator--()
-		{
-			--m_elementId;
-			return *this;
-		}
-
-		block_iterator& operator+=(size_t delta)
-		{
-			m_elementId += delta;
-			return *this;
-		}
-
-		block_iterator& operator=(const block_iterator& rhs)
-		{
-			this->m_elementId = rhs.m_elementId;
-			return *this;
-		}
-
-		friend bool operator!=(const block_iterator & lhs, const block_iterator & rhs)
-		{
-			return (lhs.m_elementId != rhs.m_elementId);
-		}
-
-		friend bool operator==(const block_iterator & lhs, const block_iterator & rhs)
-		{
-			return (lhs.m_elementId == rhs.m_elementId);
-		}
-
-		friend block_iterator operator+(const block_iterator & lhs, size_t delta)
-		{
-			return block_iterator(lhs.m_pChain, lhs.m_elementId + delta);
-		}
-
-		friend block_iterator operator-(const block_iterator & lhs, size_t delta)
-		{
-			return block_iterator(lhs.m_pChain, lhs.m_elementId - delta);
-		}
-
-		friend size_t operator-(const block_iterator & lhs, const block_iterator & rhs)
-		{
-			return lhs.m_elementId - rhs.m_elementId;
-		}
-
-		const void * value_ptr() const
-		{
-			auto addr = m_chain.element_address(m_elementId);
-			block_t & cur_block = m_chain.m_hb.m_blocks[addr.first];
-			return cur_block.data + addr.second * m_chain.m_hb.m_serializedElementSize + sizeof(size_t);
-		}
-
-	private:
-		//const block_t & block;
-		size_t m_elementId;
-		block_chain_t * m_pChain;
-	};
+	using delayed_buffer_t = delayed_buffer<value_type>;
 
 	struct block_t
 	{
@@ -216,7 +113,7 @@ protected:
 		static const size_t DataSize = Size - 3*sizeof(size_t)-sizeof(int);
 
 		block_t(size_t _id = std::numeric_limits<size_t>::max())
-			:item_count(0), id(_id), next(_id), prev(_id)
+			:m_itemCount(0), id(_id), next(_id), prev(_id)
 		{
 			memset(data, 0, DataSize);
 		}
@@ -237,7 +134,7 @@ protected:
 		}
 
 		//Returns iterator to the first element in the sequence of same hashes ~in the middle
-		block_iterator middle(int element_size)
+		/*block_iterator middle(int element_size)
 		{
 			auto m_it = block_iterator(item_count / 2, *this, element_size);
 			if (*m_it == *begin(element_size))
@@ -254,7 +151,7 @@ protected:
 			}
 
 			return m_it;
-		}
+		}*/
 
 		size_t first_hash() const
 		{
@@ -263,7 +160,7 @@ protected:
 
 		size_t last_hash(size_t record_size) const
 		{
-			const char * ptr = data + record_size * (item_count - 1);
+			const char * ptr = data + record_size * (item_count() - 1);
 			return *((const size_t*)ptr);
 		}
 
@@ -272,19 +169,41 @@ protected:
 			id = _id;
 			prev = _prev;
 			next = _next;
-			item_count = _item_count;
+			set_item_count(_item_count);
 		}
 
 		size_t id, next, prev;
-		int item_count;
 		char data[DataSize];
+
+		void inc_item_count(int delta = 1)
+		{
+			//m_itemCount += delta;
+			set_item_count(m_itemCount + delta);
+		}
+
+		int item_count() const
+		{
+			return m_itemCount;
+		}
+
+		void set_item_count(int new_count)
+		{
+			//if (new_count > 5)
+			//	throw out_of_range("!");
+			m_itemCount = new_count;
+		}
+	private:
+		int m_itemCount;
 
 	};
 
-	static_assert(sizeof(block_t) % 256 == 0, "Invalid block_t size!");
+	static_assert(sizeof(block_t) % 128 == 0, "Invalid block_t size!");
 
 	struct block_chain_t
 	{
+		template<typename C>
+		friend class block_iterator_base;
+
 		block_chain_t(complex_hashset_base & hb, chain_info_t & chain_info)
 			:m_hb(hb), limits(chain_info), m_totalElements(0)
 		{
@@ -296,7 +215,13 @@ protected:
 			{
 				last_block_id = block_id;
 				m_blockIds.push_back(block_id);
-				m_totalElements += m_hb.m_blocks[block_id].item_count;
+				m_totalElements += m_hb.m_blocks[block_id].item_count();
+
+				if (m_hb.m_blocks[block_id].item_count() > hb.m_maxItemsInBlock)
+					throw std::out_of_range("Invalid block");
+				if ((block_id != limits.last) && (m_hb.m_blocks[block_id].item_count() != hb.m_maxItemsInBlock))
+					throw std::out_of_range("Invalid block");
+
 				block_id = m_hb.m_blocks[block_id].next;
 				//cout << block_id << std::endl;
 			} while (last_block_id != block_id);
@@ -305,6 +230,26 @@ protected:
 		size_t block_count() const
 		{
 			return m_blockIds.size();
+		}
+
+		size_t element_size() const
+		{
+			return m_hb.m_serializedElementSize;
+		}
+
+		typename complex_hashset_base::wrapper_t & blocks_cache()
+		{
+			return m_hb.m_blocks;
+		}
+
+		block_reverse_iterator rbegin()
+		{
+			return block_reverse_iterator(this, m_totalElements - 1);
+		}
+
+		block_reverse_iterator rend()
+		{
+			return block_reverse_iterator(this, std::numeric_limits<size_t>::max());
 		}
 
 		block_iterator begin()
@@ -336,6 +281,10 @@ protected:
 		{
 			//limits.last = m_hb.m_blocks.size();
 			limits.last = m_hb.request_block();
+
+			if (limits.last == 76)
+				int x = 0;
+
 			block_t & new_block = m_hb.m_blocks[limits.last];
 
 			new_block.prev = *m_blockIds.rbegin();
@@ -352,7 +301,7 @@ protected:
 				append_new_block();
 
 			//m_hb.print_debug();
-			++m_hb.m_blocks[limits.last].item_count;
+			m_hb.m_blocks[limits.last].inc_item_count();
 			
 			//Move tail right by 1 position
 			auto old_end_it = end();
@@ -363,7 +312,7 @@ protected:
 			//m_hb.print_debug();
 
 			//Serialize element into freed space
-			auto new_addr = element_address(it.m_elementId);
+			auto new_addr = element_address(it.elementId());
 			block_t & cur_block = m_hb.m_blocks[new_addr.first];
 			char * dest_ptr = cur_block.data + new_addr.second * m_hb.m_serializedElementSize;
 			
@@ -398,13 +347,14 @@ protected:
 				size_t max_elements_in_current_chain = m_hb.m_maxItemsInBlock * limits.block_count;
 				if (new_size <= max_elements_in_current_chain)
 				{
-					m_hb.m_blocks[limits.last].item_count += (new_size - m_totalElements);
+					m_hb.m_blocks[limits.last].inc_item_count(new_size - m_totalElements);
 					m_totalElements = new_size;
 				}
 				else
 				{
 					size_t extra_size = new_size - max_elements_in_current_chain;
 					m_totalElements = max_elements_in_current_chain;
+					m_hb.m_blocks[limits.last].set_item_count(m_hb.m_maxItemsInBlock);
 
 					while (extra_size > 0)
 					{
@@ -413,20 +363,20 @@ protected:
 
 						if (extra_size > m_hb.m_maxItemsInBlock)
 						{
-							new_block.item_count = m_hb.m_maxItemsInBlock;
+							new_block.set_item_count(m_hb.m_maxItemsInBlock);
 							extra_size -= m_hb.m_maxItemsInBlock;
 							m_totalElements += m_hb.m_maxItemsInBlock;
 						}
 						else
 						{
-							new_block.item_count = extra_size;
+							new_block.set_item_count(extra_size);
 							m_totalElements += extra_size;
 							extra_size = 0;
 						}
 					}
 				}
 			}
-			else
+			else if (new_size < m_totalElements)
 				m_totalElements = new_size;
 		}
 
@@ -474,6 +424,18 @@ protected:
 		{
 			return m_totalElements;
 		}
+
+		void print()
+		{
+			cout << "Chain (" << m_blockIds.size() << " blocks): ";
+			for (auto it = begin(); it != end(); ++it)
+				cout << (*it).begin_as<size_t>() << ',';
+			cout << std::endl;
+			//for (auto bid : m_blockIds)
+			//	m_hb.print_block(m_hb.m_blocks[bid]);
+			
+		}
+
 		
 		chain_info_t & limits;
 		complex_hashset_base & m_hb;
@@ -529,7 +491,7 @@ public:
 
 	iterator end() const
 	{
-		return iterator(m_blocks.size(), -1);
+		return iterator(m_blocks.size(), 0);
 	}
 
 	//It will work faster, if you know hash in advance
@@ -561,31 +523,16 @@ public:
 		return res;
 	}
 
-	
-	struct delayed_insertion_request_t
+	void insert_delayed(const value_type & val)
 	{
-		using callback_t = std::function<void(const value_type & val)>;
+		insert_delayed(val, [](const value_type & _val){});
+	}
 
-		delayed_insertion_request_t(size_t _hash_val, const value_type & _val, callback_t _callback, size_t serialized_element_size)
-			:val(_val), callback(_callback), hash_val(_hash_val), serialized_val(serialized_element_size)
-		{}
-
-		size_t hash_val;
-		value_type val;
-		callback_t callback;
-		std::vector<char> serialized_val;
-	};
-
-	struct delayed_request_cmp_t
+	template<typename CallbackFun>
+	void insert_delayed(const value_type & val, CallbackFun fun)
 	{
-		bool operator()(const delayed_insertion_request_t & lhs, const delayed_insertion_request_t & rhs) const
-		{
-			return lhs.val == rhs.val;
-		}
-	};
-
-	using delayed_buffer_groupt_t = std::vector<delayed_insertion_request_t>;
-	using delayed_buffer_t = std::unordered_map<size_t, delayed_buffer_groupt_t>;
+		insert_delayed(val, m_hasher(val), fun);
+	}
 
 	template<typename CallbackFun>
 	void insert_delayed(const value_type & val, size_t hash_val, CallbackFun fun)
@@ -599,12 +546,11 @@ public:
 		{
 			size_t cur_point = m_index.interval_begin(hash_val);
 
-			auto & gr = m_delayedBuffer[cur_point];
-			gr.push_back(delayed_insertion_request_t(hash_val, val, fun, m_serializedElementSize));
+			size_t gr_size = m_delayedBuffer.insert(cur_point, typename delayed_buffer_t::insertion_request_t(hash_val, val, fun, m_serializedElementSize));
 
-			if (gr.size() > m_maxItemsInBlock / 2)
+			if (gr_size > m_maxItemsInBlock * 0.7)
 			{
-				flush_delayed_buffer_range(cur_point, gr);
+				flush_delayed_buffer_range(cur_point, m_delayedBuffer[cur_point]);
 				m_delayedBuffer.erase(cur_point);
 			}
 			else
@@ -613,7 +559,8 @@ public:
 									/*auto first_range = m_delayedBuffer.begin();
 					flush_delayed_buffer_range(first_range->first, first_range->second);
 					m_delayedBuffer.erase(first_range);*/
-				if ((m_delayedBuffer.size() > 2000) || (m_delayedCounter++ > 10000))
+				if ((m_delayedBuffer.size() > 30000) || (m_delayedCounter++ > 100000))
+				//if ((m_delayedBuffer.size() > 10000) || (m_delayedCounter++ > 1000000))
 				{
 					m_delayedCounter = 0;
 					flush_delayed_buffer();
@@ -636,18 +583,15 @@ public:
 
 	void flush_delayed_buffer()
 	{
-		if (m_delayedBuffer.empty())
-			return;
-
 		//cout << "Flushing...";
 		size_t els_count = 0, groups_count = 0;
 
-		for (auto & items : m_delayedBuffer)
-		{
+		m_delayedBuffer.for_each_range([&](size_t key, typename delayed_buffer_t::groupt_t & range){
 			++groups_count;
-			els_count += items.second.size();
-			flush_delayed_buffer_range(items.first, items.second);
-		}
+			els_count += range.size();
+			flush_delayed_buffer_range(key, range);
+		});
+
 		m_delayedBuffer.clear();
 
 		//cout << 100.0f * (float)els_count / groups_count << "% gained" << std::endl;
@@ -657,12 +601,12 @@ public:
 	void flush_delayed_buffer_range(size_t cur_point, RangeT & range)
 	{
 		//Apply internal merge
-		sort_wrapper(range.begin(), range.end(), [](const delayed_insertion_request_t & lhs, const delayed_insertion_request_t & rhs){
+		sort_wrapper(range.begin(), range.end(), [](const typename delayed_buffer_t::insertion_request_t & lhs, const typename delayed_buffer_t::insertion_request_t & rhs){
 			return lhs.hash_val < rhs.hash_val;
 		});
 
-		delayed_request_cmp_t cmp;
-		auto last_it = UltraCore::unique(range.begin(), range.end(), [](const delayed_insertion_request_t & req){
+		typename delayed_buffer_t::request_cmp_t cmp;
+		auto last_it = UltraCore::unique(range.begin(), range.end(), [](const typename delayed_buffer_t::insertion_request_t & req){
 			return req.hash_val;
 		}, cmp);
 
@@ -678,15 +622,19 @@ public:
 
 		//cout << "Flushing range with length " << std::distance(range.first, range.second) << std::endl;
 		chain_info_t & chain_id = m_index.chain_with_hash(cur_point);
+
+		if ((chain_id.first == 24) && (chain_id.last == 76))
+			int x = 0;
+
 		block_chain_t chain(*this, chain_id);
 
 		bool something_added = false;
 
-		insert_into_chain(chain, range.begin(), last_it, [](const delayed_insertion_request_t & req){
+		insert_into_chain(chain, range.begin(), last_it, [](const typename delayed_buffer_t::insertion_request_t & req){
 			return req.hash_val;
-		}, [=](const delayed_insertion_request_t & req){
-			return byte_range((char*)&req.serialized_val[0], m_serializedElementSize);
-		}, [&](const delayed_insertion_request_t & req){
+		}, [=](const typename delayed_buffer_t::insertion_request_t & req){
+			return req.to_byte_range();
+		}, [&](const typename delayed_buffer_t::insertion_request_t & req){
 			req.callback(req.val);
 			++m_size;
 			something_added = true;
@@ -760,12 +708,16 @@ public:
 
 		if (it != chain.end())	//If we found element with similar hash, check for duplication
 		{
-			m_valueStreamer.serialize(&m_elementCache[0], val);
-			for (; (it != chain.end()) && (*it == hash_val); ++it)
+			m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
+			memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
+			byte_range searchin_element_br(&m_elementCache[0], m_serializedElementSize);
+
+			for (; (it != chain.end()) && ((*it).begin_as<size_t>() == hash_val); ++it)
 			{
-				if (memcmp(&m_elementCache[0], it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
+				//if (memcmp(&m_elementCache[0], it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
+				if (searchin_element_br == *it)
 				{
-					auto addr = chain.element_address(it.m_elementId);
+					auto addr = chain.element_address(it.elementId());
 					return iterator(addr.first, addr.second);
 				}
 			}
@@ -806,7 +758,7 @@ protected:
 
 		if (it != chain.end())	//If we found element with similar hash, check for duplication
 		{
-			for (; (it != chain.end()) && (*it == hash_val); ++it)
+			for (; (it != chain.end()) && ((*it).begin_as<size_t>() == hash_val); ++it)
 			{
 				//if (memcmp(br.start + sizeof(size_t), it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
 				if (br == *it)
@@ -823,6 +775,7 @@ protected:
 	void insert_into_chain(block_chain_t & chain, It begin_it, It end_it, HashExtractor hash_fun, ValueExtractor ser_val_fun, Callback call_fun)
 	{
 		//Remove duplication amongst news
+		size_t inserting_size = std::distance(begin_it, end_it);
 		auto last_it = UltraCore::unique(chain.begin(), chain.end(), begin_it, end_it, [](const byte_range & br){
 			return br.begin_as<size_t>();
 		}, [=](const typename It::value_type & val){
@@ -834,24 +787,57 @@ protected:
 		//if (last_it != end_it)
 		//	cout << "Int unique removed " << 100.0f * (float)std::distance(last_it, end_it) / std::distance(begin_it, end_it) << "% values" << std::endl;
 		
+		//chain.print();
+		
+		
 		//Add to chain what's left
 		size_t old_size = chain.element_count();
 		size_t merging_size = std::distance(begin_it, last_it);
 		chain.resize(chain.element_count() + merging_size);
 
 		//Copy values
-		auto dest_it = chain.begin() + old_size;
+		/*auto dest_it = chain.begin() + old_size;
 		for (It it = begin_it; it != last_it; ++it, ++dest_it)
 		{
 			call_fun(*it);
 			*dest_it = ser_val_fun(*it);
-		}
+		}*/
+
+		//chain.print();
 	
 		//Merge them
-		std::inplace_merge(chain.begin(), chain.begin() + old_size, chain.end(), [](const byte_range & left, const byte_range & right){
-			return left.begin_as<size_t>() < right.begin_as<size_t>();
-		});
+		/*cout << "Adding internaly merged: ";
+		for (auto it = begin_it; it != last_it; ++it)
+			cout << ser_val_fun(*it).begin_as<size_t>() << ',';
+		cout << std::endl;*/
+		std::reverse(begin_it, last_it);
+		/*cout << "Adding internaly merged: ";
+		for (auto it = begin_it; it != last_it; ++it)
+		{
+			cout << ser_val_fun(*it).begin_as<size_t>() << ',';
+			if (hash_fun(*it) == 50)
+				cout << "!";
+		}
+		cout << std::endl;*/
 
+		/*UltraCore::merge(chain.rbegin() + merging_size, chain.rend(), begin_it, last_it, chain.rbegin(), [](const byte_range & lhs, const byte_range & rhs){
+			return lhs.begin_as<size_t>() > rhs.begin_as<size_t>();
+		});*/
+
+		/**/std::merge(chain.rbegin() + merging_size, chain.rend(), begin_it, last_it, chain.rbegin(), [](const byte_range & lhs, const byte_range & rhs){
+			return lhs.begin_as<size_t>() > rhs.begin_as<size_t>();
+		});
+		
+		for (auto it = begin_it; it != last_it; ++it)
+			call_fun(*it);
+		
+
+		/*for (auto it = begin_it; it != last_it; ++it)
+		{
+			if(insert_into_chain(chain, hash_fun(*it), ser_val_fun(*it)))
+				call_fun(*it);
+		}*/
+		//chain.print();
 	}
 
 	void try_ballance_chain(block_chain_t & chain)
@@ -992,17 +978,17 @@ protected:
 
 	void append_to_block(block_t & block, size_t hash_val, const value_type & val)
 	{
-		if (block.item_count >= m_maxItemsInBlock)
+		if (block.item_count() >= m_maxItemsInBlock)
 			throw out_of_range("Trying to append more than block can handle");
 
 
 		//m_serializeFun(&m_elementCache[0], val);
 		m_valueStreamer.serialize(&m_elementCache[0], val);
 
-		char * base_ptr = block.data + block.item_count * m_serializedElementSize;
+		char * base_ptr = block.data + block.item_count() * m_serializedElementSize;
 		*((size_t*)base_ptr) = hash_val;	//Hash
 		memcpy(base_ptr + sizeof(size_t), &m_elementCache[0], m_valueStreamer.serialized_size());	//Value
-		++block.item_count;
+		block.inc_item_count();
 	}
 
 	void print_block(const block_t & block) const

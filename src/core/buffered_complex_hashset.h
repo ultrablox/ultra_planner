@@ -64,7 +64,7 @@ namespace buffered_hashset
 	struct ext_storage_generator
 	{
 		using block_t = B;
-		using result = typename stxxl::VECTOR_GENERATOR<block_t, 1U, 65536U, sizeof(block_t), stxxl::FR, stxxl::random>::result; //131072U //262144U //65536U //1048576U
+		using result = typename stxxl::VECTOR_GENERATOR<block_t, 1U, 8192U, sizeof(block_t), stxxl::FR, stxxl::random>::result; //131072U //262144U //65536U //1048576U
 	};
 
 	template<typename B>
@@ -82,7 +82,7 @@ External - buffered stxxl vector.
 
 //std::conditional<UseIntMemory, buffered_hashset::int_storage_generator, buffered_hashset::ext_storage_generator>::type
 
-template<typename T, typename S, typename H = std::hash<T>, bool UseIntMemory = true, unsigned int BlockSize = 8192U>//65536U //4096U // 8192U
+template<typename T, typename S, typename H = std::hash<T>, bool UseIntMemory = true, unsigned int BlockSize = 32768U>//65536U //4096U // 8192U
 class buffered_complex_hashset : public complex_hashset_base<T, S, H, vector_storage_wrapper, buffered_hashset::ext_storage_generator, BlockSize>
 {
 	using _Base = complex_hashset_base<T, S, H, vector_storage_wrapper, buffered_hashset::ext_storage_generator, BlockSize>;

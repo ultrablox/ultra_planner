@@ -124,14 +124,32 @@ namespace UltraCore
 	}
 
 	/*
-	Analogue of std::merge, but works in reverse. It merges in-place src container
-	data into dest container, using allocated part of dst container.
+	Analogue of std::merge, uses only assignment operator.
 	*/
-	/*template<typename InputIter1, typename InputIter2, typename KeyLess>
-	void merge(InputIter1 rDestBegin, InputIter1 rDestDataBegin, InputIter1 rDestEnd, InputIter2 rSrcBegin, InputIter2 rSrcEnd, KeyLess cmp)
+	template<typename It1, typename It2, typename OutIt, typename KeyLess>
+	void merge(It1 first1, It1 last1, It2 first2, It2 last2, OutIt result, KeyLess cmp)
 	{
+		size_t s2 = std::distance(first2, last2);
 
-		auto result = rDestBegin;
+		while (true)
+		{
+			if (first1 == last1)
+			{
+				for (auto it = first2; it != last2; ++it)
+					*result++ = *it;
+				break;
+			}
+
+			if (first2 == last2)
+			{
+				for (auto it = first1; it != last1; ++it)
+					*result++ = *it;
+				break;
+			}
+			
+			*result++ = cmp(*first2, *first1) ? *first2++ : *first1++;
+		}
+		/*auto result = rDestBegin;
 		auto dest_it = rDestDataBegin;
 		auto src_it = rSrcBegin;
 
@@ -154,9 +172,9 @@ namespace UltraCore
 			}
 
 			//cout <<  << "\n";
-		}
+		}*/
 	}
-	*/
+	
 	/*
 	Returns iterator to the ith element: e[i] != e[i-1], where i is the most value
 	i <= max_size. Or it can return the end of first equal group, if its size is
