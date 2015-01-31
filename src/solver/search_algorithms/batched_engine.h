@@ -12,27 +12,23 @@ struct batched_priority_cmp
 {
 	typedef E element_t;
 
-	bool operator()(const element_t & lhs, const element_t & rhs) const
+	bool operator()(const node_estimation_t & lhs, const node_estimation_t & rhs) const
 	{
-		//return (get<1>(lhs) + get<0>(lhs)) < (get<1>(rhs) + get<0>(rhs));
-
-		float sum1 = get<1>(lhs) +get<0>(lhs),
-			sum2 = get<1>(rhs) +get<0>(rhs);
-		return sum1 < sum2;
+		return lhs.total_estimation() < rhs.total_estimation();
 	}
 };
 
 template<typename Gr, typename H, bool ExtMemory>
-class batched_engine : public queued_search_engine<Gr, float, batched_priority_cmp, ExtMemory>
+class batched_engine : public queued_search_engine<Gr, batched_priority_cmp, ExtMemory>
 {
 	typedef batched_engine<Gr, H, ExtMemory> _Self;
-	typedef queued_search_engine<Gr, float, batched_priority_cmp, ExtMemory> _Base;
+	typedef queued_search_engine<Gr, batched_priority_cmp, ExtMemory> _Base;
 	typedef float estimation_t;
 	typedef H heuristic_t;
 	typedef typename _Base::state_t state_t;
 
 	using search_node_t = typename _Base::search_node_t;
-	using comparison_t = typename _Base::comparison_t;
+	//using comparison_t = typename _Base::comparison_t;
 	typedef std::tuple<size_t, search_node_t/*, estimation_t*/> expanded_node_t;
 	typedef std::vector<expanded_node_t> expanded_nodes_container_t;
 public:
@@ -42,26 +38,26 @@ public:
 	{}
 
 	template<typename GraphT, typename IsGoalFun>
-	bool operator()(GraphT & graph, state_t init_node, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
+	bool operator()(GraphT & graph, const state_t & init_node, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
 	{
 		heuristic_t h_fun(graph.transition_system());
 
-		this->enqueue(is_goal_fun, this->create_node(init_node, 0), std::numeric_limits<float>::max());
+		this->enqueue(is_goal_fun, this->create_node(init_node, 0), node_estimation_t(0, h_fun(init_node)));
 
 		float best_estimation = std::numeric_limits<float>::max();
-		comparison_t current_data;
+		//comparison_t current_data;
 
 		while((!_Base::m_searchQueue.empty()) && _Base::m_goalNodes.empty())
 		{
 			//Extract batch of best states
 
-			pick_best_nodes(m_inBuffer, m_batchSize, &current_data);
+			pick_best_nodes(m_inBuffer, m_batchSize, 0/*&current_data*/);
 
-			if(get<0>(current_data) < best_estimation)
+			/*if(get<0>(current_data) < best_estimation)
 			{
 				best_estimation = get<0>(current_data);
 				cout << "Best heuristic: " << best_estimation << std::endl;
-			}
+			}*/
 			
 			expand_best_nodes(graph);
 
@@ -83,12 +79,15 @@ public:
 	}
 private:
 	
-	void pick_best_nodes(std::vector<search_node_t> & res, size_t max_count, comparison_t * first_node_data = nullptr)
+	void pick_best_nodes(std::vector<search_node_t> & res, size_t max_count, node_estimation_t * first_node_data = nullptr)
 	{
 		res.reserve(max_count);
 
-		size_t picked_count = _Base::m_searchQueue.top(res, max_count, false, first_node_data);
-		_Base::m_searchQueue.pop(picked_count);
+		/*size_t picked_count = _Base::m_searchQueue.top(res, max_count, false, first_node_data);
+		_Base::m_searchQueue.pop(picked_count);*/
+		_Base::m_searchQueue.pop_and_call([&](const node_estimation_t & prior, const search_node_t & node){
+			res.push_back(node);
+		}, max_count);
 	}
 
 	template<typename GraphT, typename It>
@@ -208,7 +207,7 @@ private:
 				return get<1>(exp_node).state;
 			}, [=](const expanded_node_t & expanded_node){
 				search_node_t new_node = this->create_node(get<1>(expanded_node).state, get<1>(expanded_node).parent_id);
-				this->enqueue(is_goal, new_node, est_fun(get<1>(expanded_node).state));
+				this->enqueue(is_goal, new_node, node_estimation_t(new_node.length, est_fun(get<1>(expanded_node).state)));
 			});
 
 			m_expandBuffer.clear();

@@ -13,9 +13,9 @@ struct dfs_node_priority_cmp
 {
 	typedef E element_t;
 
-	bool operator()(const element_t & lhs, const element_t & rhs) const
+	bool operator()(const node_estimation_t & lhs, const node_estimation_t & rhs) const
 	{
-		return get<1>(lhs) < get<1>(rhs);
+		return lhs.path_cost < rhs.path_cost;
 	}
 };
 

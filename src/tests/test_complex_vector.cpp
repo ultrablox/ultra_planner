@@ -219,19 +219,22 @@ void test_complex_hashmap()
 
 			auto r2 = correct_set.insert(val);
 
-			if (i == 5)
+			if (i == 36)
 			{
 				++count;
 				//hset.print_debug();
 			}
-			if (val == 307)
+			if (val == 553)
 				int x = 0;
 			
 			//cout << i << std::endl;
 			auto r1 = hset.insert(val);
 			//hset.print_debug();
 
-			assert_test(r1 == r2.second, "Complex hashset insertion");
+			bool crct = (r1 == r2.second);
+			if (!crct)
+				int x = 0;
+			assert_test(crct, "Complex hashset insertion");
 			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
 		}
 

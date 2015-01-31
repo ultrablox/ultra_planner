@@ -57,6 +57,9 @@
     <ClCompile Include="..\..\..\..\src\tests\test_avl_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tests\test_block_chain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\tests\test_sort.h">

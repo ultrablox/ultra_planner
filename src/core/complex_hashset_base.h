@@ -244,22 +244,22 @@ protected:
 
 		block_reverse_iterator rbegin()
 		{
-			return block_reverse_iterator(this, m_totalElements - 1);
+			return block_reverse_iterator(this, m_totalElements - 1, m_hb.m_maxItemsInBlock);
 		}
 
 		block_reverse_iterator rend()
 		{
-			return block_reverse_iterator(this, std::numeric_limits<size_t>::max());
+			return block_reverse_iterator(this, -1, m_hb.m_maxItemsInBlock);
 		}
 
 		block_iterator begin()
 		{
-			return block_iterator(this, 0);
+			return block_iterator(this, 0, m_hb.m_maxItemsInBlock);
 		}
 
 		block_iterator end()
 		{
-			return block_iterator(this, m_totalElements);
+			return block_iterator(this, m_totalElements, m_hb.m_maxItemsInBlock);
 		}
 
 		//Block Id (in global coordinates) + element Id
@@ -268,6 +268,11 @@ protected:
 			size_t block_number = index / m_hb.m_maxItemsInBlock;
 			size_t element_number = index - block_number * m_hb.m_maxItemsInBlock;
 			return make_pair(m_blockIds[block_number], element_number);
+		}
+
+		size_t block_global_address(int local_block_addr) const
+		{
+			return m_blockIds[local_block_addr];
 		}
 
 		std::pair<size_t, size_t> local_element_address(size_t index) const
@@ -512,8 +517,10 @@ public:
 		m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
 		memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
 
+		//chain.print();
 		auto res = insert_into_chain(chain, hash_val, byte_range(&m_elementCache[0], m_serializedElementSize));
-		
+		//chain.print();
+
 		if (res)
 		{			
 			try_ballance_chain(chain);
@@ -801,9 +808,9 @@ protected:
 		{
 			call_fun(*it);
 			*dest_it = ser_val_fun(*it);
-		}*/
+		}
 
-		//chain.print();
+		chain.print();*/
 	
 		//Merge them
 		/*cout << "Adding internaly merged: ";

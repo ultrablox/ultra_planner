@@ -187,8 +187,8 @@ void resize_if_less(T & container, size_t expected_size)
 template<typename It, typename Pred>
 void sort_wrapper(It begin, It end, Pred pred)
 {
-	//std::sort(begin, end, pred);
-	tbb::parallel_sort(begin, end, pred);
+	std::sort(begin, end, pred);
+	//tbb::parallel_sort(begin, end, pred);
 }
 
 //True, if left radix is less

@@ -18,4 +18,6 @@
 
 #define USE_INTRINSIC 0
 
+#define TRACE_SOLUTION 1
+
 #endif

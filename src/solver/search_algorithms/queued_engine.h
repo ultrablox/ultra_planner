@@ -6,18 +6,20 @@
 #include "../search_queue.h"
 #include <queue>
 
-template<typename Gr, typename M, template<typename> class Cmp, bool ExtMemory = false, bool RAMBuffered = true>
+template<typename Gr, /*typename M,*/ template<typename> class Cmp, bool ExtMemory = false, bool RAMBuffered = true>
 class queued_search_engine : public search_engine_base<Gr, ExtMemory, RAMBuffered>
 {
 protected:
-	using graph_t = Gr;
 	typedef search_engine_base<Gr, ExtMemory, RAMBuffered> _Base;
-	typedef M element_meta_t;
+	using graph_t = Gr;
+	
+	//typedef M element_meta_t;
 	using search_node_t = typename _Base::search_node_t;
 	
+	
 public:
-	typedef std::tuple<element_meta_t, int> comparison_t;	//any meta + length to initial
-	typedef std::pair<comparison_t, search_node_t> open_list_el_t;
+	using open_list_t = search_queue<search_node_t, Cmp<node_estimation_t>, typename _Base::node_streamer_t>;
+	using open_list_el_t = typename open_list_t::combined_value_t;
 
 	//template<typename Gr>
 	queued_search_engine(graph_t & graph, const typename Gr::vertex_streamer_t & vstreamer)
@@ -36,7 +38,7 @@ public:
 		stats_t res = _Base::template get_stats<stats_t>();
 		res.queue_layers_count = m_searchQueue.layer_count();
 		res.secondary_nodes_count = m_searchQueue.secondary_nodes_count();
-		res.best_priority = get<0>(m_bestPriority) + get<1>(m_bestPriority);
+		res.best_priority = m_bestEstimation.total_estimation();//get<0>(m_bestPriority) + get<1>(m_bestPriority);
 		res.max_distance_from_initial = m_farestDistance;
 		return res;
 	}
@@ -50,49 +52,23 @@ public:
 		os << "Max distance from initial: " << stats.max_distance_from_initial << std::endl;
 		return os;
 	}
-protected:
-	
-
-
-	//Open list structure
-/*	class open_list_cmp
-	{
-		Cmp<comparison_t> m_cmp;
-		bool reverse;
-	public:
-		open_list_cmp(const bool& revparam=false)
-			:reverse(revparam)
-		{}
-
-		bool operator() (const open_list_el_t & lhs, const open_list_el_t &rhs) const
-		{
-			if(reverse)
-				return m_cmp(lhs.first, rhs.first);
-			else
-				return m_cmp(rhs.first, lhs.first);
-		}
-	};*/
-
-	//typedef std::priority_queue<open_list_el_t, std::vector<open_list_el_t>, open_list_cmp> open_list_t;
-	typedef search_queue<open_list_el_t, Cmp<comparison_t>, typename _Base::node_streamer_t> open_list_t;
 
 protected:
 	template<typename IsGoalFun>
-	std::pair<bool, comparison_t> enqueue(IsGoalFun is_goal, search_node_t node, element_meta_t meta_data)
+	bool enqueue(IsGoalFun is_goal, const search_node_t & node, const node_estimation_t & node_estimation)
 	{
-		comparison_t new_prior(meta_data, node.length);
 		if (is_goal(node.state))
 		{
-			if (m_cmp(m_searchQueue.best_priority(), new_prior))
+			if (m_cmp(m_searchQueue.best_estimation(), node_estimation))
 			{
-				cout << "Goal found, but it is not optimal (length " << get<0>(new_prior) + get<1>(new_prior) << ")" << std::endl;
-				_Base::m_goalNodes.push_back(node);
-				return make_pair(false, comparison_t());
+				cout << "Goal found, but it is not optimal (length " << node.length << ")" << std::endl;
+				//_Base::m_goalNodes.push_back(node);
+				return true;
 			}
 			else
 			{
 				_Base::m_goalNodes.push_back(node);
-				return make_pair(false, comparison_t());
+				return true;
 			}			
 		}
 		else
@@ -101,23 +77,23 @@ protected:
 			
 			if (m_firstNode)
 			{
-				m_bestPriority = new_prior;
+				m_bestEstimation = node_estimation;
 				m_firstNode = false;
 			}
 			else
 			{
-				if (m_cmp(new_prior, m_bestPriority))
-					m_bestPriority = new_prior;
+				if (m_cmp(node_estimation, m_bestEstimation))
+					m_bestEstimation = node_estimation;
 			}
 
-			return m_searchQueue.push(open_list_el_t(new_prior, node));
+			return m_searchQueue.push(open_list_el_t(node_estimation, node));
 		}
 	}
 
-	search_node_t dequeue(comparison_t * meta_data = nullptr)
+	search_node_t dequeue(node_estimation_t * meta_data = nullptr)
 	{
 		search_node_t cur_node;
-		m_searchQueue.pop_and_call([&](const comparison_t & pri, const search_node_t & top_node){
+		m_searchQueue.pop_and_call([&](const node_estimation_t & pri, const search_node_t & top_node){
 			if (meta_data)
 				*meta_data = pri;
 			cur_node = top_node;
@@ -133,8 +109,8 @@ protected:
 
 protected:
 	open_list_t m_searchQueue;
-	comparison_t m_bestPriority;
-	Cmp<comparison_t> m_cmp;
+	node_estimation_t m_bestEstimation;
+	Cmp<node_estimation_t> m_cmp;
 	bool m_firstNode;
 	float m_farestDistance;
 };

@@ -44,6 +44,7 @@ void test_complex_queue();
 void test_avl_tree();
 void test_range_map();
 void test_complex_stack();
+void test_block_chain();
 
 int main()
 {
@@ -60,8 +61,10 @@ int main()
 	test_complex_vector();
 	test_complex_queue();
 	test_complex_stack();
+
+	test_block_chain();
 	test_complex_hashmap();
-	
+
 
 	//test_matrix();
 

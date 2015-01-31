@@ -9,13 +9,14 @@ struct astar_node_priority_cmp
 {
 	typedef E element_t;
 
-	bool operator()(const element_t & lhs, const element_t & rhs) const
+	bool operator()(const node_estimation_t & lhs, const node_estimation_t & rhs) const
 	{
-		float sum1 = get<1>(lhs) + get<0>(lhs),
+		return lhs.total_estimation() < rhs.total_estimation();
+		/*float sum1 = get<1>(lhs) + get<0>(lhs),
 			sum2 = get<1>(rhs) + get<0>(rhs);
 		return sum1 < sum2;
 
-		/*if (sum1 == sum2)
+		if (sum1 == sum2)
 		{
 			return get<1>(lhs) > get<1>(rhs);
 		}

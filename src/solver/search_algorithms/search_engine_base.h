@@ -41,13 +41,22 @@ protected:
 		return m_database.create_node(state, parent_id);
 	}
 
-	std::vector<state_t> backtrace_path(search_node_t node)
+	/*
+	Builds path using searching database, using nodes parent link. For a path
+	of length N, it's cost is O(N). If external memory is used, it also costs
+	N I/O operations. Returns an ordered list of states. Optionaly, can call a
+	node_fun for each search node.
+	*/
+	std::vector<state_t> backtrace_path(search_node_t node, std::function<void(const search_node_t &)> node_fun = [](const search_node_t &){})
 	{
+		node_fun(node);
+
 		std::vector<state_t> res;
 		do
 		{
 			res.push_back(node.state);
 			node = m_database.parent_node(node);
+			node_fun(node);
 		} while (node.id != node.parent_id);
 
 		res.push_back(node.state);
@@ -74,10 +83,10 @@ protected:
 		}
 	}
 
-	bool finalize(std::vector<state_t> & solution_path)
+	bool finalize(std::vector<state_t> & solution_path, std::function<void(const search_node_t &)> node_fun = [](const search_node_t &){})
 	{
 		if (!m_goalNodes.empty())
-			solution_path = backtrace_path(m_goalNodes[0]);
+			solution_path = backtrace_path(m_goalNodes[0], node_fun);
 
 		m_finished = true;
 
