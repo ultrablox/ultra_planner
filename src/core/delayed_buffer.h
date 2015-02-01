@@ -40,8 +40,8 @@ public:
 
 	using groupt_t = std::vector<insertion_request_t>;
 
-	delayed_buffer()
-		:m_size(0)
+	delayed_buffer(int expected_group_size)
+		:m_size(0), m_expectedGroupSize(expected_group_size)
 	{}
 
 	template<typename Fun>
@@ -70,7 +70,10 @@ public:
 		auto it = m_data.find(key);
 		if (it == m_data.end())
 		{
-			m_data.insert(make_pair(key, groupt_t(1, new_req)));
+			groupt_t new_group(1, new_req);
+			new_group.reserve(m_expectedGroupSize);
+			
+			m_data.insert(make_pair(key, std::move(new_group)));
 			return 1;
 		}
 		else
@@ -94,8 +97,14 @@ public:
 			result += el.second.size();
 		return result;*/
 	}
+
+	int range_count() const
+	{
+		return m_data.size();
+	}
 private:
 	std::unordered_map<size_t, groupt_t> m_data;
 	size_t m_size;
+	int m_expectedGroupSize;
 };
 #endif

@@ -5,14 +5,17 @@
 #include "cache.h"
 #include "data_file.h"
 
-template<typename R, int CacheSize = 50>
-class cached_file : public cache<R, CacheSize>
+template<typename R, unsigned int Cache_Size = 50>
+class cached_file : public cache<R, Cache_Size>
 {
-	using _Base = cache<R, CacheSize>;
+	
+	using _Base = cache<R, Cache_Size>;
     using record_t = R;
     using key_t = size_t;
 	using cache_t = cache<record_t>;
 public:
+	using value_type = R;
+
     cached_file(const std::string & file_name = "cached_file.dat")
 		:_Base([&](record_t & data, size_t int_id){
 				return m_file.get(int_id, data);
@@ -38,6 +41,7 @@ public:
 	void push_back(const record_t & record)
 	{
 		m_file.append(record);
+		_Base::operator[](record.id);
 	}
 
 	size_t size() const

@@ -73,8 +73,14 @@ private:
 		std::list<typename transition_system_t::transition_t> plan;
 		std::thread monitor_thread([&](){
 
+			std::ofstream monitor_data("monitoring_data.csv", std::ofstream::out);
+
+			monitor_data << "Time,s;Merging Speed,nodes/sec;Cache Load,%;" << std::endl;
+
 			std::chrono::milliseconds print_dura(10000);
 			std::chrono::milliseconds dura(500);
+
+			auto begin_tp = std::chrono::steady_clock::now();
 
 			const int print_counter = print_dura.count() / dura.count();
 
@@ -96,9 +102,14 @@ private:
 					double explored_node_count = stats.state_count;
 					size_t pow10_count = explored_node_count > 1 ? ceil(log10(explored_node_count)) : 0;
 
-					cout << "Observed 10^" << pow10_count << " states (" << explored_node_count / m_maxStateCount << "%), speed = " << (explored_node_count - last_explored_count) / print_dura.count() * 1e3 << " nodes/sec" << std::endl;
+					float merge_speed = (explored_node_count - last_explored_count) / print_dura.count() * 1e3;
+						cout << "Observed 10^" << pow10_count << " states (" << explored_node_count / m_maxStateCount << "%), speed = " << merge_speed << " nodes/sec" << std::endl;
 
 					last_explored_count = explored_node_count;
+
+					//Output to monitoring data
+					auto cur_tp = std::chrono::steady_clock::now();
+					monitor_data << std::chrono::duration_cast<std::chrono::seconds>(cur_tp - begin_tp).count() << ';' << merge_speed << ';' << stats.storage_stats[0].cache_load * 100.0f << ';' << std::endl;
 				}
 
 				std::this_thread::sleep_for(dura);

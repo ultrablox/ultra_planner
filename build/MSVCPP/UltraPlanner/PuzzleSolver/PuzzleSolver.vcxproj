@@ -250,7 +250,7 @@
       <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
