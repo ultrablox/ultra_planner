@@ -309,7 +309,7 @@ public:
 					size_t prev_block_id = local_block_id;
 					local_block_id = m_writeQueueIndex++;
 					m_writeQueue[local_block_id].set_meta(new_block_id, prev_block_id, new_block_id, 0);
-					m_writeQueue[prev_block_id].next = new_block_id;
+					m_writeQueue[prev_block_id].set_next(new_block_id);
 					++block_count;
 				}
 
@@ -346,7 +346,7 @@ public:
 
 				m_writeQueue[local_block_id].set_item_count(0);
 				last_block_id = block_id;
-				block_id = m_writeQueue[local_block_id].next;
+				block_id = m_writeQueue[local_block_id].next();
 			} while (block_id != last_block_id);
 
 			//Remove duplication amongst news
@@ -395,7 +395,7 @@ public:
 						size_t new_block_id = this->request_block();
 						local_block_id = m_writeQueueIndex++;
 						m_writeQueue[local_block_id].set_meta(new_block_id, m_writeQueue[last_local_block_id].id, new_block_id, 0);
-						m_writeQueue[last_local_block_id].next = m_writeQueue[local_block_id].id;
+						m_writeQueue[last_local_block_id].set_next(m_writeQueue[local_block_id].id);
 					}
 					else
 					{
@@ -406,7 +406,7 @@ public:
 							size_t new_block_id = this->request_block();
 							local_block_id = m_writeQueueIndex++;
 							m_writeQueue[local_block_id].set_meta(new_block_id, m_writeQueue[last_local_block_id].id, new_block_id, 0);
-							m_writeQueue[last_local_block_id].next = m_writeQueue[local_block_id].id;
+							m_writeQueue[last_local_block_id].set_next(m_writeQueue[local_block_id].id);
 						}
 						else
 							local_block_id = *local_block_it;
