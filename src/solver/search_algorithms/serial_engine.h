@@ -135,7 +135,7 @@ public:
 			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){
 
 				node_estimation_t new_est(cur_node.length + 1, h_fun(state));
-				if (m_cmp(new_est, m_searchQueue.best_estimation()))
+				if (this->m_cmp(new_est, this->m_searchQueue.best_estimation()))
 					*p_flush_flag = true;
 				
 				this->m_database.add_delayed(state, [=](const state_t & _state){

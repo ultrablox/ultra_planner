@@ -252,7 +252,10 @@ public:
     #else
         int n_read = pread(m_fileDescriptor, &data, sizeof(block_type), sizeof(block_type)*index);
         if(n_read == -1)
-            cout << "Read failed: " << strerror(errno) << std::endl;
+        {
+            cout << "Read failed (index=" << index << "): " << strerror(errno) << std::endl;
+            throw runtime_error("XXX");
+        }
 
         return (n_read != sizeof(block_type));
     #endif

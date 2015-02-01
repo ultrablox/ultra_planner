@@ -89,14 +89,19 @@ public:
 			m_index.insert(make_pair(index, cache_index));
 
 			//Read data from file, if it exists
-			m_extReadFun(m_cachedArray[cache_index].data, index);
+			int r = m_extReadFun(m_cachedArray[cache_index].data, index);
+            if(!r)
+            {
+                m_cachedArray[cache_index].data = value_t();
+                m_extWriteFun(m_cachedArray[cache_index].data, index);
+            }
 			return m_cachedArray[cache_index].data;
 		}
     }
 
     void clear()
     {
-        m_data.clear();
+        m_index.clear();
     }
 
 	bool is_element_cached(size_t element_id) const

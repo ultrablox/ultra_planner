@@ -5,7 +5,6 @@
 #include "byte_range.h"
 #include <limits>
 #include <iterator>
-#include <xutility>
 
 struct chain_info_t
 {
@@ -163,7 +162,7 @@ public:
 	//Prefix
 	block_iterator& operator++()
 	{
-		++m_address;
+		++_Base::m_address;
 		return *this;
 	}
 
@@ -178,7 +177,7 @@ public:
 	//Prefix
 	block_iterator& operator--()
 	{
-		--m_address;
+		--_Base::m_address;
 		return *this;
 	}
 
@@ -193,7 +192,7 @@ public:
 
 	block_iterator& operator+=(int delta)
 	{
-		m_address += delta;
+		_Base::m_address += delta;
 		return *this;
 	}
 
@@ -227,7 +226,7 @@ public:
 	//Prefix
 	block_reverse_iterator& operator++()
 	{
-		--m_address;
+		--_Base::m_address;
 		return *this;
 	}
 

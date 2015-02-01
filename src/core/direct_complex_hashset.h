@@ -294,7 +294,7 @@ public:
 		if (start_block_id == std::numeric_limits<size_t>::max())
 		{
 			size_t block_count = 1, last_block_global_id = start_block_id;
-			start_block_id = request_block();
+			start_block_id = this->request_block();
 			size_t local_block_id = m_writeQueueIndex++;
 			m_writeQueue[local_block_id].set_meta(start_block_id, start_block_id, start_block_id, 0);
 
@@ -305,7 +305,7 @@ public:
 				if (m_writeQueue[local_block_id].item_count() == this->m_maxItemsInBlock)
 				{
 					last_block_global_id = m_writeQueue[local_block_id].id;
-					size_t new_block_id = request_block();
+					size_t new_block_id = this->request_block();
 					size_t prev_block_id = local_block_id;
 					local_block_id = m_writeQueueIndex++;
 					m_writeQueue[local_block_id].set_meta(new_block_id, prev_block_id, new_block_id, 0);
@@ -392,7 +392,7 @@ public:
 
 					if (writing_new)
 					{
-						size_t new_block_id = request_block();
+						size_t new_block_id = this->request_block();
 						local_block_id = m_writeQueueIndex++;
 						m_writeQueue[local_block_id].set_meta(new_block_id, m_writeQueue[last_local_block_id].id, new_block_id, 0);
 						m_writeQueue[last_local_block_id].next = m_writeQueue[local_block_id].id;
@@ -403,7 +403,7 @@ public:
 						if (local_block_it == local_blocks.end())
 						{
 							writing_new = true;
-							size_t new_block_id = request_block();
+							size_t new_block_id = this->request_block();
 							local_block_id = m_writeQueueIndex++;
 							m_writeQueue[local_block_id].set_meta(new_block_id, m_writeQueue[last_local_block_id].id, new_block_id, 0);
 							m_writeQueue[last_local_block_id].next = m_writeQueue[local_block_id].id;
@@ -433,7 +433,7 @@ public:
 			gr_end_it = UltraCore::find_group_end(gr_end_it, end, this->m_maxItemsInBlock, [=](const typename It::value_type & val){return hash_fun(val); });
 
 			int block_id = m_writeQueueIndex++;
-			m_writeQueue[block_id].id = request_block();
+			m_writeQueue[block_id].id = this->request_block();
 			m_writeQueue[block_id].prev = std::numeric_limits<size_t>::max();
 			m_writeQueue[block_id].item_count = 0;
 
@@ -451,7 +451,7 @@ public:
 					{
 						prev_block_id = block_id;
 						block_id = m_writeQueueIndex++;
-						m_writeQueue[block_id].id = request_block();
+						m_writeQueue[block_id].id = this->request_block();
 						if (prev_block_id != -1)
 						{
 							m_writeQueue[block_id].item_count = 0;

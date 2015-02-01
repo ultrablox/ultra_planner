@@ -276,7 +276,11 @@ class avl_tree : public binary_tree<T, S, C, E>
 	using _Base = binary_tree<T, S, C, E>;
 	using key_t = typename _Base::key_t;
 	using satelite_data_t = typename _Base::satelite_data_t;
+	using node_t = typename _Base::node_t;
 public:
+	using iterator = typename _Base::iterator;
+
+
 	std::pair<iterator, bool> insert(const std::pair<key_t, satelite_data_t> & val)
 	{
 		auto res = _Base::insert(val);
@@ -285,8 +289,8 @@ public:
 			//Ballance
 			for (node_t * n = res.first.node(); n != nullptr; n = n->parent)
 			{
-				int left_height = subtree_height(n->left),
-					right_height = subtree_height(n->right);
+				int left_height = _Base::subtree_height(n->left),
+					right_height = _Base::subtree_height(n->right);
 
 				if (abs(left_height - right_height) > 1)
 				{
@@ -302,10 +306,10 @@ public:
 						else
 							throw runtime_error("Invalid parent link");
 
-						update_height(par);
+						_Base::update_height(par);
 					}
 					else
-						m_pRoot = ballanced_root;
+						this->m_pRoot = ballanced_root;
 
 					
 
@@ -347,19 +351,19 @@ private:
 		
 		if (node->right)
 		{
-			int h = subtree_height(node->left);
-			if ((subtree_height(node->right->left) == h) && (subtree_height(node->right->right) == h + 1))
+			int h = _Base::subtree_height(node->left);
+			if ((_Base::subtree_height(node->right->left) == h) && (_Base::subtree_height(node->right->right) == h + 1))
 				op = ballance_operation_t::rotate_left;
-			else if ((subtree_height(node->right->right) == h) && ((subtree_height(node->right->right) == h) || (subtree_height(node->right->right) == h + 1)))
+			else if ((_Base::subtree_height(node->right->right) == h) && ((_Base::subtree_height(node->right->right) == h) || (_Base::subtree_height(node->right->right) == h + 1)))
 				op = ballance_operation_t::double_rotate_left;
 		}
 		
 		if (node->left)
 		{
-			int h = subtree_height(node->right);
-			if ((subtree_height(node->left->left) == h + 1) && (subtree_height(node->left->right) == h))
+			int h = _Base::subtree_height(node->right);
+			if ((_Base::subtree_height(node->left->left) == h + 1) && (_Base::subtree_height(node->left->right) == h))
 				op = ballance_operation_t::rotate_right;
-			else if ((subtree_height(node->left->left) == h) && ((subtree_height(node->left->right) == h) || (subtree_height(node->left->right) == h + 1)))
+			else if ((_Base::subtree_height(node->left->left) == h) && ((_Base::subtree_height(node->left->right) == h) || (_Base::subtree_height(node->left->right) == h + 1)))
 				op = ballance_operation_t::double_rotate_right;
 		}
 		
@@ -394,8 +398,8 @@ private:
 			node_B->parent = r;
 
 		//Heights
-		r->height = max(subtree_height(r->left), subtree_height(r->right));
-		x->height = max(subtree_height(x->left), subtree_height(x->right));
+		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
 
 		return x;
 	}
@@ -416,8 +420,8 @@ private:
 			node_B->parent = r;
 
 		//Heights
-		r->height = max(subtree_height(r->left), subtree_height(r->right));
-		x->height = max(subtree_height(x->left), subtree_height(x->right));
+		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
 
 		return x;
 	}
@@ -445,9 +449,9 @@ private:
 			node_C->parent = r;
 
 		//Heights
-		x->height = max(subtree_height(x->left), subtree_height(x->right));
-		r->height = max(subtree_height(r->left), subtree_height(r->right));
-		w->height = max(subtree_height(w->left), subtree_height(w->right));
+		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
+		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		w->height = max(_Base::subtree_height(w->left), _Base::subtree_height(w->right));
 
 		return w;
 	}
@@ -476,9 +480,9 @@ private:
 
 
 		//Heights
-		x->height = max(subtree_height(x->left), subtree_height(x->right));
-		r->height = max(subtree_height(r->left), subtree_height(r->right));
-		w->height = max(subtree_height(w->left), subtree_height(w->right));
+		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
+		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		w->height = max(_Base::subtree_height(w->left), _Base::subtree_height(w->right));
 
 		return w;
 	}

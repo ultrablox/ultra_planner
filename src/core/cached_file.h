@@ -40,8 +40,9 @@ public:
 
 	void push_back(const record_t & record)
 	{
+        size_t new_id = size();
 		m_file.append(record);
-		_Base::operator[](record.id);
+		_Base::operator[](new_id);
 	}
 
 	size_t size() const

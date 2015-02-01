@@ -120,10 +120,10 @@ protected:
 			memset(data, 0, DataSize);
 		}
 
-		int vacant_count(int element_size) const
+		/*int vacant_count(int element_size) const
 		{
 			return DataSize / element_size - item_count;
-		}
+		}*/
 
 		block_iterator begin(int element_size)
 		{
@@ -200,6 +200,7 @@ protected:
 	};
 
 	static_assert(sizeof(block_t) % 128 == 0, "Invalid block_t size!");
+	using wrapper_t = W<typename SG<block_t>::result>;
 
 	struct block_chain_t
 	{
@@ -256,7 +257,7 @@ protected:
 			return m_hb.m_serializedElementSize;
 		}
 
-		typename complex_hashset_base::wrapper_t & blocks_cache()
+		wrapper_t & blocks_cache()
 		{
 			return m_hb.m_blocks;
 		}
@@ -453,7 +454,7 @@ protected:
 		{
 			cout << "Chain (" << m_blockIds.size() << " blocks): ";
 			for (auto it = begin(); it != end(); ++it)
-				cout << (*it).begin_as<size_t>() << ',';
+				cout << (*it).template begin_as<size_t>() << ',';
 			cout << std::endl;
 			//for (auto bid : m_blockIds)
 			//	m_hb.print_block(m_hb.m_blocks[bid]);
@@ -476,7 +477,6 @@ protected:
 	//typedef storage_wrapper<paged_vector_t> wrapper_t;
 
 	//using wrapper_t = typename std::conditional<UseIntMemory, W<int_paged_vector_t>, W<direct_paged_vector_t>>::type;
-	using wrapper_t = W<typename SG<block_t>::result>;
 public:
 	class iterator
 	{
@@ -781,7 +781,7 @@ public:
 			memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
 			byte_range searchin_element_br(&m_elementCache[0], m_serializedElementSize);
 
-			for (; (it != chain.end()) && ((*it).begin_as<size_t>() == hash_val); ++it)
+			for (; (it != chain.end()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
 			{
 				//if (memcmp(&m_elementCache[0], it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
 				if (searchin_element_br == *it)
@@ -802,7 +802,7 @@ public:
 
 	void print_debug()
 	{
-		auto chains = m_index.chains();
+/*		auto chains = m_index.chains();
 		cout << "=========================" << std::endl;
 		cout << "Hashmap contains " << chains.size() << " chains" << std::endl;
 		int i = 0;
@@ -817,7 +817,7 @@ public:
 			}
 			cout << std::endl;
 
-		}
+		}*/
 	}
 protected:
 	bool insert_into_chain(block_chain_t & chain, size_t hash_val, const byte_range & br)
@@ -827,7 +827,7 @@ protected:
 
 		if (it != chain.end())	//If we found element with similar hash, check for duplication
 		{
-			for (; (it != chain.end()) && ((*it).begin_as<size_t>() == hash_val); ++it)
+			for (; (it != chain.end()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
 			{
 				//if (memcmp(br.start + sizeof(size_t), it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
 				if (br == *it)
