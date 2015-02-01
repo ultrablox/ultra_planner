@@ -85,16 +85,14 @@ public:
 		}
 		else
 		{
-			int cache_index = read_into_cache(index);
-			m_index.insert(make_pair(index, cache_index));
+			int cache_index = get_cache_page(index);
 
-			//Read data from file, if it exists
-			int r = m_extReadFun(m_cachedArray[cache_index].data, index);
-            if(!r)
-            {
-                m_cachedArray[cache_index].data = value_t();
-                m_extWriteFun(m_cachedArray[cache_index].data, index);
-            }
+            int r = m_extReadFun(m_cachedArray[cache_index].data, index);
+            if(r)
+                throw runtime_error("I/O error");
+            m_index.insert(make_pair(index, cache_index));
+            //cout << "Readed into " << res_index << " (id=" << m_cachedArray[res_index].data.id << ", prev=" << m_cachedArray[res_index].data.prev << ", next=" << m_cachedArray[res_index].data.next() << ")" << std::endl;
+
 			return m_cachedArray[cache_index].data;
 		}
     }
@@ -108,12 +106,25 @@ public:
 	{
 		return (m_index.find(element_id) != m_index.end());
 	}
+
+    void load(size_t key, const value_t & val)
+    {
+        int cache_index = get_cache_page(key);
+        m_cachedArray[cache_index].data = val;
+        m_index.insert(make_pair(key, cache_index));
+    }
 private:
+
+
     /*
     Inserts cached record with FINUFO and returns index of array.
     */
-	int read_into_cache(size_t block_index)
+	int get_cache_page(size_t block_index)
     {
+        /*cout << "Reading into cache " << block_index << std::endl;
+        if(block_index == std::numeric_limits<size_t>::max())
+            throw runtime_error("Invalid index");*/
+
         bool inserted = false;
         int res_index = -1;
 		size_t old_index = std::numeric_limits<size_t>::max();
@@ -148,13 +159,11 @@ private:
 
 			m_currentCacheIndex = (m_currentCacheIndex + 1) % CacheSize;
 
-			if (m_currentCacheIndex == 0)
-				cout << "Cache loop" << std::endl;
+			//if (m_currentCacheIndex == 0)
+			//	cout << "Cache loop" << std::endl;
         }
 
-		m_extReadFun(m_cachedArray[res_index].data, block_index);
-
-		return res_index;
+        return res_index;
     }
 
 	void kick_element(int cache_index)
@@ -163,7 +172,7 @@ private:
 			m_extWriteFun(m_cachedArray[cache_index].data, m_cachedArray[cache_index].key);
 
 		m_index.erase(m_cachedArray[cache_index].key);
-		m_cachedArray[cache_index].empty = false;
+		m_cachedArray[cache_index].empty = true;
 	}
 public:
 	unsigned int m_currentCacheIndex;

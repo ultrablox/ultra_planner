@@ -79,7 +79,7 @@ public:
 				return false;
 
 			last_id = cur_id;
-			cur_id = m_storage[cur_id].next;
+			cur_id = m_storage[cur_id].next();
 		} while (cur_id != last_id);
 		
 		return true;
@@ -123,7 +123,7 @@ public:
 			do
 			{
 				last_id = cur_id;
-				cur_id = m_storage[cur_id].next;
+				cur_id = m_storage[cur_id].next();
 
 			} while (cur_id != last_id);
 		}

@@ -237,10 +237,9 @@ public:
 
 	int get(size_t index, block_type & data)
     {
+        if (index >= m_blockCount)
+            return 1;
     #ifdef WIN32
-		if (index >= m_blockCount)
-			return 1;
-
 		//seek(index);
 
 		OVERLAPPED ol = { 0 };
@@ -272,6 +271,13 @@ public:
 		bool r = WriteFile(m_hFile, &data, sizeof(block_type), &m_bytesWritten, &ol);
 		if (r)
 			++m_blockCount;
+    #else
+        //cout << "Appending block with ID=" << data.id << std::endl;
+        int r = set(m_blockCount, data);
+        if(r != 0)
+            cout << "Appending failed" << std::endl;
+        else
+            ++m_blockCount;
     #endif
 	}
 

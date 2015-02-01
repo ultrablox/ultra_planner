@@ -270,6 +270,11 @@ protected:
 	equal_t m_eq;
 };
 
+
+/*
+Simpliest AVL-tree base on 
+http://www.cs.unb.ca/tech-reports/documents/TR95_100.pdf
+*/
 template<typename T, typename S, typename C = std::less<T>, typename E = std::equal_to<T>>
 class avl_tree : public binary_tree<T, S, C, E>
 {

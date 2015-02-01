@@ -51,7 +51,9 @@ public:
 
 	void create_mapping(size_t hash_val, const chain_info_t & chain_id)
 	{
-		//cout << "mapping: " << hash_val << std::endl;
+		if(chain_id.first == std::numeric_limits<size_t>::max())
+			throw runtime_error("Invalid mapping");
+		//cout << "mapping: " << hash_val << ", chain:" << chain_id << std::endl;
 		m_rtree.insert(hash_val, chain_id);
 	}
 
@@ -115,7 +117,7 @@ protected:
 		static const size_t DataSize = Size - 3*sizeof(size_t)-sizeof(int);
 
 		block_t(size_t _id = std::numeric_limits<size_t>::max())
-			:m_itemCount(0), id(_id), next(_id), prev(_id)
+			:m_itemCount(0), id(_id), m_next(_id), prev(_id)
 		{
 			memset(data, 0, DataSize);
 		}
@@ -170,12 +172,9 @@ protected:
 		{
 			id = _id;
 			prev = _prev;
-			next = _next;
+			set_next(_next);
 			set_item_count(_item_count);
 		}
-
-		size_t id, next, prev;
-		char data[DataSize];
 
 		void inc_item_count(int delta = 1)
 		{
@@ -194,8 +193,24 @@ protected:
 			//	throw out_of_range("!");
 			m_itemCount = new_count;
 		}
-	private:
+
+		void set_next(size_t new_next)
+		{
+			//cout << "Setting next to " << new_next << std::endl;
+			m_next = new_next;
+		}
+
+		size_t next() const
+		{
+			return m_next;
+		}
+
 		int m_itemCount;
+		char data[DataSize];
+
+		size_t id, prev;
+	private:
+		size_t m_next;
 
 	};
 
@@ -211,9 +226,12 @@ protected:
 			:m_hb(hb), limits(chain_info), m_totalElements(0)
 		{
 			if ((limits.first == std::numeric_limits<size_t>::max()) || (limits.last == std::numeric_limits<size_t>::max()))
+			{
+				//cout << limits << std::endl;
 				throw runtime_error("Invalid chain");
+			}
 			//cout << "Creating chain " << limits.first << "->" << limits.second << std::endl;
-			size_t block_id = limits.first, last_block_id;
+			size_t block_id = limits.first, last_block_id = block_id;
 
 			/*if (hb.m_blocks.chain_in_cache(chain_info))
 			{
@@ -235,12 +253,13 @@ protected:
 				complex_hashset_base::wrapper_t & _blocks = hb.m_blocks;
 				do
 				{
+					//cout << block_id << std::endl;
+
 					last_block_id = block_id;
 					m_blockIds.push_back(block_id);
 					block_t & block_ref = _blocks[block_id];
 					m_totalElements += block_ref.item_count();
-					block_id = block_ref.next;
-					//cout << block_id << std::endl;
+					block_id = block_ref.next();
 				} while (last_block_id != block_id);
 			}
 
@@ -304,16 +323,17 @@ protected:
 
 		void append_new_block()
 		{
+			//cout << "Appending new block..." << std::endl;
 			//limits.last = m_hb.m_blocks.size();
 			limits.last = m_hb.request_block();
 
-			if (limits.last == 76)
-				int x = 0;
+			//if (limits.last == 76)
+			//	int x = 0;
 
 			block_t & new_block = m_hb.m_blocks[limits.last];
 
 			new_block.prev = *m_blockIds.rbegin();
-			m_hb.m_blocks[*m_blockIds.rbegin()].next = new_block.id;
+			m_hb.m_blocks[*m_blockIds.rbegin()].set_next(new_block.id);
 			m_blockIds.push_back(new_block.id);
 
 			++limits.block_count;
@@ -531,6 +551,8 @@ public:
 		//Find appropriate block, create if it does not exists
 		
 		chain_info_t & chain_id = m_index.chain_with_hash(hash_val);
+		//cout << chain_id << std::endl;
+
 		block_chain_t chain(*this, chain_id);
 
 		m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
@@ -930,6 +952,10 @@ protected:
 			if (partitioned_block_number != 0)
 			{
 
+				/*cout << "Ballancing chain: " << chain.limits << std::endl;
+				for(auto bi : chain.m_blockIds)
+					cout << bi << "," << std::endl;*/
+
 				//Fast split the chain
 				chain_info_t new_chain_id;
 				new_chain_id.first = chain.m_blockIds[partitioned_block_number];
@@ -939,7 +965,7 @@ protected:
 
 				chain.limits.last = chain.m_blockIds[partitioned_block_number - 1];
 				chain.limits.block_count = partitioned_block_number;
-				m_blocks[chain.limits.last].next = chain.limits.last;
+				m_blocks[chain.limits.last].set_next(chain.limits.last);
 
 				m_index.create_mapping(m_blocks[new_chain_id.first].first_hash(), new_chain_id);
 			}
@@ -1099,7 +1125,7 @@ protected:
 
 			block_t & block = m_blocks[res];
 			block.id = res;
-			block.next = res;
+			block.set_next(res);
 			block.prev = res;
 
 			return res;
@@ -1108,9 +1134,10 @@ protected:
 
 	void delete_block(size_t block_id)
 	{
+		cout << "Deleting block " << block_id << std::endl;
 		block_t & block = m_blocks[block_id];
 		block.item_count = 0;
-		block.next = std::numeric_limits<size_t>::max();
+		block.set_next(std::numeric_limits<size_t>::max());
 		block.prev = std::numeric_limits<size_t>::max();
 		block.id = std::numeric_limits<size_t>::max();
 

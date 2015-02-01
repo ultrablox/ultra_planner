@@ -42,7 +42,8 @@ public:
 	{
         size_t new_id = size();
 		m_file.append(record);
-		_Base::operator[](new_id);
+        _Base::load(new_id, record);
+		//_Base::operator[](new_id);
 	}
 
 	size_t size() const

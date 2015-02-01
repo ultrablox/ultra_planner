@@ -14,6 +14,12 @@ struct chain_info_t
 
 	size_t first, last, block_count;
 	//size_t _placeholder;
+
+	friend std::ostream & operator<<(std::ostream & os, const chain_info_t & info)
+	{
+		os << "F:" << info.first << ", L:" << info.last << ", count=" << info.block_count << std::endl;
+		return os;
+	}
 };
 
 
