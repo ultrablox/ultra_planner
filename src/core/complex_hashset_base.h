@@ -77,6 +77,7 @@ struct hashset_stats_t
 	double average_chain_length;
 	float density, cache_load;
 	size_t block_count;
+	cached_file_stats_t file_stats;
 
 	friend std::ostream & operator<<(std::ostream & os, const hashset_stats_t & stats)
 	{
@@ -86,6 +87,7 @@ struct hashset_stats_t
 		os << "Block Count: " << stats.block_count << std::endl;
 		os << "I/O request count: " << stats.io_request_count << std::endl;
 		os << "Cache load: " << stats.cache_load * 100.0f << '%' << std::endl;
+		os << stats.file_stats;
 		return os;
 	}
 };
@@ -106,9 +108,11 @@ protected:
 	struct block_t;
 	struct block_chain_t;
 
+	using block_const_iterator = block_iterator<const block_chain_t>;
+	using block_reverse_const_iterator = block_reverse_iterator<const block_chain_t>;
 	using block_iterator = block_iterator<block_chain_t>;
 	using block_reverse_iterator = block_reverse_iterator<block_chain_t>;
-
+	
 	using delayed_buffer_t = delayed_buffer<value_type>;
 
 	struct block_t
@@ -233,7 +237,7 @@ protected:
 			//cout << "Creating chain " << limits.first << "->" << limits.second << std::endl;
 			size_t block_id = limits.first, last_block_id = block_id;
 
-			/*if (hb.m_blocks.chain_in_cache(chain_info))
+			/**/if (hb.m_blocks.chain_in_cache(chain_info))
 			{
 				const complex_hashset_base::wrapper_t & const_blocks = hb.m_blocks;
 				do
@@ -244,11 +248,11 @@ protected:
 					m_totalElements += block_const_ref.item_count();
 
 
-					block_id = block_const_ref.next;
+					block_id = block_const_ref.next();
 					//cout << block_id << std::endl;
 				} while (last_block_id != block_id);
 			}
-			else*/
+			else
 			{
 				complex_hashset_base::wrapper_t & _blocks = hb.m_blocks;
 				do
@@ -276,6 +280,11 @@ protected:
 			return m_hb.m_serializedElementSize;
 		}
 
+		const wrapper_t & blocks_cache() const
+		{
+			return m_hb.m_blocks;
+		}
+
 		wrapper_t & blocks_cache()
 		{
 			return m_hb.m_blocks;
@@ -296,9 +305,19 @@ protected:
 			return block_iterator(this, 0, m_hb.m_maxItemsInBlock);
 		}
 
+		block_const_iterator cbegin() const
+		{
+			return block_const_iterator(this, 0, m_hb.m_maxItemsInBlock);
+		}
+
 		block_iterator end()
 		{
 			return block_iterator(this, m_totalElements, m_hb.m_maxItemsInBlock);
+		}
+
+		block_const_iterator cend() const
+		{
+			return block_const_iterator(this, m_totalElements, m_hb.m_maxItemsInBlock);
 		}
 
 		//Block Id (in global coordinates) + element Id
@@ -552,13 +571,14 @@ public:
 		
 		chain_info_t & chain_id = m_index.chain_with_hash(hash_val);
 		//cout << chain_id << std::endl;
-
+		m_blocks.ensure_chain_in_cache(chain_id);
 		block_chain_t chain(*this, chain_id);
 
 		m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
 		memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
 
 		//chain.print();
+		
 		auto res = insert_into_chain(chain, hash_val, byte_range(&m_elementCache[0], m_serializedElementSize));
 		//chain.print();
 
@@ -761,6 +781,7 @@ public:
 		res.average_chain_length = (double)m_blocks.size() / m_index.size();
 		res.io_request_count = m_blocks.io_request_count();
 		res.cache_load = (float)m_blocks.size() / m_blocks.cache_size();
+		res.file_stats = m_blocks.stats();
 
 		return res;
 	}
@@ -844,12 +865,12 @@ public:
 protected:
 	bool insert_into_chain(block_chain_t & chain, size_t hash_val, const byte_range & br)
 	{
-		auto it = find_first_ge(chain.begin(), chain.end(), hash_val);
+		auto it = find_first_ge(chain.cbegin(), chain.cend(), hash_val);
 
 
-		if (it != chain.end())	//If we found element with similar hash, check for duplication
+		if (it != chain.cend())	//If we found element with similar hash, check for duplication
 		{
-			for (; (it != chain.end()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
+			for (; (it != chain.cend()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
 			{
 				//if (memcmp(br.start + sizeof(size_t), it.value_ptr(), m_valueStreamer.serialized_size()) == 0)	//Duplication detected
 				if (br == *it)
@@ -857,7 +878,7 @@ protected:
 			}
 		}
 
-		chain.insert(it, br);
+		chain.insert(chain.begin() + std::distance(chain.cbegin(), it), br);
 
 		return true;
 	}

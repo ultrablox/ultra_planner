@@ -84,8 +84,44 @@ struct chain_address
 	int block, element, elementsPerBlock;
 };
 
+class block_iterator_abstract_base
+{
+public:
+	block_iterator_abstract_base(int _element_id, int elements_per_block)
+		:m_address(_element_id / elements_per_block, _element_id % elements_per_block, elements_per_block)
+	{}
+
+	const int elementId() const
+	{
+		return m_address.linear_address();
+	}
+
+	block_iterator_abstract_base& operator=(const block_iterator_abstract_base& rhs)
+	{
+		this->m_address = rhs.m_address;
+		return *this;
+	}
+
+	friend bool operator!=(const block_iterator_abstract_base & lhs, const block_iterator_abstract_base & rhs)
+	{
+		return (lhs.m_address != rhs.m_address);
+	}
+
+	friend bool operator==(const block_iterator_abstract_base & lhs, const block_iterator_abstract_base & rhs)
+	{
+		return (lhs.m_address == rhs.m_address);
+	}
+
+	friend size_t operator-(const block_iterator_abstract_base & lhs, const block_iterator_abstract_base & rhs)
+	{
+		return lhs.elementId() - rhs.elementId();
+	}
+protected:
+	chain_address m_address;
+};
+
 template<typename C>
-class block_iterator_base
+class block_iterator_base : public block_iterator_abstract_base
 {
 	using chain_t = C;
 public:
@@ -98,21 +134,8 @@ public:
 	
 
 	block_iterator_base(chain_t * _chain, int _element_id, int elements_per_block)
-		:m_pChain(_chain), /*m_elementId(_element_id), m_elementsPerBlock(elements_per_block),*/ m_address(_element_id / elements_per_block, _element_id % elements_per_block, elements_per_block)
+		:block_iterator_abstract_base(_element_id, elements_per_block), m_pChain(_chain)
 	{}
-
-	const int elementId() const
-	{
-		//return m_elementId;
-		//return m_address.block * m_elementsPerBlock + m_address.element;
-		return m_address.linear_address();
-	}
-
-	block_iterator_base& operator=(const block_iterator_base& rhs)
-	{
-		this->m_address = rhs.m_address;
-		return *this;
-	}
 
 	//Returns byterange to RAM of current element (hash + val)
 	byte_range operator*() const
@@ -128,32 +151,17 @@ public:
 		//if (offset >= block_t::DataSize)
 		//	throw out_of_range("Out of block data");
 
-		return byte_range(m_pChain->blocks_cache()[m_pChain->block_global_address(m_address.block)].data + m_address.element * m_pChain->element_size(), m_pChain->element_size());
+		return byte_range((char*)m_pChain->blocks_cache()[m_pChain->block_global_address(m_address.block)].data + m_address.element * m_pChain->element_size(), m_pChain->element_size());
 	}
 
-	friend bool operator!=(const block_iterator_base & lhs, const block_iterator_base & rhs)
-	{
-		return (lhs.m_address != rhs.m_address);
-	}
-
-	friend bool operator==(const block_iterator_base & lhs, const block_iterator_base & rhs)
-	{
-		return (lhs.m_address == rhs.m_address);
-	}
-
-	friend size_t operator-(const block_iterator_base & lhs, const block_iterator_base & rhs)
-	{
-		return lhs.elementId() - rhs.elementId();
-	}
 protected:
 	chain_t * m_pChain;
 	//size_t m_elementId;
 	//int m_elementsPerBlock;
-	chain_address m_address;
 };
 
 
-template<typename C>
+template<class C>
 class block_iterator : public block_iterator_base<C>
 {
 	using _Base = block_iterator_base<C>;
@@ -213,7 +221,7 @@ public:
 	}
 };
 
-template<typename C>
+template<class C>
 class block_reverse_iterator : public block_iterator_base<C>
 {
 	using _Base = block_iterator_base<C>;

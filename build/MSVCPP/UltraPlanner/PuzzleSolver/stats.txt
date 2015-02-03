@@ -1,10 +1,13 @@
-wall_time:13.2628
+wall_time:37.1001
 plan_length:42
-node_count: 1840416
-Max chain length: 3
-Average chain length: 2.46928
-Density: 76.5395%
-Block Count: 14228
+node_count: 2321121
+Max chain length: 4
+Average chain length: 2.82636
+Density: 79.6754%
+Block Count: 17238
+I/O request count: 0
+Cache load: 6.57578%
+I/O operations (reads/writes): 0/17238
 Search queue layer count: 2
 Search queue secondary node count: 0
 Best priority: 24

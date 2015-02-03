@@ -119,11 +119,17 @@ public:
 			return;
 		else
 		{
+			const storage_t & const_storage = m_storage;
+
 			size_t cur_id = cur_chain.first, last_id = cur_id;
 			do
 			{
 				last_id = cur_id;
-				cur_id = m_storage[cur_id].next();
+
+				if (m_storage.is_element_cached(cur_id))
+					cur_id = const_storage[cur_id].next();
+				else
+					cur_id = m_storage[cur_id].next();
 
 			} while (cur_id != last_id);
 		}
@@ -137,6 +143,11 @@ public:
 	size_t cache_size() const
 	{
 		return storage_t::CacheSize;
+	}
+
+	const cached_file_stats_t & stats() const
+	{
+		return m_storage.stats();
 	}
 
 	std::mutex m_mtx;
@@ -156,7 +167,7 @@ namespace buffered_hashset
 	{
 		using block_t = B;
 		//using result = typename stxxl::VECTOR_GENERATOR<block_t, 1U, 8192U, sizeof(block_t), stxxl::RC, stxxl::lru>::result; //131072U //262144U //65536U //1048576U
-		using result = cached_file<block_t, 262144U>; //131072U //262144U //65536U //1048576U
+		using result = cached_file<block_t, 4096>; //131072U //262144U //65536U //1048576U
 	};
 
 	template<typename B>

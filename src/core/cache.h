@@ -17,10 +17,24 @@ struct cached_record
     using record_t = R;
 
     cached_record()
-		:empty(true), recently_used(1) /*key(std::numeric_limits<size_t>::max()), use_count(0)*/
+		:empty(true), recently_used(1), m_modified(false) /*key(std::numeric_limits<size_t>::max()), use_count(0)*/
     {
     }
 
+	void set_modified()
+	{
+		m_modified = true;
+	}
+
+	void clear_modified()
+	{
+		m_modified = false;
+	}
+
+	bool modified() const
+	{
+		return m_modified;
+	}
     //mutex mtx;
     //std::atomic<int> access_counter;
     
@@ -29,7 +43,8 @@ struct cached_record
 	size_t key;
 	mutable int recently_used;
 	bool empty;
-	mutable bool modified;
+private:
+	bool m_modified;
     
 };
 
@@ -79,7 +94,7 @@ public:
 		//If found - return accessor
 		if (it != m_index.end())
 		{
-			m_cachedArray[it->second].modified = true;
+			m_cachedArray[it->second].set_modified();
 			//++m_cachedArray[it->second].recently_used;
 			return m_cachedArray[it->second].data;
 		}
@@ -92,6 +107,7 @@ public:
                 throw runtime_error("I/O error");
             m_index.insert(make_pair(index, cache_index));
             //cout << "Readed into " << res_index << " (id=" << m_cachedArray[res_index].data.id << ", prev=" << m_cachedArray[res_index].data.prev << ", next=" << m_cachedArray[res_index].data.next() << ")" << std::endl;
+			m_cachedArray[cache_index].clear_modified();
 
 			return m_cachedArray[cache_index].data;
 		}
@@ -137,7 +153,7 @@ private:
 				cur_rec.empty = false;
 				cur_rec.recently_used = 1;
 				cur_rec.key = block_index;
-				cur_rec.modified = false;
+				cur_rec.clear_modified();
                 res_index = m_currentCacheIndex;
                 inserted = true;
             }
@@ -151,7 +167,7 @@ private:
 					cur_rec.empty = false;
 					cur_rec.recently_used = 1;
 					cur_rec.key = block_index;
-					cur_rec.modified = false;
+					cur_rec.clear_modified();
 					res_index = m_currentCacheIndex;
 					inserted = true;
 				}
@@ -168,7 +184,7 @@ private:
 
 	void kick_element(int cache_index)
 	{
-		if (m_cachedArray[cache_index].modified)
+		if (m_cachedArray[cache_index].modified())
 			m_extWriteFun(m_cachedArray[cache_index].data, m_cachedArray[cache_index].key);
 
 		m_index.erase(m_cachedArray[cache_index].key);
