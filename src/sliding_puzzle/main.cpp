@@ -75,7 +75,7 @@ private:
 
 			std::ofstream monitor_data("monitoring_data.csv", std::ofstream::out);
 
-			monitor_data << "Time,s;Merging Speed,nodes/sec;Cache Load,%;" << std::endl;
+			monitor_data << "Time,s;Merging Speed,nodes/sec;Cache Load,%;Nodes Merged;" << std::endl;
 
 			std::chrono::milliseconds print_dura(10000);
 			std::chrono::milliseconds dura(500);
@@ -109,7 +109,7 @@ private:
 
 					//Output to monitoring data
 					auto cur_tp = std::chrono::steady_clock::now();
-					monitor_data << std::chrono::duration_cast<std::chrono::seconds>(cur_tp - begin_tp).count() << ';' << merge_speed << ';' << stats.storage_stats[0].cache_load * 100.0f << ';' << std::endl;
+					monitor_data << std::chrono::duration_cast<std::chrono::seconds>(cur_tp - begin_tp).count() << ';' << merge_speed << ';' << stats.storage_stats[0].cache_load * 100.0f << ';' << explored_node_count << ';' << std::endl;
 				}
 
 				std::this_thread::sleep_for(dura);

@@ -25,13 +25,13 @@ struct astar_node_priority_cmp
 	}
 };
 
-//#define ASTAR_BASE buffered_heuristic_engine
-#define ASTAR_BASE heuristic_engine
+#define ASTAR_BASE buffered_heuristic_engine
+//#define ASTAR_BASE heuristic_engine
 
 template<typename Gr, typename H, bool ExtMemory>
-class astar_engine : public ASTAR_BASE<Gr, astar_node_priority_cmp, H, ExtMemory>
+class astar_engine : public ASTAR_BASE<Gr, astar_node_priority_cmp, H, ExtMemory, hashset_t::Delayed>
 {
-	using _Base = ASTAR_BASE<Gr, astar_node_priority_cmp, H, ExtMemory>;
+	using _Base = ASTAR_BASE<Gr, astar_node_priority_cmp, H, ExtMemory, hashset_t::Delayed>;
 public:
 	astar_engine(Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)
 		:_Base(graph, vstreamer)

@@ -5,10 +5,10 @@
 #include "queued_engine.h"
 
 template<typename Gr, template<typename> class Cmp>
-class blind_engine : public queued_search_engine<Gr, Cmp>
+class blind_engine : public queued_search_engine<Gr, Cmp, false, hashset_t::Buffered>
 {
 	using graph_t = Gr;
-	typedef queued_search_engine<Gr, Cmp> _Base;
+	typedef queued_search_engine<Gr, Cmp, false, hashset_t::Buffered> _Base;
 	using state_t = typename _Base::state_t;
 //	using comparison_t = typename _Base::comparison_t;
 	using search_node_t = typename _Base::search_node_t;
@@ -21,7 +21,7 @@ public:
 
 	//Returns true, if found.
 	//template<typename GraphT>
-	bool operator()(graph_t & graph, state_t init_node, std::function<bool(const state_t & node)> goal_check_fun, std::vector<state_t> & solution_path)
+	bool operator()(graph_t & graph, const state_t & init_node, std::function<bool(const state_t & node)> goal_check_fun, std::vector<state_t> & solution_path)
 	{
 		enqueue(goal_check_fun, create_node(init_node, 0), node_estimation_t(0, 0));
 
@@ -47,13 +47,13 @@ public:
 
 };
 
-template<typename Gr, template<typename> class Cmp, typename H, bool ExtMemory>
-class heuristic_engine : public queued_search_engine<Gr, Cmp, ExtMemory, true>
+template<typename Gr, template<typename> class Cmp, typename H, bool ExtMemory, hashset_t StorageType>
+class heuristic_engine : public queued_search_engine<Gr, Cmp, ExtMemory, StorageType>
 {
 	//using priority_t = template<typename> Cmp;
 	using graph_t = Gr;
 	typedef float estimation_t;
-	typedef queued_search_engine<Gr, Cmp, ExtMemory> _Base;
+	typedef queued_search_engine<Gr, Cmp, ExtMemory, StorageType> _Base;
 	typedef H heuristic_t;
 	using search_node_t = typename _Base::search_node_t;
 	using state_t = typename _Base::state_t;
@@ -70,6 +70,7 @@ public:
 		heuristic_t h_fun(graph.transition_system());
 
 		this->enqueue(is_goal_fun, this->create_node(init_state, 0), node_estimation_t(0, h_fun(init_state)));
+		this->m_database.add(init_state, [=](const state_t & state){});
 
 		float best_data = std::numeric_limits<float>::max();
 		//comparison_t current_data;
@@ -96,10 +97,10 @@ public:
 	}
 };
 
-template<typename Gr, template<typename> class Cmp, typename H, bool ExtMemory>
-class buffered_heuristic_engine : public queued_search_engine<Gr, Cmp, ExtMemory, true>
+template<typename Gr, template<typename> class Cmp, typename H, bool ExtMemory, hashset_t StorageType>
+class buffered_heuristic_engine : public queued_search_engine<Gr, Cmp, ExtMemory, StorageType>
 {
-	using _Base = queued_search_engine<Gr, Cmp, ExtMemory, true>;
+	using _Base = queued_search_engine<Gr, Cmp, ExtMemory, StorageType>;
 	using graph_t = Gr;
 	typedef H heuristic_t;
 	using search_node_t = typename _Base::search_node_t;
@@ -118,6 +119,7 @@ public:
 		cout << "Initial heuristic estimation " << initial_est << std::endl;
 
 		this->enqueue(is_goal_fun, this->create_node(init_state, 0), node_estimation_t(0, initial_est));
+		this->m_database.add_delayed(init_state, [=](const state_t & state){});
 
 		float best_data = std::numeric_limits<float>::max();
 		

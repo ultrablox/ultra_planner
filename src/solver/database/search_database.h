@@ -3,8 +3,7 @@
 #define UltraSolver_search_database_h
 
 #include <core/complex_vector.h>
-#include <core/direct_complex_hashset.h>
-#include <core/buffered_complex_hashset.h>
+#include <core/complex_hashset/generator.h>
 #include <utility>
 #include <unordered_set>
 #include <type_traits>
@@ -35,7 +34,7 @@ private:
 };
 
 
-template<typename T, typename S, typename H = std::hash<T>, bool ExtMemory = false, bool RAMBuffered = true, int StorageCount = 1>
+template<typename T, typename S, typename H = std::hash<T>, bool ExtMemory = false, hashset_t StorageType = hashset_t::Internal, int StorageCount = 1>
 class search_database
 {
 	typedef T state_t;
@@ -43,10 +42,11 @@ class search_database
 	typedef H hash_t;
 	typedef std::tuple<size_t, state_t> record_t;
 	//typedef std::unordered_set<state_t> hash_map_t;
-	typedef direct_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> direct_hash_map_t;
-	typedef buffered_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> buffered_hash_map_t;
+	//typedef direct_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> direct_hash_map_t;
+	//typedef buffered_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> buffered_hash_map_t;
 
-	typedef typename std::conditional<RAMBuffered, buffered_hash_map_t, direct_hash_map_t>::type hash_map_t;
+	//typedef typename std::conditional<true, buffered_hash_map_t, direct_hash_map_t>::type hash_map_t;
+	using hash_map_t = typename hashset_generator<state_t, state_streamer_t, hash_t>::generate<StorageType>::result;
 	const int storage_count = StorageCount;
 
 	
@@ -214,8 +214,8 @@ public:
 			auto gr_begin = begin + group_start[i],
 				gr_end = begin + group_start[i+1];
 
-			if (gr_begin != gr_end)
-				m_storages[i].insert_range(gr_begin, gr_end, hash_fun, val_fun, call_fun);
+//			if (gr_begin != gr_end)
+//				m_storages[i].insert_range(gr_begin, gr_end, hash_fun, val_fun, call_fun);
 		}
 	}
 

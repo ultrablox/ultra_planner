@@ -5,9 +5,10 @@
 
 #include "streamer.h"
 #include <stxxl/stack>
+#include <stack>
 #include <stdexcept>
 
-template<typename T, typename S = base_type_streamer<T>, unsigned int BlockSize = 8192>
+template<typename T, typename S = base_type_streamer<T>, unsigned int BlockSize = 8192, bool ExtMemory = true>
 class complex_stack
 {
 	using value_type = T;
@@ -26,7 +27,7 @@ class complex_stack
 		char data[DataSize];
 	};
 
-	typedef typename stxxl::STACK_GENERATOR<block_t>::result base_container_t;
+	typedef typename std::conditional<ExtMemory, typename stxxl::STACK_GENERATOR<block_t>::result, std::stack<block_t>>::type base_container_t;
 
 public:
 	complex_stack(const streamer_t & streamer)

@@ -286,14 +286,18 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\core\avl_tree.h" />
     <ClInclude Include="..\..\..\..\src\core\bdd_map.h" />
-    <ClInclude Include="..\..\..\..\src\core\block_chain.h" />
-    <ClInclude Include="..\..\..\..\src\core\buffered_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\byte_range.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\block.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\block_chain.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\buffered_complex_hashset.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\complex_hashset_base.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\delayed_complex_hashset.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\direct_complex_hashset.h" />
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\generator.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_queue.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_stack.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_vector.h" />
     <ClInclude Include="..\..\..\..\src\core\delayed_buffer.h" />
-    <ClInclude Include="..\..\..\..\src\core\direct_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h" />
@@ -302,7 +306,6 @@
     <ClInclude Include="..\..\..\..\src\core\algorithm\sort.h" />
     <ClInclude Include="..\..\..\..\src\core\cache.h" />
     <ClInclude Include="..\..\..\..\src\core\cached_file.h" />
-    <ClInclude Include="..\..\..\..\src\core\complex_hashset_base.h" />
     <ClInclude Include="..\..\..\..\src\core\config.h" />
     <ClInclude Include="..\..\..\..\src\core\data_file.h" />
     <ClInclude Include="..\..\..\..\src\core\streamer.h" />

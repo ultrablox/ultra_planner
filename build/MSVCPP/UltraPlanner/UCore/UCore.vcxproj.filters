@@ -31,6 +31,9 @@
     <Filter Include="src\expression">
       <UniqueIdentifier>{dae2f150-2898-4a6a-aede-a6e235f379b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\complex_hashset">
+      <UniqueIdentifier>{7d5bd49f-963b-4382-963e-dedd239b0268}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp">
@@ -116,15 +119,6 @@
     <ClInclude Include="..\..\..\..\src\core\algorithm\merge.h">
       <Filter>src\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\buffered_complex_hashset.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\direct_complex_hashset.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\complex_hashset_base.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\complex_vector.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -152,11 +146,29 @@
     <ClInclude Include="..\..\..\..\src\core\complex_stack.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\block_chain.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\delayed_buffer.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\buffered_complex_hashset.h">
+      <Filter>src\complex_hashset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\complex_hashset_base.h">
+      <Filter>src\complex_hashset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\delayed_complex_hashset.h">
+      <Filter>src\complex_hashset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\direct_complex_hashset.h">
+      <Filter>src\complex_hashset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\generator.h">
+      <Filter>src\complex_hashset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\block_chain.h">
+      <Filter>src\complex_hashset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\complex_hashset\block.h">
+      <Filter>src\complex_hashset</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

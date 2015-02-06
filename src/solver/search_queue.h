@@ -34,7 +34,7 @@ struct node_estimation_t
 	float heuristic_estimation;	//Estimation of the left path (based on heuristic)
 };
 
-template<typename T, typename C, typename S>
+template<typename T, typename C, typename S, bool ExtMemory>
 class search_queue
 {
 public:
@@ -81,7 +81,7 @@ public:
 		size_t m_serializedSize;
 	};
 
-	using layer_container_t = complex_stack<combined_value_t, combined_val_streamer_t>;
+	using layer_container_t = complex_stack<combined_value_t, combined_val_streamer_t, 8192U, ExtMemory>;
 public:
 
 	search_queue(const value_streamer & node_streamer)

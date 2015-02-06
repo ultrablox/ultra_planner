@@ -5,7 +5,7 @@
 #include "../database/search_database.h"
 
 //template<typename N, bool ExtMemory>
-template<typename Gr, bool ExtMemory, bool RAMBuffered>
+template<typename Gr, bool ExtMemory, hashset_t StorageType>
 class search_engine_base
 {
 protected:
@@ -15,7 +15,7 @@ protected:
 	using state_streamer_t = typename Gr::vertex_streamer_t;
 
 	//typedef simple_search_database<state_t> search_database_t;
-	typedef search_database<state_t, state_streamer_t, std::hash<state_t>, ExtMemory, RAMBuffered> search_database_t;
+	typedef search_database<state_t, state_streamer_t, std::hash<state_t>, ExtMemory, StorageType> search_database_t;
 
 	//Id + parent search node id + state + init->current path length
 	typedef typename search_database_t::search_node_t search_node_t;

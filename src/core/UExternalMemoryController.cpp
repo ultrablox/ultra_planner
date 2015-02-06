@@ -28,14 +28,14 @@ UExternalMemoryController::UExternalMemoryController(const std::string & ignored
 
 #ifdef WIN32
 	//std::string drive_letters[] = { "C:/temp"};
-	//std::string drive_letters[] = { "D:"};
-	std::string drive_letters[] = { "D:", "F:", "G:" };
+	std::string drive_letters[] = { "D:"};
+	//std::string drive_letters[] = { "D:", "F:", "G:" };
 #elif defined(__APPLE__)
 	std::string drive_letters[] = {"/Volumes/HDD/Users/ultrablox/Projects/ultra_planner/bin/osx"};
 #endif
 	for (auto drive : drive_letters)
 	{
-		for (int i = 0; i < 1; ++i)
+		for (int i = 0; i < 4; ++i)
 		{
 			size_t disc_space_size = 8ULL * 1024 * 1024 * 1024;
 		#ifdef WIN32

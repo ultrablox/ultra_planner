@@ -1,14 +1,14 @@
-wall_time:37.1001
-plan_length:42
-node_count: 2321121
-Max chain length: 4
-Average chain length: 2.82636
-Density: 79.6754%
-Block Count: 17238
-I/O request count: 0
-Cache load: 6.57578%
-I/O operations (reads/writes): 0/17238
-Search queue layer count: 2
+wall_time:0.005
+plan_length:0
+node_count: 0
+Max chain length: 0
+Average chain length: -1.#IND
+Density: -1.#IND%
+Block Count: 0
+I/O request count: -858993460
+Cache load: -1.#IND%
+I/O operations (reads/writes): 0/0
+Search queue layer count: 0
 Search queue secondary node count: 0
-Best priority: 24
-Max distance from initial: 42
+Best priority: 41
+Max distance from initial: 0

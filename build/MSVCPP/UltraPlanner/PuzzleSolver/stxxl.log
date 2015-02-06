@@ -1,2 +1,6 @@
 [STXXL-MSG] STXXL v1.4.99 (prerelease/) (git c92521a91aedb950d57cd7e0f596cc622f2e67c8)
-[STXXL-MSG] Disk 'D:\Temp\stxxl.tmp' is allocated, space: 1000 MiB, I/O implementation: wincall autogrow delete_on_exit queue=0 devid=0
+[STXXL-MSG] Disk 'D:/stxxl_0.tmp' is allocated, space: 8192 MiB, I/O implementation: wincall queue=0 devid=0
+[STXXL-MSG] Disk 'D:/stxxl_1.tmp' is allocated, space: 8192 MiB, I/O implementation: wincall queue=1 devid=1
+[STXXL-MSG] Disk 'D:/stxxl_2.tmp' is allocated, space: 8192 MiB, I/O implementation: wincall queue=2 devid=2
+[STXXL-MSG] Disk 'D:/stxxl_3.tmp' is allocated, space: 8192 MiB, I/O implementation: wincall queue=3 devid=3
+[STXXL-MSG] In total 4 disks are allocated, space: 32768 MiB

@@ -19,10 +19,10 @@ struct batched_priority_cmp
 };
 
 template<typename Gr, typename H, bool ExtMemory>
-class batched_engine : public queued_search_engine<Gr, batched_priority_cmp, ExtMemory>
+class batched_engine : public queued_search_engine<Gr, batched_priority_cmp, ExtMemory, hashset_t::Delayed>
 {
 	typedef batched_engine<Gr, H, ExtMemory> _Self;
-	typedef queued_search_engine<Gr, batched_priority_cmp, ExtMemory> _Base;
+	typedef queued_search_engine<Gr, batched_priority_cmp, ExtMemory, hashset_t::Delayed> _Base;
 	typedef float estimation_t;
 	typedef H heuristic_t;
 	typedef typename _Base::state_t state_t;

@@ -17,7 +17,7 @@ struct cached_record
     using record_t = R;
 
     cached_record()
-		:empty(true), recently_used(1), m_modified(false) /*key(std::numeric_limits<size_t>::max()), use_count(0)*/
+		:empty(true), recently_used(1), m_modified(false), use_counter(0) /*key(std::numeric_limits<size_t>::max()), use_count(0)*/
     {
     }
 
@@ -43,6 +43,7 @@ struct cached_record
 	size_t key;
 	mutable int recently_used;
 	bool empty;
+	int use_counter;
 private:
 	bool m_modified;
     
@@ -94,7 +95,7 @@ public:
 		//If found - return accessor
 		if (it != m_index.end())
 		{
-			m_cachedArray[it->second].set_modified();
+			//m_cachedArray[it->second].set_modified();
 			//++m_cachedArray[it->second].recently_used;
 			return m_cachedArray[it->second].data;
 		}
@@ -112,6 +113,36 @@ public:
 			return m_cachedArray[cache_index].data;
 		}
     }
+
+	void set_modified(size_t index)
+	{
+		auto it = m_index.find(index);
+#if _DEBUG
+		if (it == m_index.end())
+			throw runtime_error("Unable to mark modified not cached element");
+#endif
+		m_cachedArray[it->second].set_modified();
+	}
+
+	void mark_used(size_t index)
+	{
+		auto it = m_index.find(index);
+#if _DEBUG
+		if (it == m_index.end())
+			throw runtime_error("Unable to mark used not cached element");
+#endif
+		++m_cachedArray[it->second].use_counter;
+	}
+
+	void clear_used(size_t index)
+	{
+		auto it = m_index.find(index);
+#if _DEBUG
+		if (it == m_index.end())
+			throw runtime_error("Unable to clear used for not cached element");
+#endif
+		--m_cachedArray[it->second].use_counter;
+	}
 
     void clear()
     {
@@ -159,17 +190,20 @@ private:
             }
             else
             {
-				if (cur_rec.recently_used > 0)
-					--cur_rec.recently_used;
-				else
+				if (cur_rec.use_counter == 0)
 				{
-					kick_element(m_currentCacheIndex);
-					cur_rec.empty = false;
-					cur_rec.recently_used = 1;
-					cur_rec.key = block_index;
-					cur_rec.clear_modified();
-					res_index = m_currentCacheIndex;
-					inserted = true;
+					if (cur_rec.recently_used > 0)
+						--cur_rec.recently_used;
+					else
+					{
+						kick_element(m_currentCacheIndex);
+						cur_rec.empty = false;
+						cur_rec.recently_used = 1;
+						cur_rec.key = block_index;
+						cur_rec.clear_modified();
+						res_index = m_currentCacheIndex;
+						inserted = true;
+					}
 				}
             }
 

@@ -16,9 +16,9 @@ struct greedy_bfs_node_priority_cmp
 };
 
 template<typename Gr, typename H, bool ExtMemory>
-class greedy_bfs_engine : public heuristic_engine<Gr, greedy_bfs_node_priority_cmp, H, ExtMemory>
+class greedy_bfs_engine : public heuristic_engine<Gr, greedy_bfs_node_priority_cmp, H, ExtMemory, hashset_t::Buffered>
 {
-	using _Base = heuristic_engine<Gr, greedy_bfs_node_priority_cmp, H, ExtMemory>;
+	using _Base = heuristic_engine<Gr, greedy_bfs_node_priority_cmp, H, ExtMemory, hashset_t::Buffered>;
 public:
 	//template<typename Gr>
 	greedy_bfs_engine(Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)

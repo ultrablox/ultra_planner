@@ -6,29 +6,37 @@
 #include <unordered_map>
 
 template<typename T>
-class delayed_buffer
+struct insertion_request
 {
 	using value_type = T;
 
-public:
-	struct insertion_request_t
+	using callback_t = std::function<void(const value_type & val)>;
+
+	insertion_request()
+	{}
+
+	insertion_request(size_t _hash_val, const value_type & _val, callback_t _callback, size_t serialized_element_size)
+		:val(_val), callback(_callback), hash_val(_hash_val), serialized_val(serialized_element_size)
+	{}
+
+	byte_range to_byte_range() const
 	{
-		using callback_t = std::function<void(const value_type & val)>;
+		return byte_range((char*)&serialized_val[0], serialized_val.size());
+	}
 
-		insertion_request_t(size_t _hash_val, const value_type & _val, callback_t _callback, size_t serialized_element_size)
-			:val(_val), callback(_callback), hash_val(_hash_val), serialized_val(serialized_element_size)
-		{}
+	size_t hash_val;
+	value_type val;
+	callback_t callback;
+	std::vector<char> serialized_val;
+};
 
-		byte_range to_byte_range() const
-		{
-			return byte_range((char*)&serialized_val[0], serialized_val.size());
-		}
-
-		size_t hash_val;
-		value_type val;
-		callback_t callback;
-		std::vector<char> serialized_val;
-	};
+template<typename T>
+class delayed_buffer
+{
+	using value_type = T;
+	using insertion_request_t = insertion_request<T>;
+public:
+	
 
 	struct request_cmp_t
 	{

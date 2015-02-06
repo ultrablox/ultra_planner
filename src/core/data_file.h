@@ -29,13 +29,15 @@ Linear container of fixed-length data elements.
 template<typename T>
 class data_file
 {
-    using block_type = T;
+    
 	
     //using data_vec_t = std::vector<block_type>;
 
 //    static_assert((sizeof(block_type) % 4096) == 0, "ERROR: user_record_data size is not 4K/divisible");
 public:
+	using block_type = T;
 	using value_type = block_type;
+	using block_t = block_type;
 
     data_file(const std::string & file_name = "unnamed")
 		:m_fileName(file_name), m_blockCount(0)
@@ -294,6 +296,10 @@ public:
             cout << "Unable to truncate file!" << std::endl;*/
     }
 
+	int cache_size() const
+	{
+		return 0;
+	}
 private:
 	void seek(size_t index)
 	{

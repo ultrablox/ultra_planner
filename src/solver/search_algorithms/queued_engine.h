@@ -6,19 +6,17 @@
 #include "../search_queue.h"
 #include <queue>
 
-template<typename Gr, /*typename M,*/ template<typename> class Cmp, bool ExtMemory = false, bool RAMBuffered = true>
-class queued_search_engine : public search_engine_base<Gr, ExtMemory, RAMBuffered>
+template<typename Gr, template<typename> class Cmp, bool ExtMemory, hashset_t StorageType>
+class queued_search_engine : public search_engine_base<Gr, ExtMemory, StorageType>
 {
 protected:
-	typedef search_engine_base<Gr, ExtMemory, RAMBuffered> _Base;
+	typedef search_engine_base<Gr, ExtMemory, StorageType> _Base;
 	using graph_t = Gr;
-	
-	//typedef M element_meta_t;
 	using search_node_t = typename _Base::search_node_t;
 	
 	
 public:
-	using open_list_t = search_queue<search_node_t, Cmp<node_estimation_t>, typename _Base::node_streamer_t>;
+	using open_list_t = search_queue<search_node_t, Cmp<node_estimation_t>, typename _Base::node_streamer_t, ExtMemory>;
 	using open_list_el_t = typename open_list_t::combined_value_t;
 
 	//template<typename Gr>
