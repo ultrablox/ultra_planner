@@ -151,8 +151,12 @@ public:
 			bool res = m_primaryData.empty() ? true : m_cmp(val.first, m_primaryData.begin()->first);
 			m_primaryData.insert(make_pair(val.first, new layer_container_t(m_nodeStreamer, val)));
 
+#if _DEBUG
 			if (res)
-				cout << "Added layer with best estimation: " << val.first << std::endl;
+			{
+				//cout << "Added layer with best estimation: " << val.first << std::endl;
+			}
+#endif
 			return res;
 
 			/*else if (m_primaryData.size() < MaxPrimaryLayers)
@@ -284,7 +288,9 @@ public:
 
 		if (it->second->empty())
 		{
-			cout << "Layer with estimation " << it->first << " expanded" << std::endl;
+#if _DEBUG
+//			cout << "Layer with estimation " << it->first << " expanded" << std::endl;
+#endif
 			delete it->second;
 			m_primaryData.erase(it);
 		}

@@ -5,6 +5,7 @@
 #include "../byte_range.h"
 #include <limits>
 #include <iterator>
+#include <vector>
 
 struct chain_info_t
 {
@@ -445,28 +446,29 @@ public:
 	{
 		if (new_size > m_totalElements)
 		{
-			size_t max_elements_in_current_chain = m_hb.m_maxItemsInBlock * limits.block_count;
+			size_t max_elements_in_current_chain = m_maxItemsInBlock * limits.block_count;
 			if (new_size <= max_elements_in_current_chain)
 			{
-				m_hb.m_blocks[limits.last].inc_item_count(new_size - m_totalElements);
+				m_blocksData.rbegin()->pBlock->inc_item_count(new_size - m_totalElements); // m_hb.m_blocks[limits.last].inc_item_count(new_size - m_totalElements);
 				m_totalElements = new_size;
 			}
 			else
 			{
 				size_t extra_size = new_size - max_elements_in_current_chain;
 				m_totalElements = max_elements_in_current_chain;
-				m_hb.m_blocks[limits.last].set_item_count(m_hb.m_maxItemsInBlock);
+
+				m_blocksData.rbegin()->pBlock->set_item_count(m_maxItemsInBlock);// m_hb.m_blocks[limits.last].set_item_count(m_hb.m_maxItemsInBlock);
 
 				while (extra_size > 0)
 				{
 					append_new_block(fun);
-					block_t & new_block = m_hb.m_blocks[limits.last];
+					block_t & new_block = *m_blocksData.rbegin()->pBlock;//m_hb.m_blocks[limits.last];
 
-					if (extra_size > m_hb.m_maxItemsInBlock)
+					if (extra_size > m_maxItemsInBlock)
 					{
-						new_block.set_item_count(m_hb.m_maxItemsInBlock);
-						extra_size -= m_hb.m_maxItemsInBlock;
-						m_totalElements += m_hb.m_maxItemsInBlock;
+						new_block.set_item_count(m_maxItemsInBlock);
+						extra_size -= m_maxItemsInBlock;
+						m_totalElements += m_maxItemsInBlock;
 					}
 					else
 					{
@@ -512,11 +514,23 @@ public:
 	*/
 	int partitioned_block()
 	{
+		int best_succ_block = 0, best_block = m_blocksData.size() / 2;
 		for (int i = 1; i < m_blocksData.size(); ++i)
 		{
 			if (m_blocksData[i].pBlock->first_hash() != m_blocksData[i - 1].pBlock->last_hash(element_size()))
-				return i;
+				best_succ_block = abs(i - best_block) < abs(best_succ_block - best_block) ? i : best_succ_block;
 		}
+
+		return best_succ_block;
+		/*
+
+		*/
+
+		/*for (int i = m_blocksData.size() - 1; i > 0; --i)
+		{
+			if (m_blocksData[i].pBlock->first_hash() != m_blocksData[i - 1].pBlock->last_hash(element_size()))
+				return i;
+		}*/
 
 		return 0;
 	}
@@ -587,7 +601,7 @@ public:
 	//complex_hashset_base & m_hb;
 	size_t m_totalElements;
 	//vector<size_t> m_blockIds;
-	vector<block_info_t> m_blocksData;
+	std::vector<block_info_t> m_blocksData;
 	int m_maxItemsInBlock;
 	const value_streamer_t & m_valueStreamer;
 //	block_storage_t & m_blocksStorage;

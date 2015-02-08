@@ -1,12 +1,12 @@
-wall_time:0.005
+wall_time:2.20513
 plan_length:0
 node_count: 0
-Max chain length: 0
-Average chain length: -1.#IND
-Density: -1.#IND%
-Block Count: 0
+Max chain length: 1
+Average chain length: 1
+Density: 0%
+Block Count: 1
 I/O request count: -858993460
-Cache load: -1.#IND%
+Cache load: 1.#INF%
 I/O operations (reads/writes): 0/0
 Search queue layer count: 0
 Search queue secondary node count: 0

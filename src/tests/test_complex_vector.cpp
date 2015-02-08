@@ -3,8 +3,7 @@
 #include <core/complex_vector.h>
 #include <core/complex_queue.h>
 #include <core/complex_stack.h>
-#include <core/direct_complex_hashset.h>
-#include <core/buffered_complex_hashset.h>
+#include <core/complex_hashset/generator.h>
 #include <random>
 #include <chrono>
 #include <unordered_set>
@@ -208,7 +207,8 @@ void test_complex_hashmap()
 		auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
 		std::unordered_set<complex_element> correct_set;
 	
-		buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);	
+		//buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);	
+		hashset_generator<complex_element, complex_element_streamer, std::hash<complex_element>>::generate<hashset_t::Buffered>::result hset(streamer);
 
 		int count = 0;
 		//Insertion test
@@ -237,7 +237,7 @@ void test_complex_hashmap()
 			assert_test(crct, "Complex hashset insertion");
 			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
 		}
-
+		
 
 		assert_test(hset.size() == correct_set.size(), "Complex hashset size");
 
@@ -258,14 +258,13 @@ void test_complex_hashmap()
 
 	//Tets add delayed
 	{
-		buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);
-
+		
 		{
 			auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
 
 			std::unordered_set<complex_element> correct_set;
 
-			buffered_complex_hashset<complex_element, complex_element_streamer, std::hash<complex_element>, true, 128U> hset(streamer);
+			hashset_generator<complex_element, complex_element_streamer, std::hash<complex_element>>::generate<hashset_t::Delayed>::result hset(streamer);
 
 			int count = 0;
 			//Insertion test
@@ -293,7 +292,7 @@ void test_complex_hashmap()
 			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
 
 
-			itt = hset.find(324);
+	//		itt = hset.find(324);
 
 			//Find test
 			for (int i = 0; i < 2000; ++i)
@@ -311,10 +310,10 @@ void test_complex_hashmap()
 			}
 		}
 	}
-
+	
 	//Test add_range
 	{
-		complex_element_streamer streamer;
+/*		complex_element_streamer streamer;
 		direct_complex_hashset<complex_element, complex_element_streamer, std::hash<complex_element>, true, 4096U> hset(streamer);
 
 		std::unordered_set<complex_element> correct_set;
@@ -342,9 +341,9 @@ void test_complex_hashmap()
 				correct_set.insert(begin_it, end_it);
 			}
 		}
-
-		assert_test(hset.size() == correct_set.size(), "Complex hashset insert range");
 		
+		assert_test(hset.size() == correct_set.size(), "Complex hashset insert range");
+		*/
 	}
 }
 

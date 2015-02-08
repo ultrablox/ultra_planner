@@ -257,12 +257,28 @@ class buffered_complex_hashset : public complex_hashset_base<T, S, W, H>
 
 		~block_chain_t()
 		{
-			for (block_info_t & bd : m_blocksData)
+			remove_last_blocks(m_blocksData.size());
+			/*for (block_info_t & bd : m_blocksData)
 			{
 				if (bd.modified)
 					m_blocksStorage.set_modified(bd.pBlock->meta.id);
 				m_blocksStorage.clear_used(bd.pBlock->meta.id);
+			}*/
+		}
+
+		void remove_last_blocks(int count)
+		{
+			for (int i = 0; i < count; ++i)
+			{
+				int idx = m_blocksData.size() - i - 1;
+				block_info_t & bd = m_blocksData[idx];
+
+				if (bd.modified)
+					m_blocksStorage.set_modified(bd.pBlock->meta.id);
+				m_blocksStorage.clear_used(bd.pBlock->meta.id);
 			}
+
+			m_blocksData.resize(m_blocksData.size() - count);
 		}
 	private:
 		storage_t & m_blocksStorage;
@@ -313,7 +329,9 @@ public:
 
 		if (res)
 		{
-			try_ballance_chain(chain);
+			chain_info_t new_chain_info;
+			if (try_ballance_chain(chain, new_chain_info))
+				m_index.create_mapping(m_blocks[new_chain_info.first].first_hash(), new_chain_info);
 			++m_size;
 		}
 
@@ -324,27 +342,9 @@ public:
 	{
 		size_t hash_val = m_hasher(val);
 
-		block_chain_t chain(*this, m_index.chain_with_hash(hash_val));
-		auto it = find_first_ge(chain.begin(), chain.end(), hash_val);
+		block_chain_t chain(m_blocks, m_index.chain_with_hash(hash_val), m_valueStreamer, m_maxItemsInBlock);
 
-
-		if (it != chain.end())	//If we found element with similar hash, check for duplication
-		{
-			m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
-			memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
-			byte_range searchin_element_br(&m_elementCache[0], m_serializedElementSize);
-
-			for (; (it != chain.end()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
-			{
-				if (searchin_element_br == *it)	//Duplication detected
-				{
-					auto addr = chain.element_address(it.elementId());
-					return iterator(addr.first, addr.second);
-				}
-			}
-		}
-
-		return end();
+		return find_in_chain(chain, val, hash_val);
 	}
 private:
 	bool insert_into_chain(block_chain_t & chain, size_t hash_val, const byte_range & br)
@@ -374,59 +374,6 @@ private:
 		chain.insert(chain.begin() + std::distance(chain.cbegin(), it), br);
 
 		return true;
-	}
-
-	void try_ballance_chain(block_chain_t & chain)
-	{
-		//Ballance
-		if ((chain.limits.block_count > MaxBlocksPerChain) && (chain.density() > 0.96))
-		{
-			//cout << "B" << std::endl;
-
-			int partitioned_block_number = chain.partitioned_block();
-			if (partitioned_block_number != 0)
-			{
-
-				/*cout << "Ballancing chain: " << chain.limits << std::endl;
-				for(auto bi : chain.m_blockIds)
-				cout << bi << "," << std::endl;*/
-
-				//Fast split the chain
-				chain_info_t new_chain_id;
-				new_chain_id.first = chain.m_blocksData[partitioned_block_number].pBlock->meta.id;
-				new_chain_id.last = chain.limits.last;
-				new_chain_id.block_count = chain.m_blocksData.size() - partitioned_block_number;
-				m_blocks[new_chain_id.first].meta.prev = new_chain_id.first;
-				m_blocks.set_modified(new_chain_id.first);
-
-				chain.limits.last = chain.m_blocksData[partitioned_block_number - 1].pBlock->meta.id;
-				chain.limits.block_count = partitioned_block_number;
-				m_blocks[chain.limits.last].set_next(chain.limits.last);
-				m_blocks.set_modified(chain.limits.last);
-
-				m_index.create_mapping(m_blocks[new_chain_id.first].first_hash(), new_chain_id);
-			}
-			//Split chain
-			/*auto it = UltraCore::find_group_end(chain.begin(), chain.end(), chain.element_count() / 2, [](const byte_range & br){
-			return *((size_t*)br.start);
-			});
-
-			size_t median_hash = it.hash();
-
-			chain_info_t new_chain_id;
-			new_chain_id.first = request_block();
-			new_chain_id.last = new_chain_id.first;
-			new_chain_id.block_count = 1;
-
-			block_t & new_chain_block = m_blocks[new_chain_id.first];
-
-			block_chain_t new_chain(*this, new_chain_id);
-			new_chain.insert(new_chain.end(), it, chain.end());
-
-			chain.erase(it, chain.end());
-
-			m_index.create_mapping(median_hash, new_chain_id);*/
-		}
 	}
 private:
 	size_t request_block()

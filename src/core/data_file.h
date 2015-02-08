@@ -29,15 +29,21 @@ Linear container of fixed-length data elements.
 template<typename T>
 class data_file
 {
-    
-	
-    //using data_vec_t = std::vector<block_type>;
 
-//    static_assert((sizeof(block_type) % 4096) == 0, "ERROR: user_record_data size is not 4K/divisible");
+
+	//using data_vec_t = std::vector<block_type>;
+
+	//    static_assert((sizeof(block_type) % 4096) == 0, "ERROR: user_record_data size is not 4K/divisible");
 public:
 	using block_type = T;
 	using value_type = block_type;
 	using block_t = block_type;
+
+	struct read_request
+	{
+		size_t block_id;
+		block_t * dest_ptr;
+	};
 
     data_file(const std::string & file_name = "unnamed")
 		:m_fileName(file_name), m_blockCount(0)
@@ -47,7 +53,7 @@ public:
     {
 		cout << "Creating data file: " << m_fileName << std::endl;
 	#ifdef WIN32
-        m_hFile = CreateFile(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
+		m_hFile = CreateFile(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
 
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
@@ -98,36 +104,62 @@ public:
 		return 0;
 	}*/
 
-    int set(size_t index, const block_type & data)
-    {
-    #ifdef WIN32
-		//cout << "Writing " << data.val << " to " << index << std::endl;
-		OVERLAPPED ol = { 0 };
-		
+	int set(size_t index, const block_type & data)
+	{
+#ifdef WIN32
+		//cout << "Writing " << data.meta.id << " to " << index << std::endl;
+
 
 		if (index > m_blockCount)
 		{
-			//Create some empty blocks
+			size_t empty_count = index - m_blockCount;
+/*			//Create some empty blocks
 			block_type empty_block;
 			memset(&empty_block, 0, sizeof(block_type));
 
-			for (size_t i = m_blockCount; i < index; ++i)
+			OVERLAPPED * p_ol = (OVERLAPPED*)malloc(sizeof(OVERLAPPED)* (empty_count + 2));
+			memset(p_ol, 0, sizeof(OVERLAPPED)* (empty_count + 2));
+
+			FILE_SEGMENT_ELEMENT * seg_arr = (FILE_SEGMENT_ELEMENT*)malloc(sizeof(FILE_SEGMENT_ELEMENT)* (empty_count + 2));
+			memset(seg_arr, 0, sizeof(FILE_SEGMENT_ELEMENT)* (empty_count + 2));
+
+			for (size_t i = 0; i < empty_count; ++i)
 			{
-				append(empty_block);
+				p_ol[i].Offset = (m_blockCount + i) * sizeof(block_type);
+				seg_arr[i].Buffer = &empty_block;
 			}
 
+			p_ol[empty_count].Offset = (m_blockCount + empty_count) * sizeof(block_type);
+			seg_arr[empty_count].Buffer = (void*)&data;
+
+
+			bool r = WriteFileGather(m_hFile, seg_arr, sizeof(block_type), NULL, p_ol);
+			if (!r)
+			{
+				DWORD err = ::GetLastError();
+
+				if (err != ERROR_IO_PENDING)
+					return 1;
+
+				DWORD num_written = 0;
+				r = GetOverlappedResult(m_hFile, p_ol, &num_written, true);
+				if (!r)
+				{
+					return 1;
+				}
+			}*/
+
+			OVERLAPPED ol = { 0 };
 			ol.Offset = 0xFFFFFFFF;
 			ol.OffsetHigh = 0xFFFFFFFF;
+			bool r = WriteFile(m_hFile, 0, sizeof(block_type)* empty_count, &m_bytesWritten, &ol);
 		}
-		else
-		{
-			ol.Offset = index * sizeof(block_type);
-		//	seek(index);
-		}
-
 		
-		bool r = WriteFile(m_hFile, &data, sizeof(block_type), &m_bytesWritten, &ol);
+		OVERLAPPED ol = { 0 };
+		ol.Offset = index * sizeof(block_type);
 
+		bool r = WriteFile(m_hFile, &data, sizeof(block_type), &m_bytesWritten, &ol);
+		m_blockCount = max(m_blockCount, index + 1);
 		return r ? 0 : 1;
     #else
         int n_write = pwrite(m_fileDescriptor, &data, sizeof(block_type), sizeof(block_type)*index);
@@ -145,6 +177,8 @@ public:
 		OVERLAPPED ol = { 0 };
 		ol.Offset = first_id * sizeof(block_type);
 		bool r = WriteFile(m_hFile, buf_begin, sizeof(block_type)* block_count, &m_bytesWritten, &ol);
+		m_blockCount = max(m_blockCount, first_id + block_count);
+
     #else
         int n_write = pwrite(m_fileDescriptor, buf_begin, sizeof(block_type) * block_count, sizeof(block_type) * first_id);
         if(n_write == -1)
@@ -261,6 +295,35 @@ public:
         return (n_read != sizeof(block_type));
     #endif
     }
+
+	struct read_req_t
+	{
+		read_req_t()
+		{
+			ol = { 0 };
+		}
+
+		OVERLAPPED ol;
+		DWORD bytes_read;
+	};
+
+	void get(const std::vector<read_request> & requests)
+	{
+		std::vector<read_req_t> rreqs(requests.size());
+
+		for (int i = 0; i < requests.size(); ++i)
+		{
+			auto & req = requests[i];
+			rreqs[i].ol.Offset = req.block_id * sizeof(block_type);
+
+			bool res = ReadFile(m_hFile, req.dest_ptr, sizeof(block_type), &rreqs[i].bytes_read, &rreqs[i].ol);
+		}
+
+		//Wait all opertaions to complete
+
+		//bool r = ReadFileScatter(m_hFile, segs.data(), sizeof(block_t), NULL,  );
+	}
+
 
 	void append(const block_type & data)
 	{

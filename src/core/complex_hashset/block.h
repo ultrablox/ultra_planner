@@ -30,8 +30,8 @@ struct hashset_block
 
 	void set_meta(size_t _id, size_t _prev, size_t _next, int _item_count)
 	{
-		id = _id;
-		prev = _prev;
+		meta.id = _id;
+		meta.prev = _prev;
 		set_next(_next);
 		set_item_count(_item_count);
 	}

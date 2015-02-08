@@ -37,6 +37,15 @@ void test_avl_tree()
 		assert_test(r != tree.end(), "avl tree find");
 	}
 
+	//Ordering
+	{
+		auto correct_it = correct_tree.begin();
+		auto it = tree.begin();
+		for (; it != tree.end(); ++it, ++correct_it)
+		{
+			assert_test(*it == *correct_it, "avl tree ordering");
+		}
+	}
 }
 
 void test_range_map()

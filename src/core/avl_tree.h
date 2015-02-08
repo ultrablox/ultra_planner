@@ -19,7 +19,7 @@ protected:
 	struct node_t
 	{
 		node_t(key_t _key = key_t(), node_t * _parent = nullptr)
-			:key(_key), left(nullptr), right(nullptr), parent(_parent), height(0)
+			:key(_key), left(nullptr), right(nullptr), parent(_parent), height(0), prev(nullptr), next(nullptr)
 		{}
 
 		~node_t()
@@ -31,7 +31,7 @@ protected:
 		key_t key;
 
 		typename std::enable_if<!std::is_void<satelite_data_t>::value, satelite_data_t>::type data;
-		node_t *left, *right, *parent;
+		node_t *left, *right, *parent, *prev, *next;
 		int height;
 	};
 
@@ -50,6 +50,24 @@ public:
 			return p_node->key;
 		}
 
+		iterator& operator++()
+		{
+			p_node = p_node->next;
+			return *this;
+		}
+
+		iterator operator+(int delta)
+		{
+			node_t * nd = p_node;
+			while (delta > 0)
+			{
+				nd = nd->next;
+				--delta;
+			}
+
+			return iterator(nd);
+		}
+
 		satelite_data_t & data()
 		{
 			return p_node->data;
@@ -58,6 +76,11 @@ public:
 		friend bool operator!=(const iterator & lhs, const iterator & rhs)
 		{
 			return (lhs.p_node != rhs.p_node);
+		}
+
+		friend bool operator==(const iterator & lhs, const iterator & rhs)
+		{
+			return (lhs.p_node == rhs.p_node);
 		}
 
 		node_t * node() const
@@ -73,7 +96,7 @@ public:
 	};
 
 	binary_tree()
-		:m_pRoot(nullptr)
+		:m_pRoot(nullptr), m_pFirst(nullptr)
 	{
 	}
 
@@ -92,6 +115,11 @@ public:
 		return iterator(lower_bound(m_pRoot, val));
 	}
 
+	iterator begin() const
+	{
+		return iterator(m_pFirst);
+	}
+
 	iterator end() const
 	{
 		return iterator(nullptr);
@@ -99,7 +127,12 @@ public:
 
 	std::pair<iterator, bool> insert(const key_t & val)
 	{
+		bool first_node = (m_pRoot == nullptr);
+
 		node_t * res_node = insert_to_node(nullptr, m_pRoot, val);
+
+		if (first_node)
+			m_pFirst = res_node;
 		
 		//Update heights
 		update_height(res_node);
@@ -135,7 +168,9 @@ public:
 	template<typename Fun>
 	void for_each(Fun fun) const
 	{
-		for_each_node(m_pRoot, fun);
+		//for_each_node(m_pRoot, fun);
+		for (auto it = begin(); it != end(); ++it)
+			fun(it.p_node->data);
 	}
 
 private:
@@ -144,6 +179,29 @@ private:
 		if (dest == nullptr)
 		{
 			dest = new node_t(val, p_parent);
+			//Build next/prev links
+			if (p_parent != nullptr)
+			{
+				if (m_cmp(val, p_parent->key))//Insertion to the left
+				{
+					dest->next = p_parent;
+					dest->prev = p_parent->prev;
+					if (p_parent->prev)
+						p_parent->prev->next = dest;
+					else
+						m_pFirst = dest;
+					p_parent->prev = dest;
+				}
+				else//Insertion to the right
+				{
+					dest->next = p_parent->next;
+					dest->prev = p_parent;
+					if (p_parent->next)
+						p_parent->next->prev = dest;
+					p_parent->next = dest;
+				}
+
+			}
 			return dest;
 		}
 		else
@@ -170,7 +228,7 @@ private:
 
 	node_t * lower_bound(node_t * base_node, const key_t & val) const
 	{
-		if (base_node == nullptr)
+		/*if (base_node == nullptr)
 			return nullptr;
 
 		if (base_node->key == val)
@@ -185,8 +243,17 @@ private:
 			}
 			
 			return child_lower_bound;
+		}*/
+		node_t * last_node = base_node;
+		while (base_node)
+		{
+			last_node = base_node;
+			base_node = m_cmp(val, base_node->key) ? base_node->left : base_node->right;
 		}
+
+		return m_cmp(val, last_node->key) ? last_node->prev : last_node;
 	}
+
 
 	void print_node(std::ostream & os, int offset, const node_t * p_node) const
 	{
@@ -265,7 +332,7 @@ protected:
 	}
 
 protected:
-	node_t * m_pRoot;
+	node_t * m_pRoot, *m_pFirst;
 	compare_t m_cmp;
 	equal_t m_eq;
 };
@@ -556,6 +623,11 @@ public:
 	void for_each(Fun fun) const
 	{
 		m_tree.for_each(fun);
+	}
+
+	iterator end() const
+	{
+		return m_tree.end();
 	}
 private:
 	avl_tree<key_t, value_t> m_tree;

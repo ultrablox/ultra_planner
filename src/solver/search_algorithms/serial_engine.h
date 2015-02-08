@@ -151,6 +151,11 @@ public:
 				//	*p_flush_flag = true;
 			});
 
+			do
+			{
+				this->m_database.get_delayed_result();
+			} while (_Base::m_searchQueue.empty());
+
 			if (db_flush_needed)
 				this->m_database.flush();
 		}

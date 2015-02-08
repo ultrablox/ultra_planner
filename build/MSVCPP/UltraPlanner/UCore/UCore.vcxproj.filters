@@ -170,5 +170,8 @@
     <ClInclude Include="..\..\..\..\src\core\complex_hashset\block.h">
       <Filter>src\complex_hashset</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\thread_pool.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

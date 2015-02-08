@@ -28,7 +28,7 @@ public:
 	template<>
 	struct generate<hashset_t::Buffered>
 	{
-		using storage_wrapper_t = vector_storage_wrapper<cached_file<block_t, 200000>>;//65536U
+		using storage_wrapper_t = vector_storage_wrapper<cached_file<block_t, 500000>>;//65536U
 		using result = buffered_complex_hashset<T, S, storage_wrapper_t, H>;
 	};
 

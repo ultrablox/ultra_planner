@@ -106,11 +106,13 @@ public:
 
 
 	search_database(const state_streamer_t & ss)
-		:m_searchNodes(node_streamer_t(ss)), m_nodeCount(0), m_stateStreamer(ss)
+		:m_searchNodes(node_streamer_t(ss)), m_nodeCount(0), m_stateStreamer(ss)//, m_storages(storage_count, m_stateStreamer)
 	{
 		for (int i = 0; i < storage_count; ++i)
 			m_storages.emplace_back(m_stateStreamer);
 	}
+
+	search_database(const search_database &) = delete;
 
 	bool contains(const state_t & state) const
 	{
@@ -274,6 +276,11 @@ public:
 			res += storage.bucket_factor();
 		return res / m_storages.size();
 	}*/
+	void get_delayed_result()
+	{
+		for (auto & storage : m_storages)
+			storage.get_merged();
+	}
 public:
 	//std::function<void(void*, const search_node_t&)> m_nodeSerializeFun;
 	//std::function<void(const void*, search_node_t&)> m_nodeDeserializeFun;

@@ -40,7 +40,7 @@ public:
 			[&](const record_t & data, size_t int_id){
 				++m_stats.io_writes;
 				return m_file.set(int_id, data);
-            }), m_file(file_name)
+			}), m_file(file_name), m_count(0)
     {
 
     }
@@ -58,16 +58,17 @@ public:
 
 	void push_back(const record_t & record)
 	{
-        size_t new_id = size();
+        /*size_t new_id = size();
 		m_file.append(record);
-		++m_stats.io_writes;
-        _Base::load(new_id, record);
-		//_Base::operator[](new_id);
+		++m_stats.io_writes;		
+        _Base::load(new_id, record);*/
+
+		_Base::load(m_count++, record);
 	}
 
 	size_t size() const
 	{
-		return m_file.size();
+		return m_count;
 	}
 
 	void open(const std::string file_name)
@@ -84,9 +85,11 @@ public:
 	{
 		return m_stats;
 	}
+
 private:
     data_file<record_t> m_file;
 	cached_file_stats_t m_stats;
+	size_t m_count;
 };
 
 #endif

@@ -1,5 +1,5 @@
 
-#include <core/block_chain.h>
+#include <core/complex_hashset/block_chain.h>
 #include "helpers.h"
 
 void test_block_chain()

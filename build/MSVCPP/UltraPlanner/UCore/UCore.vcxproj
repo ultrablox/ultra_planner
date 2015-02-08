@@ -309,6 +309,7 @@
     <ClInclude Include="..\..\..\..\src\core\config.h" />
     <ClInclude Include="..\..\..\..\src\core\data_file.h" />
     <ClInclude Include="..\..\..\..\src\core\streamer.h" />
+    <ClInclude Include="..\..\..\..\src\core\thread_pool.h" />
     <ClInclude Include="..\..\..\..\src\core\transition_system\transition_system.h" />
     <ClInclude Include="..\..\..\..\src\core\transition_system\UState.h" />
     <ClInclude Include="..\..\..\..\src\core\transition_system\UTransition.h" />

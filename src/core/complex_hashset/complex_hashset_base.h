@@ -37,9 +37,17 @@ public:
 		return m_rtree.size();
 	}
 
-	chain_info_t & chain_with_hash(size_t hash_val)
+	chain_info_t & chain_with_hash(size_t hash_val, size_t * p_last_hash = nullptr)
 	{
 		auto it = m_rtree.find(hash_val);
+		if (p_last_hash)
+		{
+			auto next_it = it + 1;
+			if (next_it == m_rtree.end())
+				*p_last_hash = std::numeric_limits<size_t>::max();
+			else
+				*p_last_hash = *next_it;
+		}
 		return it.data();
 	}
 	
@@ -149,7 +157,7 @@ public:
 	};
 
 	complex_hashset_base(const value_streamer_t & vs)
-		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(sizeof(size_t)+m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0), m_delayedCounter(0), m_delayedBuffer(m_maxItemsInBlock)
+		:m_valueStreamer(vs), m_serializedElementSize(vs.serialized_size() + sizeof(size_t)), m_maxLoadFactor(0.9), m_elementCache(sizeof(size_t)+m_valueStreamer.serialized_size()), m_size(0), m_maxItemsInBlock(block_t::DataSize / m_serializedElementSize), m_blockCount(0)
 	{
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");
@@ -158,7 +166,10 @@ public:
 		cout << "Hashset page can store " << m_maxItemsInBlock << " elements." << std::endl;
 	}
 
-//	complex_hashset_base(const complex_hashset_base & rhs) = delete;
+	complex_hashset_base(const complex_hashset_base & rhs)
+		:m_serializedElementSize(0), m_maxLoadFactor(0), m_maxItemsInBlock(0), m_valueStreamer(rhs.m_valueStreamer)
+	{
+	}
 
 	iterator end() const
 	{
@@ -414,6 +425,71 @@ protected:
 		return (float)block.item_count / (block.vacant_count(m_serializedElementSize) + (float)block.item_count);
 	}
 
+	template<typename ChainT>
+	iterator find_in_chain(const ChainT & chain, const value_type & val, size_t hash_val) const
+	{
+		auto it = find_first_ge(chain.cbegin(), chain.cend(), hash_val);
+
+
+		if (it != chain.cend())	//If we found element with similar hash, check for duplication
+		{
+			m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
+			memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
+			byte_range searchin_element_br(&m_elementCache[0], m_serializedElementSize);
+
+			for (; (it != chain.cend()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
+			{
+				if (searchin_element_br == *it)	//Duplication detected
+				{
+					//auto addr = chain.element_address(it.elementId());
+					return iterator(chain.m_blocksData[it.address().block].pBlock->meta.id, it.address().element);
+				}
+			}
+		}
+
+		return end();
+	}
+
+	template<typename ChainT>
+	bool try_ballance_chain(ChainT & chain, chain_info_t & new_chain_id, size_t * p_new_chain_first_hash = nullptr)
+	{
+		if (chain.limits.block_count <= MaxBlocksPerChain)
+			return false;
+
+		if ((chain.limits.block_count == MaxBlocksPerChain) && (chain.density() < 0.96))
+			return false;
+
+		if (chain.m_blocksData.begin()->pBlock->first_hash() == chain.m_blocksData.rbegin()->pBlock->last_hash(chain.element_size()))
+			return false;
+		
+		int partitioned_block_number = chain.partitioned_block();
+		if (partitioned_block_number != 0)
+		{
+			//Fast split the chain
+			new_chain_id.first = chain.m_blocksData[partitioned_block_number].pBlock->meta.id;
+			new_chain_id.last = chain.limits.last;
+			new_chain_id.block_count = chain.m_blocksData.size() - partitioned_block_number;
+
+			chain.m_blocksData[partitioned_block_number].pBlock->meta.prev = new_chain_id.first;	//m_blocks[new_chain_id.first].meta.prev = new_chain_id.first;
+			chain.m_blocksData[partitioned_block_number].modified = true; //m_blocks.set_modified(new_chain_id.first);
+
+			chain.limits.last = chain.m_blocksData[partitioned_block_number - 1].pBlock->meta.id;
+			chain.limits.block_count = partitioned_block_number;
+			chain.m_blocksData[partitioned_block_number - 1].pBlock->set_next(chain.limits.last);//m_blocks[chain.limits.last].set_next(chain.limits.last);
+			chain.m_blocksData[partitioned_block_number - 1].modified = true;  //m_blocks.set_modified(chain.limits.last);
+
+			if (p_new_chain_first_hash)
+				*p_new_chain_first_hash = chain.m_blocksData[partitioned_block_number].pBlock->first_hash();
+
+			chain.remove_last_blocks(chain.m_blocksData.size() - partitioned_block_number);
+			return true;
+		}
+		else
+		{
+			//cout << "Failed to partition chain" << std::endl;
+			return false;
+		}
+	}
 protected:
 	//In bytes
 	const int m_serializedElementSize;
@@ -431,13 +507,8 @@ protected:
 
 	mutable std::vector<char> m_elementCache;
 
-	size_t m_size, m_blockCount;
-	
-	//std::vector<bucket_t> m_buckets;
-
-
-	delayed_buffer_t m_delayedBuffer;
-	size_t m_delayedCounter;
+	size_t m_blockCount;
+	std::atomic<size_t> m_size;
 };
 
 
