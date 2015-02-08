@@ -203,12 +203,13 @@ void test_complex_hashmap()
 	
 	complex_element_streamer streamer;
 
+	//Internal
 	{
 		auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
 		std::unordered_set<complex_element> correct_set;
 	
 		//buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);	
-		hashset_generator<complex_element, complex_element_streamer, std::hash<complex_element>>::generate<hashset_t::Buffered>::result hset(streamer);
+		hashset_generator<complex_element, complex_element_streamer, 128U>::generate<hashset_t::Internal>::result hset(streamer);
 
 		int count = 0;
 		//Insertion test
@@ -219,7 +220,7 @@ void test_complex_hashmap()
 
 			auto r2 = correct_set.insert(val);
 
-			if (i == 36)
+			if (i == 5)
 			{
 				++count;
 				//hset.print_debug();
@@ -255,6 +256,59 @@ void test_complex_hashmap()
 		}
 	}
 
+	//Buffered
+	{
+		auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
+		std::unordered_set<complex_element> correct_set;
+
+		//buffered_complex_hashset<complex_element, complex_element_streamer> hset(streamer);	
+		hashset_generator<complex_element, complex_element_streamer, 4096U>::generate<hashset_t::Buffered>::result hset(streamer);
+
+		int count = 0;
+		//Insertion test
+		for (int i = 0; i < 2000; ++i)
+		{
+			int val = gen();
+			//cout << "Inserting " << val << std::endl;
+
+			auto r2 = correct_set.insert(val);
+
+			if (i == 36)
+			{
+				++count;
+				//hset.print_debug();
+			}
+			if (val == 553)
+				int x = 0;
+
+			//cout << i << std::endl;
+			auto r1 = hset.insert(val);
+			//hset.print_debug();
+
+			bool crct = (r1 == r2.second);
+			if (!crct)
+				int x = 0;
+			assert_test(crct, "Complex hashset insertion");
+			assert_test(hset.size() == correct_set.size(), "Complex hashset size");
+		}
+
+
+		assert_test(hset.size() == correct_set.size(), "Complex hashset size");
+
+		//Find test
+		for (int i = 0; i < 2000; ++i)
+		{
+			int val = gen();
+			auto it1 = correct_set.find(val);
+			auto it2 = hset.find(val);
+
+			bool r1 = (it1 == correct_set.end());
+			bool r2 = (it2 == hset.end());
+
+			assert_test(r1 == r2, "Complex hashset find");
+		}
+	}
+
 
 	//Tets add delayed
 	{
@@ -264,7 +318,7 @@ void test_complex_hashmap()
 
 			std::unordered_set<complex_element> correct_set;
 
-			hashset_generator<complex_element, complex_element_streamer, std::hash<complex_element>>::generate<hashset_t::Delayed>::result hset(streamer);
+			hashset_generator<complex_element, complex_element_streamer, 4096U, std::hash<complex_element>>::generate<hashset_t::Delayed>::result hset(streamer);
 
 			int count = 0;
 			//Insertion test

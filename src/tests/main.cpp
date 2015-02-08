@@ -57,7 +57,7 @@ int main()
 	test_rubik_core();
 
 	test_bdd_map();
-	test_cached_file();
+	//test_cached_file();
 	test_complex_vector();
 	test_complex_queue();
 	test_complex_stack();

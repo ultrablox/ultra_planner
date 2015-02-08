@@ -368,18 +368,18 @@ public:
 	template<typename Fun>
 	void append_new_block(Fun request_block_fun)
 	{
-		//cout << "Appending new block..." << std::endl;
-		//limits.last = m_hb.m_blocks.size();
 		block_t * p_new_block = request_block_fun();
 		limits.last = p_new_block->meta.id;
 
-		//if (limits.last == 76)
-		//	int x = 0;
+		block_info_t & last_block_info = *m_blocksData.rbegin();
+		last_block_info.modified = true;
+
+		block_t * p_last_block = last_block_info.pBlock;
+
+		p_new_block->meta.prev = p_last_block->meta.id;
+		p_last_block->set_next(p_new_block->meta.id);
 		
-		p_new_block->meta.prev = (*m_blocksData.rbegin()).pBlock->meta.id;
-		(*m_blocksData.rbegin()).pBlock->set_next(p_new_block->meta.id);
-		(*m_blocksData.rbegin()).modified = true;
-//		m_blockIds.push_back(p_new_block->meta.id);
+
 		m_blocksData.push_back(block_info_t(p_new_block, true));
 
 		++limits.block_count;
@@ -401,9 +401,10 @@ public:
 		auto old_end_it = end();
 		++m_totalElements;
 
-
+		//print();
 		//std::copy_backward(it, old_end_it, end());
 		fast_offset(it, old_end_it);
+		
 
 		for (int i = it.address().block; i < block_count(); ++i)
 			m_blocksData[i].modified = true;
@@ -427,6 +428,9 @@ public:
 		/* *((size_t*)ptr) = hash_fun(element);
 		memcpy(ptr + sizeof(size_t), data_fun(element), m_hb.m_valueStreamer.serialized_size());*/
 		//m_hb.print_debug();
+
+		//print();
+
 		return (it + 1);
 	}
 
@@ -543,8 +547,18 @@ public:
 	void print()
 	{
 		cout << "Chain (" << m_blocksData.size() << " blocks): ";
+		int last_block = -1;
 		for (auto it = begin(); it != end(); ++it)
-			cout << (*it).template begin_as<size_t>() << ',';
+		{
+			if (it.address().block != last_block)
+			{
+				cout << '|';
+				last_block = it.address().block;
+			}
+			else
+				cout << ',';
+			cout << (*it).template begin_as<size_t>();
+		}
 		cout << std::endl;
 		//for (auto bid : m_blockIds)
 		//	m_hb.print_block(m_hb.m_blocks[bid]);
@@ -564,6 +578,9 @@ public:
 
 	void fast_offset(const block_iterator & it, const block_iterator & last_it)
 	{
+		if (it.address() == last_it.address())
+			return;
+
 		int block_index = block_count() - 1;
 		
 		//Offset tail - just move the whole tail
@@ -576,7 +593,7 @@ public:
 		{
 			//Offset last block
 			char * r_data_ptr = m_blocksData[block_index].pBlock->data, *l_data_ptr = m_blocksData[block_index-1].pBlock->data;
-			memmove(r_data_ptr, r_data_ptr + 1 * element_size(), last_it.address().element * element_size());
+			memmove(r_data_ptr + 1 * element_size(), r_data_ptr, last_it.address().element * element_size());
 			memcpy(r_data_ptr, l_data_ptr + (m_maxItemsInBlock - 1) * element_size(), element_size());
 			--block_index;
 
@@ -586,7 +603,7 @@ public:
 				r_data_ptr = m_blocksData[block_index].pBlock->data;
 				l_data_ptr = m_blocksData[block_index - 1].pBlock->data;
 
-				memmove(r_data_ptr, r_data_ptr + 1 * element_size(), (m_maxItemsInBlock - 1) * element_size());
+				memmove(r_data_ptr + 1 * element_size(), r_data_ptr, (m_maxItemsInBlock - 1) * element_size());
 				memcpy(r_data_ptr, l_data_ptr + (m_maxItemsInBlock - 1) * element_size(), element_size());
 				--block_index;
 			}

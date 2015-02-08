@@ -117,8 +117,6 @@ protected:
 
 	
 	using delayed_buffer_t = delayed_buffer<value_type>;
-
-	static_assert(sizeof(block_t) % 4096 == 0, "Invalid block_t size!");
 	
 	/*using block_const_iterator = block_iterator<const block_chain_t>;
 	using block_reverse_const_iterator = block_reverse_iterator<const block_chain_t>;

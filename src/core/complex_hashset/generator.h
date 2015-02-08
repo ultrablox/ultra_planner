@@ -9,10 +9,10 @@
 
 enum class hashset_t {Internal, Buffered, Delayed};
 
-template<typename T, typename S, typename H>
+template<typename T, typename S, unsigned int BlockSize = 4096U, typename H = std::hash<T>>//65536U //4096U // 8192U, unsigned int BlockSize = 4096U
 class hashset_generator
 {
-	using block_t = hashset_block<4096U>;	//65536U //4096U // 8192U
+	using block_t = hashset_block<BlockSize>;
 
 public:
 	template<hashset_t Tp>
@@ -23,12 +23,14 @@ public:
 	template<>
 	struct generate<hashset_t::Internal>
 	{
+		using storage_wrapper_t = vector_wrapper<std::vector<block_t>>;
+		using result = buffered_complex_hashset<T, S, storage_wrapper_t, H>;
 	};
 
 	template<>
 	struct generate<hashset_t::Buffered>
 	{
-		using storage_wrapper_t = vector_storage_wrapper<cached_file<block_t, 500000>>;//65536U
+		using storage_wrapper_t = cached_file_wrapper<cached_file<block_t, 500000>>;//65536U
 		using result = buffered_complex_hashset<T, S, storage_wrapper_t, H>;
 	};
 

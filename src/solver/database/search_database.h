@@ -41,15 +41,9 @@ class search_database
 	using state_streamer_t = S;
 	typedef H hash_t;
 	typedef std::tuple<size_t, state_t> record_t;
-	//typedef std::unordered_set<state_t> hash_map_t;
-	//typedef direct_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> direct_hash_map_t;
-	//typedef buffered_complex_hashset<state_t, state_streamer_t, hash_t, !ExtMemory> buffered_hash_map_t;
-
-	//typedef typename std::conditional<true, buffered_hash_map_t, direct_hash_map_t>::type hash_map_t;
-	using hash_map_t = typename hashset_generator<state_t, state_streamer_t, hash_t>::generate<StorageType>::result;
-	const int storage_count = StorageCount;
-
 	
+	using hash_map_t = typename hashset_generator<state_t, state_streamer_t, 4096U, hash_t>::template generate<StorageType>::result;
+	const int storage_count = StorageCount;
 public:
 	//Id + parent search node id + state + init->current path length
 	//typedef std::tuple<size_t, size_t, state_t, int> search_node_t;
@@ -290,6 +284,9 @@ private:
 	hash_t m_hasher;
 
 	std::vector<hash_map_t> m_storages;
+
+	//std::vector<typename hashset_generator<state_t, state_streamer_t>::generate<StorageType>::result> m_storages;
+	
 	//std::array<hash_map_t, StorageCount> m_storages;
 
 	complex_vector<search_node_t, node_streamer_t, ExtMemory, true> m_searchNodes;

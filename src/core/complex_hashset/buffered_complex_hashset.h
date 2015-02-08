@@ -7,28 +7,12 @@
 #include <thread>
 
 template<typename S>
-class vector_storage_wrapper
+class cached_file_wrapper
 {
-	using storage_t = S;
 public:
+	using storage_t = S;
 	using block_t = typename S::value_type;
-
-	vector_storage_wrapper()
-		:m_cacheLoader(&vector_storage_wrapper::cache_requests_loader, this)
-	{
-		m_finished = false;
-	}
-
-	vector_storage_wrapper(const vector_storage_wrapper & rhs)
-	{
-		throw runtime_error("Unable to copy");
-	}
-
-	~vector_storage_wrapper()
-	{
-		m_finished = true;
-		m_cacheLoader.join();
-	}
+	static_assert(sizeof(block_t) % 4096 == 0, "Invalid block_t size for file!");
 
 	size_t size() const
 	{
@@ -110,29 +94,6 @@ public:
 		m_cacheRequests.push(chain_info);
 	}
 
-	void cache_requests_loader()
-	{
-		std::chrono::milliseconds dura(100);
-
-		while (!m_finished)
-		{
-			if (m_cacheRequests.empty())
-			{
-				//std::this_thread::yield();
-				std::this_thread::sleep_for(dura);
-			}
-			else
-			{
-				chain_info_t cur_chain;
-				if (m_cacheRequests.try_pop(cur_chain))
-				{
-					std::lock_guard<std::mutex> lock(m_mtx);
-					ensure_chain_in_cache(cur_chain);
-				}
-			}
-		}
-	}
-
 	void ensure_chain_in_cache(const chain_info_t & cur_chain)
 	{
 		/*if ((cur_chain.block_count <= 2) && m_storage.is_element_cached(cur_chain.last) && m_storage.is_element_cached(cur_chain.first))
@@ -170,14 +131,69 @@ public:
 		return m_storage.stats();
 	}
 
+	void reserve(size_t new_size) const
+	{}
+
 	std::mutex m_mtx;
 
 private:
 	storage_t m_storage;
 	tbb::concurrent_queue<chain_info_t> m_cacheRequests;
-	std::thread m_cacheLoader;
-	std::atomic<bool> m_finished;
 	
+};
+
+template<typename S>
+class vector_wrapper
+{
+public:
+	using storage_t = S;
+	using block_t = typename S::value_type;
+	
+	vector_wrapper()
+	{
+		m_storage.reserve(1000000);
+	}
+
+	size_t size() const
+	{
+		return m_storage.size();
+	}
+
+	size_t cache_size() const
+	{
+		return 0;
+	}
+
+	const block_t & operator[](size_t index) const
+	{
+		return m_storage[index];
+	}
+
+	block_t & operator[](size_t index)
+	{
+		return m_storage[index];
+	}
+
+	void mark_used(size_t index) const
+	{}
+
+	void clear_used(size_t index) const
+	{}
+
+	void set_modified(size_t index) const
+	{}
+
+	void push_back(const block_t & block)
+	{
+		m_storage.push_back(block);
+	}
+
+	void reserve(size_t new_size)
+	{
+		m_storage.reserve(new_size);
+	}
+private:
+	storage_t m_storage;
 };
 
 namespace buffered_hashset
@@ -312,11 +328,13 @@ public:
 
 	bool insert(const value_type & val, size_t hash_val)
 	{
+		//cout << "Inserting" << std::endl;
 		//Find appropriate block, create if it does not exists
 
 		chain_info_t & chain_id = m_index.chain_with_hash(hash_val);
 		//cout << chain_id << std::endl;
 		//m_blocks.ensure_chain_in_cache(chain_id);
+		m_blocks.reserve(m_blocks.size() + 1);
 		block_chain_t chain(m_blocks, chain_id, m_valueStreamer, m_maxItemsInBlock);
 
 		m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
@@ -365,9 +383,8 @@ private:
 		{
 			chain.append_new_block([=](){
 				size_t block_id = this->request_block();
-				block_t & block_ref = m_blocks[block_id];
-				m_blocks.mark_used(block_id);
-				return &block_ref;
+				this->m_blocks.mark_used(block_id);
+				return &(this->m_blocks[block_id]);
 			});
 		}
 
