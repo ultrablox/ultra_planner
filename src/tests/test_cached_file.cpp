@@ -61,15 +61,21 @@ void test_large_files()
 	cached_file<sample_block_t, 1> test_file("test_file.dat");
 	test_file.open("test_file.dat");
 
+	std::unordered_map<int, sample_block_t> correct_map;
+
 	size_t first_large_index = 1024ULL * 1024;
 
-	for (int i = 0; i < 20; ++i)
+	for (int i = 0; i < 200; ++i)
 	{
 		sample_block_t block;
 		block.val = 1000 + i;
 
 		test_file.load(first_large_index + i, block);
+		correct_map.insert(make_pair(first_large_index + i, block));
 	}
+
+	for (auto & el : correct_map)
+		assert_test(test_file[el.first] == el.second, "Large Cached file random read");
 }
 
 void test_cached_file()

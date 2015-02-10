@@ -105,6 +105,17 @@ public:
 		return 0;
 	}*/
 
+#ifdef WIN32
+	OVERLAPPED to_win_address(size_t index) const
+	{
+		size_t first_byte = index * sizeof(block_type);
+		OVERLAPPED ol = { 0 };
+		ol.Offset = first_byte & 0xffffffff;
+		ol.OffsetHigh = (first_byte >> 32ULL) & 0xffffffff;
+		return std::move(ol);
+	}
+#endif
+
 	int set(size_t index, const block_type & data)
 	{
 #ifdef WIN32
@@ -150,7 +161,7 @@ public:
 				}
 			}*/
 
-			OVERLAPPED ol = { 0 };
+			/*OVERLAPPED ol = { 0 };
 			ol.Offset = 0xFFFFFFFF;
 			ol.OffsetHigh = 0xFFFFFFFF;
 
@@ -167,20 +178,30 @@ public:
 					cout << "Write failed" << std::endl;
 			}
 
-			m_blockCount = m_blockCount + iter_count * ITERATION_BLOCK_COUNT;
-		}
-		
+			m_blockCount = m_blockCount + iter_count * ITERATION_BLOCK_COUNT;*/
 
-		size_t first_byte = index * sizeof(block_type);
-		OVERLAPPED ol = { 0 };
+			OVERLAPPED ol = { 0 };
+			ol.Offset = 0xFFFFFFFF;
+			ol.OffsetHigh = 0xFFFFFFFF;
 
-		if (first_byte >= 4294967296ULL)
-		{
-			ol.Offset = first_byte & 0xffff;
-			ol.OffsetHigh = (first_byte >> 32ULL) & 0xffff;
+			block_t empty_block;
+
+			FILE_SEGMENT_ELEMENT any_seg;
+			any_seg.Buffer = &empty_block;
+
+			size_t iter_block_count = 4294967296ULL / sizeof(block_t) / 2;
+
+			std::vector<FILE_SEGMENT_ELEMENT> segments(iter_block_count + 1, any_seg);
+			memset(&segments[iter_block_count], 0, sizeof(FILE_SEGMENT_ELEMENT));
+
+			size_t iter_count = integer_ceil(empty_count, iter_block_count);
+			for (int i = 0; i < iter_count; ++i)
+			{
+				bool r = WriteFileGather(m_hFile, segments.data(), iter_block_count * sizeof(block_type), NULL, &ol);
+			}
 		}
-		else
-			ol.Offset = first_byte;
+	
+		OVERLAPPED ol = to_win_address(index);
 
 		bool r = WriteFile(m_hFile, &data, sizeof(block_type), &m_bytesWritten, &ol);
 		if (!r)
@@ -305,8 +326,7 @@ public:
     #ifdef WIN32
 		//seek(index);
 
-		OVERLAPPED ol = { 0 };
-		ol.Offset = index * sizeof(block_type);
+		OVERLAPPED ol = to_win_address(index);
 		DWORD bytes_read(0);
 		bool res = ReadFile(m_hFile, &data, sizeof(block_type), &bytes_read, &ol);
 
