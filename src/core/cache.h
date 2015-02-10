@@ -108,7 +108,7 @@ public:
                 throw runtime_error("I/O error");
             m_index.insert(make_pair(index, cache_index));
             //cout << "Readed into " << res_index << " (id=" << m_cachedArray[res_index].data.id << ", prev=" << m_cachedArray[res_index].data.prev << ", next=" << m_cachedArray[res_index].data.next() << ")" << std::endl;
-			m_cachedArray[cache_index].clear_modified();
+			m_cachedArray[cache_index].set_modified();
 
 			return m_cachedArray[cache_index].data;
 		}
@@ -158,6 +158,7 @@ public:
     {
         int cache_index = get_cache_page(key);
         m_cachedArray[cache_index].data = val;
+		m_cachedArray[cache_index].set_modified();
         m_index.insert(make_pair(key, cache_index));
     }
 private:

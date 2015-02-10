@@ -22,6 +22,7 @@
 using namespace std;
 
 
+#define ITERATION_BLOCK_COUNT 16
 
 /*
 Linear container of fixed-length data elements.
@@ -152,13 +153,39 @@ public:
 			OVERLAPPED ol = { 0 };
 			ol.Offset = 0xFFFFFFFF;
 			ol.OffsetHigh = 0xFFFFFFFF;
-			bool r = WriteFile(m_hFile, 0, sizeof(block_type)* empty_count, &m_bytesWritten, &ol);
+
+			size_t iter_count = empty_count / ITERATION_BLOCK_COUNT;
+			block_t blocks_buffer[ITERATION_BLOCK_COUNT];
+			memset(blocks_buffer, 0, sizeof(blocks_buffer));
+
+			std::vector<DWORD> wrtten(iter_count);
+
+			for (size_t i = 0; i < iter_count; i++)
+			{
+				bool r = WriteFile(m_hFile, blocks_buffer, sizeof(blocks_buffer), &wrtten[i], &ol);
+				if (!r)
+					cout << "Write failed" << std::endl;
+			}
+
+			m_blockCount = m_blockCount + iter_count * ITERATION_BLOCK_COUNT;
 		}
 		
+
+		size_t first_byte = index * sizeof(block_type);
 		OVERLAPPED ol = { 0 };
-		ol.Offset = index * sizeof(block_type);
+
+		if (first_byte >= 4294967296ULL)
+		{
+			ol.Offset = first_byte & 0xffff;
+			ol.OffsetHigh = (first_byte >> 32ULL) & 0xffff;
+		}
+		else
+			ol.Offset = first_byte;
 
 		bool r = WriteFile(m_hFile, &data, sizeof(block_type), &m_bytesWritten, &ol);
+		if (!r)
+			cout << "Write failed" << std::endl;
+
 		m_blockCount = max(m_blockCount, index + 1);
 		return r ? 0 : 1;
     #else

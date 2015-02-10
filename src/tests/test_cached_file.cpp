@@ -19,7 +19,7 @@ bool operator==(const sample_block_t & b1, const sample_block_t & b2)
 	return b1.val == b2.val;
 }
 
-void test_cached_file()
+void test_basic_io()
 {
 	std::vector<sample_block_t> correct_data;
 
@@ -52,6 +52,28 @@ void test_cached_file()
 
 	//Test random read
 	cout << "================Testing random read=============" << std::endl;
-	for (int i = 0; i <  correct_data.size(); ++i)
+	for (int i = 0; i < correct_data.size(); ++i)
 		assert_test(test_file[i] == correct_data[i], "Cached file random read");
+}
+
+void test_large_files()
+{
+	cached_file<sample_block_t, 1> test_file("test_file.dat");
+	test_file.open("test_file.dat");
+
+	size_t first_large_index = 1024ULL * 1024;
+
+	for (int i = 0; i < 20; ++i)
+	{
+		sample_block_t block;
+		block.val = 1000 + i;
+
+		test_file.load(first_large_index + i, block);
+	}
+}
+
+void test_cached_file()
+{
+	test_basic_io();
+	test_large_files();
 }
