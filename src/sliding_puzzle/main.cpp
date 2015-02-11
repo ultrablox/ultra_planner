@@ -8,11 +8,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <chrono>
-#include <thread>
 
 using namespace std;
-using namespace std::chrono;
 using namespace TCLAP;
 
 

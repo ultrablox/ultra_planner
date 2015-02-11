@@ -6,6 +6,9 @@
 #include "search_algorithms/greedy_bfs_engine.h"
 #include "search_algorithms/batched_engine.h"
 #include <thread>
+#include <chrono>
+
+using namespace std::chrono;
 
 template<typename T>
 class state_space_solver
@@ -49,6 +52,8 @@ private:
 			return select_engine<batched_engine<graph_t, manhattan_heuristic<transition_system_t>, ExtMem>>();
 		else if (alg_name == "GBFS")
 			return select_engine<greedy_bfs_engine<graph_t, manhattan_heuristic<transition_system_t>, ExtMem>>();
+		else
+			return false;
 	}
 
 	template<typename EngType>

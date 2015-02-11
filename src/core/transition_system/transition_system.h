@@ -112,12 +112,12 @@ public:
 		for (; trans_first != trans_last; ++trans_first, ++state_first, ++i)
 		{
 			os << "Step #" << i << ':';
-			interpret_transition(os, *state_first, *trans_first) << std::endl;
-			interpet_state(os, *state_first) << std::endl;
+			this->interpret_transition(os, *state_first, *trans_first) << std::endl;
+			this->interpet_state(os, *state_first) << std::endl;
 		}
 
 		os << "Final:" << std::endl;
-		interpet_state(os, *state_first) << std::endl;
+		this->interpet_state(os, *state_first) << std::endl;
 	}
 protected:
 	//state_t m_state;
