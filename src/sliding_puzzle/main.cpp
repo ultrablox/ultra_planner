@@ -2,9 +2,7 @@
 #include "sliding_puzzle.h"
 #include <core/transition_system/transition_system.h>
 #include <core/algorithm/graph.h>
-#include <solver/search_algorithms/astar_engine.h>
-#include <solver/search_algorithms/greedy_bfs_engine.h>
-#include <solver/search_algorithms/batched_engine.h>
+#include <solver/state_space_solver.h>
 #include <core/UExternalMemoryController.h>
 #include <tclap/CmdLine.h>
 #include <string>
@@ -17,169 +15,6 @@ using namespace std;
 using namespace std::chrono;
 using namespace TCLAP;
 
-
-template<typename T>
-class state_space_solver
-{
-	typedef T transition_system_t;
-
-	template<typename X>
-	struct engine_generator
-	{
-
-	};
-
-
-public:
-	state_space_solver(transition_system_t & tr_sys)
-		:m_system(tr_sys)
-	{
-		size_t state_power = tr_sys.max_state_count_10();
-
-		m_maxStateCount = pow(10, state_power);
-		cout << "Search space contains maximum 10^" << state_power << " states" << std::endl;
-	}
-
-	template<bool UseExternalMem>
-	void solve(istream & in_file, const std::string & alg_name)
-	{
-		auto state = m_system.default_state();
-		m_system.deserialize_state(in_file, state);
-
-		//m_system.set_state(state);
-
-		typedef transition_system_graph<transition_system_t> graph_t;
-		graph_t graph(m_system);
-		
-
-		if (alg_name == "A*")
-			solve_with_engine<astar_engine<graph_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
-		else if (alg_name == "BA*")
-			solve_with_engine<batched_engine<graph_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
-		else if (alg_name == "GBFS")
-			solve_with_engine<greedy_bfs_engine<graph_t, manhattan_heuristic<transition_system_t>, UseExternalMem>>(graph, state);
-		
-	}
-private:
-
-	template<typename EngType, typename GraphT, typename StateT>
-	void solve_with_engine(GraphT & graph, const StateT & initial_state)
-	{
-		typedef typename GraphT::vertex_streamer_t streamer_t;
-		streamer_t streamer(graph.transition_system());
-
-		EngType search_engine(graph, streamer);
-
-		std::list<typename transition_system_t::transition_t> plan;
-		std::thread monitor_thread([&](){
-
-			std::ofstream monitor_data("monitoring_data.csv", std::ofstream::out);
-
-			monitor_data << "Time,s;Merging Speed,nodes/sec;Cache Load,%;Nodes Merged;" << std::endl;
-
-			std::chrono::milliseconds print_dura(10000);
-			std::chrono::milliseconds dura(500);
-
-			auto begin_tp = std::chrono::steady_clock::now();
-
-			const int print_counter = print_dura.count() / dura.count();
-
-			int counter = print_counter;
-
-			cout << "Started solving monitor, interval " << dura.count() << " msecs" << std::endl;
-			double last_explored_count = 0.0;
-			while (!search_engine.finished())
-			{
-				if (!(counter--))
-				{
-					counter = print_counter;
-				
-					auto stats = search_engine.get_stats();
-
-					cout << "=============Monitoring================" << std::endl;
-					cout << stats;
-
-					double explored_node_count = stats.state_count;
-					size_t pow10_count = explored_node_count > 1 ? ceil(log10(explored_node_count)) : 0;
-
-					float merge_speed = (explored_node_count - last_explored_count) / print_dura.count() * 1e3;
-						cout << "Observed 10^" << pow10_count << " states (" << explored_node_count / m_maxStateCount << "%), speed = " << merge_speed << " nodes/sec" << std::endl;
-
-					last_explored_count = explored_node_count;
-
-					//Output to monitoring data
-					auto cur_tp = std::chrono::steady_clock::now();
-					monitor_data << std::chrono::duration_cast<std::chrono::seconds>(cur_tp - begin_tp).count() << ';' << merge_speed << ';' << stats.storage_stats[0].cache_load * 100.0f << ';' << explored_node_count << ';' << std::endl;
-				}
-
-				std::this_thread::sleep_for(dura);
-			}
-		});
-
-
-		cout << "Starting solving process..." << std::endl;
-		plan = solve_puzzle<std::list<typename transition_system_t::transition_t>>(search_engine, m_system, graph, initial_state);
-
-		std::ofstream out_file("plan.txt");
-		for (auto p : plan)
-			out_file << p << std::endl;
-
-		monitor_thread.join();
-	}
-
-	template<typename Res, typename PuzzleT, typename Eng, typename GraphT>
-	Res solve_puzzle(Eng && eng, PuzzleT & puzzle, GraphT & graph, const typename PuzzleT::state_t & initial_state)
-	{
-		typedef PuzzleT puzzle_t;
-
-		std::vector<typename puzzle_t::state_t> path;
-
-		auto start_tp = high_resolution_clock::now();
-
-		bool found = eng(graph, initial_state, [&](const typename puzzle_t::state_t & state){
-			return puzzle.is_solved(state);
-		}, path);
-
-		auto plan = puzzle.build_transition_path(path.begin(), path.end());
-
-		if(found)
-			cout << "Solution found (length " << plan.size() << ")" << std::endl;
-		else
-			cout << "Solution not found!" << std::endl;
-
-		auto end_tp = high_resolution_clock::now();
-		double search_timecost = duration_cast<microseconds>(end_tp - start_tp).count() * 1e-6;
-
-		std::ofstream stats_file("stats.txt");
-		stats_file << "wall_time:" << search_timecost << std::endl;
-		stats_file << "plan_length:" << plan.size() << std::endl;
-		stats_file << eng.get_stats();
-
-		return plan;
-	}
-private:
-	transition_system_t & m_system;
-	double m_maxStateCount;
-};
-
-void solve_fun(bool in_ext_mem, istream & in_file, const std::string & alg_name)
-{
-	//Read size
-	int width, height;
-	in_file >> width >> height;
-
-	auto problem_size = make_pair(width, height);
-
-	typedef transition_system<sliding_puzzle> puzzle_t;
-	puzzle_t puzzle(problem_size);
-
-	state_space_solver<puzzle_t> solver(puzzle);
-
-	if (in_ext_mem)
-		solver.solve<true>(in_file, alg_name);
-	else
-		solver.solve<false>(in_file, alg_name);
-}
 
 int main(int argc, const char ** argv)
 {
@@ -204,8 +39,8 @@ int main(int argc, const char ** argv)
 	ValueArg<string> algorithm_name("a", "algorithm", "Algorithm (A*, BA*, GBFS).", false, "A*", "string");
 	cmd.add(algorithm_name);
 
-	ValueArg<string> heuristic_name("", "heuristic", "Heuristic (MD - manhatten distance, PDB - pattern database).", false, "PDB", "string");
-	cmd.add(heuristic_name);
+	//ValueArg<string> heuristic_name("", "heuristic", "Heuristic (MD - manhatten distance, PDB - pattern database).", false, "PDB", "string");
+	//cmd.add(heuristic_name);
 
 	ValueArg<string> storage_type("s", "storage", "Use type of storage (ext - external memory / int - internal memory).", false, "int", "string");
 	cmd.add(storage_type);
@@ -238,7 +73,14 @@ int main(int argc, const char ** argv)
 		if (storage_type.getValue() == "ext")
 			ext_memory_ctrl.reset(new UExternalMemoryController());
 
-		solve_fun(storage_type.getValue() == "ext", in_file, algorithm_name.getValue());
+		//Read size
+
+		using puzzle_t = transition_system<sliding_puzzle>;
+		state_space_solver<puzzle_t> solver(in_file, cout);
+
+		bool r = solver.solve(storage_type.getValue() == "ext", algorithm_name.getValue());
+		if (!r)
+			cout << "Solution not found!" << std::endl;
 	}
 	else if(command_name.getValue() == "generate")
 	{

@@ -161,5 +161,8 @@
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\serial_engine.h">
       <Filter>src\search_algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\state_space_solver.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

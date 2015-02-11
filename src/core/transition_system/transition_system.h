@@ -105,6 +105,20 @@ public:
 		return initial_state == sliding_puzzle::default_state();
 	}
 
+	template<typename StateIt, typename TransIt>
+	void trace_solution(std::ostream & os, TransIt trans_first, TransIt trans_last, StateIt state_first)
+	{
+		int i = 1;
+		for (; trans_first != trans_last; ++trans_first, ++state_first, ++i)
+		{
+			os << "Step #" << i << ':';
+			interpret_transition(os, *state_first, *trans_first) << std::endl;
+			interpet_state(os, *state_first) << std::endl;
+		}
+
+		os << "Final:" << std::endl;
+		interpet_state(os, *state_first) << std::endl;
+	}
 protected:
 	//state_t m_state;
 	//std::function<transition_t(const state_t &, const state_t &)> m_diffFun;

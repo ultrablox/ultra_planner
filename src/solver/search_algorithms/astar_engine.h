@@ -30,8 +30,8 @@ class astar_engine : public heuristic_engine<Gr, astar_node_priority_cmp, H, Ext
 {
 	using _Base = heuristic_engine<Gr, astar_node_priority_cmp, H, ExtMemory, hashset_t::Buffered>;
 public:
-	astar_engine(Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)
-		:_Base(graph, vstreamer)
+	astar_engine(const typename Gr::vertex_streamer_t & vstreamer)
+		:_Base(vstreamer)
 	{}
 };
 
@@ -40,7 +40,7 @@ class delayed_astar_engine : public buffered_heuristic_engine<Gr, astar_node_pri
 {
 	using _Base = buffered_heuristic_engine<Gr, astar_node_priority_cmp, H, ExtMemory, hashset_t::Delayed>;
 public:
-	delayed_astar_engine(Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)
+	delayed_astar_engine(const Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)
 		:_Base(graph, vstreamer)
 	{}
 };

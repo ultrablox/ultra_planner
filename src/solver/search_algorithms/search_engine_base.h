@@ -31,7 +31,7 @@ public:
 
 	//enum class state_state_t {Unknown, Discovered, Expanded};
 	//template<typename Gr>
-	search_engine_base(const graph_t & graph, const state_streamer_t & streamer)
+	search_engine_base(const state_streamer_t & streamer)
 		:m_database(streamer), m_finished(false)
 	{
 	}

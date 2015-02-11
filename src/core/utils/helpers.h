@@ -195,4 +195,15 @@ void sort_wrapper(It begin, It end, Pred pred)
 ULTRA_CORE_API std::pair<size_t, bool> different_radix(size_t lhs, size_t rhs);
 ULTRA_CORE_API bool check_radix(size_t val, size_t radix_id);
 
+template<typename It>
+void print_range(std::ostream & os, It first, It last, char delimeter)
+{
+	if (first == last)
+		return;
+
+	os << *first++;
+	while (first != last)
+		os << delimeter << *first++;
+}
+
 #endif

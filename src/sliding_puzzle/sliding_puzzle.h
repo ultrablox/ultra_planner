@@ -181,9 +181,16 @@ public:
 	};
 
 	
-	sliding_puzzle(size_description_t description)
-		:/*m_state(_state), */m_size(description)
+	sliding_puzzle(const size_description_t & description)
+		:m_size(description)
 	{
+	}
+
+	static size_description_t deserialize_problem_size(std::istream & is)
+	{
+		int width, height;
+		is >> width >> height;
+		return size_description_t(width, height);
 	}
 
 	bool is_solved(const state_t & cur_state) const
@@ -303,16 +310,7 @@ public:
 	void serialize_state(std::ostream & os, const state_t & state) const
 	{
 		os << width() << ' ' << height() << std::endl;
-
-		for(int y = 0; y < height(); ++y)
-		{
-			//os << print_data[0 + y*width()];
-			os << (int)state.data[y*width()];
-			for(int x = 1; x < width(); ++x)
-				os << ' ' << (int)state.data[x + width()*y]; //os << ' ' << print_data[x + width()*y];
-
-			os << std::endl;
-		}
+		interpet_state(os, state);
 	}
 
 	/*void serialize_state(void * dst, const state_t & state) const
@@ -386,6 +384,25 @@ public:
 	size_t max_state_count_10() const
 	{
 		return lg_factor(width() * height());
+	}
+
+	std::ostream & interpret_transition(std::ostream & os, const state_t & state, const transition_t & transition) const
+	{
+		os << " move " << (int)state.data[transition];
+		return os;
+	}
+
+	std::ostream & interpet_state(std::ostream & os, const state_t & state) const
+	{
+		for (int y = 0; y < height(); ++y)
+		{
+			os << (int)state.data[y*width()];
+			for (int x = 1; x < width(); ++x)
+				os << ' ' << (int)state.data[x + width()*y];
+
+			os << std::endl;
+		}
+		return os;
 	}
 protected:
 	//state_t & m_state;

@@ -20,8 +20,8 @@ public:
 	using open_list_el_t = typename open_list_t::combined_value_t;
 
 	//template<typename Gr>
-	queued_search_engine(graph_t & graph, const typename Gr::vertex_streamer_t & vstreamer)
-		:_Base(graph, vstreamer), m_searchQueue(typename _Base::node_streamer_t(vstreamer)/*, graph.serialized_state_size() + sizeof(size_t)* 2 + sizeof(int), _Base::m_database.m_nodeSerializeFun, _Base::m_database.m_nodeDeserializeFun*/), m_firstNode(true)
+	queued_search_engine(const typename Gr::vertex_streamer_t & vstreamer)
+		:_Base(vstreamer), m_searchQueue(typename _Base::node_streamer_t(vstreamer)), m_firstNode(true)
 	{}
 
 	struct stats_t : public _Base::stats_t

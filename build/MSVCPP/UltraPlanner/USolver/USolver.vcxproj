@@ -338,6 +338,7 @@
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\greedy_bfs_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\search_engine_base.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_queue.h" />
+    <ClInclude Include="..\..\..\..\src\solver\state_space_solver.h" />
     <ClInclude Include="..\..\..\..\src\solver\UHeuristic.h" />
     <ClInclude Include="..\..\..\..\src\solver\UInstantiator.h" />
     <ClInclude Include="..\..\..\..\src\solver\UMetric.h" />

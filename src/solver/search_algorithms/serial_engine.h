@@ -15,13 +15,13 @@ class blind_engine : public queued_search_engine<Gr, Cmp, false, hashset_t::Buff
 
 public:
 	//template<typename Gr>
-	blind_engine(graph_t & graph, const typename graph_t::vertex_streamer_t & vstreamer)
-		:_Base(graph, vstreamer)
+	blind_engine(const typename graph_t::vertex_streamer_t & vstreamer)
+		:_Base(vstreamer)
 	{}
 
 	//Returns true, if found.
 	//template<typename GraphT>
-	bool operator()(graph_t & graph, const state_t & init_node, std::function<bool(const state_t & node)> goal_check_fun, std::vector<state_t> & solution_path)
+	bool operator()(const graph_t & graph, const state_t & init_node, std::function<bool(const state_t & node)> goal_check_fun, std::vector<state_t> & solution_path)
 	{
 		enqueue(goal_check_fun, create_node(init_node, 0), node_estimation_t(0, 0));
 
@@ -60,12 +60,12 @@ class heuristic_engine : public queued_search_engine<Gr, Cmp, ExtMemory, Storage
 	//using comparison_t = typename _Base::comparison_t;
 public:
 	//template<typename Gr>
-	heuristic_engine(graph_t & graph, const typename graph_t::vertex_streamer_t & vstreamer)
-		:_Base(graph, vstreamer)
+	heuristic_engine(const typename graph_t::vertex_streamer_t & vstreamer)
+		:_Base(vstreamer)
 	{}
 
 	template<typename IsGoalFun>
-	bool operator()(graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
+	bool operator()(const graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
 	{
 		heuristic_t h_fun(graph.transition_system());
 
@@ -106,12 +106,12 @@ class buffered_heuristic_engine : public queued_search_engine<Gr, Cmp, ExtMemory
 	using search_node_t = typename _Base::search_node_t;
 	using state_t = typename _Base::state_t;
 public:
-	buffered_heuristic_engine(graph_t & graph, const typename graph_t::vertex_streamer_t & vstreamer)
-		:_Base(graph, vstreamer)
+	buffered_heuristic_engine(const typename graph_t::vertex_streamer_t & vstreamer)
+		:_Base(vstreamer)
 	{}
 
 	template<typename IsGoalFun>
-	bool operator()(graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
+	bool operator()(const graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
 	{
 		heuristic_t h_fun(graph.transition_system());
 
