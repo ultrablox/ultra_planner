@@ -81,7 +81,8 @@ public:
 		size_t m_serializedSize;
 	};
 
-	using layer_container_t = complex_stack<combined_value_t, combined_val_streamer_t, 8192U, ExtMemory>;
+	//using layer_container_t = complex_stack<combined_value_t, combined_val_streamer_t, 8192U, ExtMemory>;
+	using layer_container_t = complex_queue<combined_value_t, combined_val_streamer_t, 8192U>;
 public:
 
 	search_queue(const value_streamer & node_streamer)
