@@ -15,31 +15,33 @@ class hashset_generator
 	using block_t = hashset_block<BlockSize>;
 
 public:
-	template<hashset_t Tp>
+	template<hashset_t Tp, bool = true>	//By default it uses hashset_t::Internal
 	struct generate
 	{
+		/*using storage_wrapper_t = vector_wrapper<std::vector<block_t>>;
+		using result = buffered_complex_hashset<T, S, storage_wrapper_t, H>;*/
 	};
 
-	template<>
-	struct generate<hashset_t::Internal>
+	template<bool dummy>
+	struct generate<hashset_t::Internal, dummy>
 	{
 		using storage_wrapper_t = vector_wrapper<std::vector<block_t>>;
 		using result = buffered_complex_hashset<T, S, storage_wrapper_t, H>;
 	};
 
-	template<>
-	struct generate<hashset_t::Buffered>
+	template<bool dummy>
+	struct generate<hashset_t::Buffered, dummy>
 	{
 		using storage_wrapper_t = cached_file_wrapper<cached_file<block_t, 500000>>;//65536U
 		using result = buffered_complex_hashset<T, S, storage_wrapper_t, H>;
 	};
 
-	template<>
-	struct generate<hashset_t::Delayed>
+	template<bool dummy>
+	struct generate<hashset_t::Delayed, dummy>
 	{
 		using storage_t = data_file<block_t>;
 		using result = delayed_complex_hashset<T, S, storage_t, H>;
-	};
+	};/**/
 };
 
 #endif

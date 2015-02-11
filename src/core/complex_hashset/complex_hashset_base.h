@@ -116,8 +116,6 @@ protected:
 	static const int MaxBlocksPerChain = 2;
 
 	
-	using delayed_buffer_t = delayed_buffer<value_type>;
-	
 	/*using block_const_iterator = block_iterator<const block_chain_t>;
 	using block_reverse_const_iterator = block_reverse_iterator<const block_chain_t>;
 	using block_iterator = block_iterator<block_chain_t>;
@@ -224,85 +222,6 @@ public:
 		}*/
 	}
 protected:
-	
-	/*template<typename It, typename HashExtractor, typename ValueExtractor, typename Callback>
-	void insert_small_into_chain(block_chain_t & chain, It begin_it, It end_it, HashExtractor hash_fun, ValueExtractor ser_val_fun, Callback call_fun)
-	{
-		for (auto it = begin_it; it != end_it; ++it)
-		{
-			if (insert_into_chain(chain, hash_fun(*it), ser_val_fun(*it)))
-				call_fun(*it);
-		}
-	}*/
-
-/*	template<typename It, typename HashExtractor, typename ValueExtractor, typename Callback>
-	void insert_into_chain(block_chain_t & chain, It begin_it, It end_it, HashExtractor hash_fun, ValueExtractor ser_val_fun, Callback call_fun)
-	{
-		//Remove duplication amongst news
-		size_t inserting_size = std::distance(begin_it, end_it);
-		auto last_it = UltraCore::unique(chain.begin(), chain.end(), begin_it, end_it, [](const byte_range & br){
-			return br.begin_as<size_t>();
-		}, [=](const typename It::value_type & val){
-			return hash_fun(val);
-		}, [=](const byte_range & old_val, const typename It::value_type & new_val){
-			return old_val == ser_val_fun(new_val);
-		});
-		
-		//if (last_it != end_it)
-		//	cout << "Int unique removed " << 100.0f * (float)std::distance(last_it, end_it) / std::distance(begin_it, end_it) << "% values" << std::endl;
-		
-		//chain.print();
-		
-		
-		//Add to chain what's left
-		size_t old_size = chain.element_count();
-		size_t merging_size = std::distance(begin_it, last_it);
-		chain.resize(chain.element_count() + merging_size);
-*/
-		//Copy values
-		/*auto dest_it = chain.begin() + old_size;
-		for (It it = begin_it; it != last_it; ++it, ++dest_it)
-		{
-			call_fun(*it);
-			*dest_it = ser_val_fun(*it);
-		}
-
-		chain.print();*/
-	
-		//Merge them
-		/*cout << "Adding internaly merged: ";
-		for (auto it = begin_it; it != last_it; ++it)
-			cout << ser_val_fun(*it).begin_as<size_t>() << ',';
-		cout << std::endl;*/
-//		std::reverse(begin_it, last_it);
-		/*cout << "Adding internaly merged: ";
-		for (auto it = begin_it; it != last_it; ++it)
-		{
-			cout << ser_val_fun(*it).begin_as<size_t>() << ',';
-			if (hash_fun(*it) == 50)
-				cout << "!";
-		}
-		cout << std::endl;*/
-
-		/*UltraCore::merge(chain.rbegin() + merging_size, chain.rend(), begin_it, last_it, chain.rbegin(), [](const byte_range & lhs, const byte_range & rhs){
-			return lhs.begin_as<size_t>() > rhs.begin_as<size_t>();
-		});*/
-
-/*		std::merge(chain.rbegin() + merging_size, chain.rend(), begin_it, last_it, chain.rbegin(), [](const byte_range & lhs, const byte_range & rhs){
-			return lhs.begin_as<size_t>() > rhs.begin_as<size_t>();
-		});
-		
-		for (auto it = begin_it; it != last_it; ++it)
-			call_fun(*it);
-*/		
-
-		/*for (auto it = begin_it; it != last_it; ++it)
-		{
-			if(insert_into_chain(chain, hash_fun(*it), ser_val_fun(*it)))
-				call_fun(*it);
-		}*/
-		//chain.print();
-//	}
 
 
 	std::pair<iterator, bool> write_to_block(size_t block_id, size_t hash_val, const value_type & val)
@@ -409,14 +328,14 @@ protected:
 		block.inc_item_count();
 	}
 
-	void print_block(const block_t & block) const
+	/*void print_block(const block_t & block) const
 	{
 		auto end_it = block_iterator(block.item_count, block, m_serializedElementSize);
 
 		for (auto it = block_iterator(0, block, m_serializedElementSize); it != end_it; ++it)
 			cout << *it << ',';
 		cout << std::endl;
-	}
+	}*/
 	
 	float load_factor(const block_t & block) const
 	{

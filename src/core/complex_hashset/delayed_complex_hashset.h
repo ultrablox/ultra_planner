@@ -67,6 +67,10 @@ class delayed_complex_hashset: public complex_hashset_base<T, S, W, H>
 	using storage_t = W;
 	using insertion_request_t = insertion_request<T>;
 	using request_container_t = std::vector<insertion_request_t>;
+	using block_t = typename _Base::block_t;
+	using value_type = typename _Base::value_type;
+	using iterator = typename _Base::iterator;
+	using delayed_buffer_t = delayed_buffer<value_type>;
 
 	struct merge_range_descr_t
 	{
@@ -92,8 +96,8 @@ class delayed_complex_hashset: public complex_hashset_base<T, S, W, H>
 		{
 			for (int i = 0; i < chain_info.block_count; ++i)
 			{
-				m_blocksData[i].pBlock = &m_buffer[first_buffer_index + i].data;
-				m_totalElements += m_blocksData[i].pBlock->item_count();
+				_Base::m_blocksData[i].pBlock = &m_buffer[first_buffer_index + i].data;
+				_Base::m_totalElements += _Base::m_blocksData[i].pBlock->item_count();
 			}
 		}
 
@@ -105,23 +109,23 @@ class delayed_complex_hashset: public complex_hashset_base<T, S, W, H>
 			m_buffer[m_firstBufferIndex + i].modified = true;
 			}*/
 
-			remove_last_blocks(m_blocksData.size());	
+			remove_last_blocks(_Base::m_blocksData.size());	
 		}
 
 		void remove_last_blocks(int count)
 		{
 			for (int i = 0; i < count; ++i)
 			{
-				int idx = m_blocksData.size() - i - 1;
+				int idx = _Base::m_blocksData.size() - i - 1;
 
 				if (idx < m_initialBlockCount)
 				{
-					if (m_blocksData[idx].modified)
+					if (_Base::m_blocksData[idx].modified)
 						m_buffer[m_firstBufferIndex + idx].modified = true;
 				}
 			}
 
-			m_blocksData.resize(m_blocksData.size() - count);
+			_Base::m_blocksData.resize(_Base::m_blocksData.size() - count);
 		}
 	private:
 		blocks_buffer_t & m_buffer;
@@ -160,8 +164,8 @@ public:
 	delayed_complex_hashset(const S & ss)
 		:_Base(ss), m_threadPool(20), m_controllerThread(&delayed_complex_hashset::merge_loop, this)
 	{
-		m_blocks.append(block_t(0));
-		m_index.create_mapping(0, chain_info_t(0, 0, 1));
+		_Base::m_blocks.append(block_t(0));
+		_Base::m_index.create_mapping(0, chain_info_t(0, 0, 1));
 	}
 
 	delayed_complex_hashset(const delayed_complex_hashset & rhs)
@@ -199,7 +203,7 @@ public:
 	void insert_delayed(const value_type & val, size_t hash_val, CallbackFun fun)
 	{
 		m_inputBuffer.safe_access_first([=](request_container_t & cont){
-			cont.push_back(insertion_request_t(hash_val, val, fun, m_serializedElementSize));
+			cont.push_back(insertion_request_t(hash_val, val, fun, _Base::m_serializedElementSize));
 		});
 /*		if (m_blockCount < 64)
 		{
@@ -253,7 +257,7 @@ public:
 				//cout << "...done" << std::endl;
 			}
 
-			/*auto group_it = m_delayedBuffer.find(cur_point);
+			auto group_it = m_delayedBuffer.find(cur_point);
 			if (group_it == m_delayedBuffer.end())
 			m_delayedBuffer.insert(delayed_buffer_groupt_t(delayed_insertion_request_t(hash_val, val, fun)));
 			else
@@ -297,8 +301,8 @@ public:
 	{
 		bool something_added = false;
 
-		chain_info_t & chain_id = m_index.chain_with_hash(cur_point);
-		m_blocks.ensure_chain_in_cache(chain_id);
+		chain_info_t & chain_id = _Base::m_index.chain_with_hash(cur_point);
+		_Base::m_blocks.ensure_chain_in_cache(chain_id);
 		block_chain_t chain(*this, chain_id);
 
 		if (range.size() < 10)
@@ -311,7 +315,7 @@ public:
 				return req.to_byte_range();
 			}, [&](const typename delayed_buffer_t::insertion_request_t & req){
 				req.callback(req.val);
-				++m_size;
+				++_Base::m_size;
 				something_added = true;
 			});
 
@@ -332,7 +336,7 @@ public:
 			for (auto it = range.begin(); it != last_it; ++it)
 			{
 				memcpy(&it->serialized_val[0], &it->hash_val, sizeof(size_t));
-				m_valueStreamer.serialize(&it->serialized_val[sizeof(size_t)], it->val);
+				_Base::m_valueStreamer.serialize(&it->serialized_val[sizeof(size_t)], it->val);
 			}
 
 			/*if (last_it != range.end())
@@ -346,7 +350,7 @@ public:
 				return req.to_byte_range();
 			}, [&](const typename delayed_buffer_t::insertion_request_t & req){
 				req.callback(req.val);
-				++m_size;
+				++_Base::m_size;
 				something_added = true;
 			});
 
@@ -367,7 +371,7 @@ public:
 	iterator find(const value_type & val)
 	{
 		size_t hash_val = m_hasher(val);
-		chain_info_t & info = m_index.chain_with_hash(hash_val);
+		chain_info_t & info = _Base::m_index.chain_with_hash(hash_val);
 
 		//Read sequentional all the chain
 		size_t cur_block_id = info.first, last_block_id;
@@ -375,13 +379,13 @@ public:
 		do
 		{
 			last_block_id = cur_block_id;
-			m_blocks.get(cur_block_id, m_blocksBuffer[buffer_index].data);
+			_Base::m_blocks.get(cur_block_id, m_blocksBuffer[buffer_index].data);
 			cur_block_id = m_blocksBuffer[buffer_index].data.meta.next;
 			++buffer_index;
 		} while (last_block_id != cur_block_id);
 
 		//Build chain
-		block_chain_t chain(m_blocksBuffer, 0, info, m_valueStreamer, m_maxItemsInBlock);
+		block_chain_t chain(m_blocksBuffer, 0, info, _Base::m_valueStreamer, _Base::m_maxItemsInBlock);
 
 		return find_in_chain(chain, val, hash_val);
 	}
@@ -424,7 +428,7 @@ public:
 		while( it != end)
 		{
 			size_t group_last_hash = 0;
-			chain_info_t * p_chain = &m_index.chain_with_hash(it->hash_val, &group_last_hash);
+			chain_info_t * p_chain = &_Base::m_index.chain_with_hash(it->hash_val, &group_last_hash);
 
 			auto last_it = std::find_if_not(it, end, [=](const insertion_request_t & el){
 				return el.hash_val < group_last_hash;
@@ -447,7 +451,7 @@ public:
 		resize_if_less(m_blocksBuffer, total_old_blocks);
 
 		size_t total_merging_items = std::distance(begin, end);
-		resize_if_less(m_newBlocksBuffer, integer_ceil(total_merging_items, m_maxItemsInBlock));
+		resize_if_less(m_newBlocksBuffer, integer_ceil(total_merging_items, _Base::m_maxItemsInBlock));
 
 		//Read all chain beginnings and ends in one API
 /*		vector<storage_t::read_request> first_read_req;
@@ -485,11 +489,11 @@ public:
 
 		//Write new blocks
 		if (new_block_buf_index.load() > 0)
-			m_blocks.write_range(m_newBlocksBuffer.data(), m_newBlocksBuffer.data()->meta.id, new_block_buf_index.load());
+			_Base::m_blocks.write_range(m_newBlocksBuffer.data(), m_newBlocksBuffer.data()->meta.id, new_block_buf_index.load());
 
 		//Update indices
 		for (auto & el : new_indices)
-			m_index.create_mapping(el.first, el.second);
+			_Base::m_index.create_mapping(el.first, el.second);
 	}
 
 	template<typename It>
@@ -507,7 +511,7 @@ public:
 		for (auto it = begin; it != last_it; ++it)
 		{
 			memcpy(&it->serialized_val[0], &it->hash_val, sizeof(size_t));
-			m_valueStreamer.serialize(&it->serialized_val[sizeof(size_t)], it->val);
+			_Base::m_valueStreamer.serialize(&it->serialized_val[sizeof(size_t)], it->val);
 		}
 	
 
@@ -518,7 +522,7 @@ public:
 		do
 		{
 			last_block_id = cur_block_id;
-			m_blocks.get(cur_block_id, m_blocksBuffer[buffer_index].data);
+			_Base::m_blocks.get(cur_block_id, m_blocksBuffer[buffer_index].data);
 			cur_block_id = m_blocksBuffer[buffer_index].data.meta.next;
 			++buffer_index;
 		} while (last_block_id != cur_block_id);
@@ -527,8 +531,8 @@ public:
 
 		{
 			//Build chain
-			block_chain_t chain(m_blocksBuffer, first_block_index, info, m_valueStreamer, m_maxItemsInBlock);
-			const size_t old_block_count = m_blocks.size();
+			block_chain_t chain(m_blocksBuffer, first_block_index, info, _Base::m_valueStreamer, _Base::m_maxItemsInBlock);
+			const size_t old_block_count = _Base::m_blocks.size();
 
 			//Merge into it
 			insert_into_chain(chain, begin, last_it, [&](){
@@ -546,7 +550,7 @@ public:
 			bool r;
 			do
 			{
-				r = try_ballance_chain(chain, new_chain_info, &new_chain_first_hash);
+				r = _Base::try_ballance_chain(chain, new_chain_info, &new_chain_first_hash);
 				if (r)
 					new_indices.push_back(make_pair(new_chain_first_hash, new_chain_info));
 			} while (r);				
@@ -556,7 +560,7 @@ public:
 		for (size_t i = 0; i < initial_chain_length; ++i)
 		{
 			if (m_blocksBuffer[first_block_index + i].modified)
-				m_blocks.set(m_blocksBuffer[first_block_index + i].data.meta.id, m_blocksBuffer[first_block_index + i].data);
+				_Base::m_blocks.set(m_blocksBuffer[first_block_index + i].data.meta.id, m_blocksBuffer[first_block_index + i].data);
 		}
 	}
 
@@ -585,7 +589,7 @@ public:
 			return lhs.begin_as<size_t>() > rhs.begin_as<size_t>();
 		});
 
-		m_size += std::distance(begin_it, last_it);
+		_Base::m_size += std::distance(begin_it, last_it);
 
 		for (auto it = begin_it; it != last_it; ++it)
 			m_successQueue.push(*it);

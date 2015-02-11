@@ -3,7 +3,12 @@
 #define USERDB_CACHED_FILE_H_
 
 #include "cache.h"
-#include "data_file.h"
+
+#ifdef WIN32
+    #include "data_file_win.h"
+#else
+    #include "data_file_unix.h"
+#endif
 
 struct cached_file_stats_t
 {

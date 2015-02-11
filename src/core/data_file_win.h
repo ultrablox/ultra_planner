@@ -125,60 +125,6 @@ public:
 		if (index > m_blockCount)
 		{
 			size_t empty_count = index - m_blockCount;
-/*			//Create some empty blocks
-			block_type empty_block;
-			memset(&empty_block, 0, sizeof(block_type));
-
-			OVERLAPPED * p_ol = (OVERLAPPED*)malloc(sizeof(OVERLAPPED)* (empty_count + 2));
-			memset(p_ol, 0, sizeof(OVERLAPPED)* (empty_count + 2));
-
-			FILE_SEGMENT_ELEMENT * seg_arr = (FILE_SEGMENT_ELEMENT*)malloc(sizeof(FILE_SEGMENT_ELEMENT)* (empty_count + 2));
-			memset(seg_arr, 0, sizeof(FILE_SEGMENT_ELEMENT)* (empty_count + 2));
-
-			for (size_t i = 0; i < empty_count; ++i)
-			{
-				p_ol[i].Offset = (m_blockCount + i) * sizeof(block_type);
-				seg_arr[i].Buffer = &empty_block;
-			}
-
-			p_ol[empty_count].Offset = (m_blockCount + empty_count) * sizeof(block_type);
-			seg_arr[empty_count].Buffer = (void*)&data;
-
-
-			bool r = WriteFileGather(m_hFile, seg_arr, sizeof(block_type), NULL, p_ol);
-			if (!r)
-			{
-				DWORD err = ::GetLastError();
-
-				if (err != ERROR_IO_PENDING)
-					return 1;
-
-				DWORD num_written = 0;
-				r = GetOverlappedResult(m_hFile, p_ol, &num_written, true);
-				if (!r)
-				{
-					return 1;
-				}
-			}*/
-
-			/*OVERLAPPED ol = { 0 };
-			ol.Offset = 0xFFFFFFFF;
-			ol.OffsetHigh = 0xFFFFFFFF;
-
-			size_t iter_count = empty_count / ITERATION_BLOCK_COUNT;
-			block_t blocks_buffer[ITERATION_BLOCK_COUNT];
-			memset(blocks_buffer, 0, sizeof(blocks_buffer));
-
-			std::vector<DWORD> wrtten(iter_count);
-
-			for (size_t i = 0; i < iter_count; i++)
-			{
-				bool r = WriteFile(m_hFile, blocks_buffer, sizeof(blocks_buffer), &wrtten[i], &ol);
-				if (!r)
-					cout << "Write failed" << std::endl;
-			}
-
-			m_blockCount = m_blockCount + iter_count * ITERATION_BLOCK_COUNT;*/
 
 			OVERLAPPED ol = { 0 };
 			ol.Offset = 0xFFFFFFFF;
