@@ -297,6 +297,7 @@
     <ClInclude Include="..\..\..\..\src\core\complex_queue.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_stack.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_vector.h" />
+    <ClInclude Include="..\..\..\..\src\core\data_file_win.h" />
     <ClInclude Include="..\..\..\..\src\core\delayed_buffer.h" />
     <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h" />
@@ -307,7 +308,6 @@
     <ClInclude Include="..\..\..\..\src\core\cache.h" />
     <ClInclude Include="..\..\..\..\src\core\cached_file.h" />
     <ClInclude Include="..\..\..\..\src\core\config.h" />
-    <ClInclude Include="..\..\..\..\src\core\data_file.h" />
     <ClInclude Include="..\..\..\..\src\core\streamer.h" />
     <ClInclude Include="..\..\..\..\src\core\thread_pool.h" />
     <ClInclude Include="..\..\..\..\src\core\transition_system\transition_system.h" />

@@ -107,9 +107,6 @@
     <ClInclude Include="..\..\..\..\src\core\algorithm\math.h">
       <Filter>src\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\data_file.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\cache.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -171,6 +168,9 @@
       <Filter>src\complex_hashset</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\thread_pool.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\data_file_win.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

@@ -391,8 +391,8 @@ private:
 		{
 			chain.append_new_block([=](){
 				size_t block_id = this->request_block();
-				_Base::m_blocks.mark_used(block_id);
-				return &(_Base::m_blocks[block_id]);
+				this->m_blocks.mark_used(block_id);
+				return &(this->m_blocks[block_id]);
 			});
 		}
 
