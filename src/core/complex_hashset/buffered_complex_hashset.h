@@ -226,18 +226,23 @@ class buffered_complex_hashset : public complex_hashset_base<T, S, W, H>
 {
 	using _Base = complex_hashset_base<T, S, W, H>;
 	using storage_t = W;
+	using value_type = typename _Base::value_type;
+	using iterator = typename _Base::iterator;
+	using block_t = typename _Base::block_t;
 	//using value_streamer_t = S;
 
-	class block_chain_t : public block_chain<typename wrapper_t::block_t, S>
+	class block_chain_t : public block_chain<typename W::block_t, S>
 	{
-		using _Base = block_chain<typename wrapper_t::block_t, S>;
+		using _Base = block_chain<typename W::block_t, S>;
+		using block_t = typename _Base::block_t;
+		using block_info_t = typename _Base::block_info_t;
 	public:
 		block_chain_t(storage_t & _blocks, chain_info_t & chain_info, const S & vs, int max_items_in_block)
 			:_Base(chain_info, vs, max_items_in_block), m_blocksStorage(_blocks)
 		{
 			//cout << "Creating chain " << limits.first << "->" << limits.second << std::endl;
 
-			size_t block_id = limits.first, last_block_id = block_id;
+			size_t block_id = _Base::limits.first, last_block_id = block_id;
 
 			int block_number = 0;
 			do
@@ -253,9 +258,9 @@ class buffered_complex_hashset : public complex_hashset_base<T, S, W, H>
 				last_block_id = block_id;
 
 				_blocks.mark_used(block_id);
-				m_blocksData[block_number].pBlock = &block_ref;
+				_Base::m_blocksData[block_number].pBlock = &block_ref;
 
-				m_totalElements += block_ref.item_count();
+				_Base::m_totalElements += block_ref.item_count();
 				block_id = block_ref.next();
 				++block_number;
 			} while (last_block_id != block_id);
@@ -273,7 +278,7 @@ class buffered_complex_hashset : public complex_hashset_base<T, S, W, H>
 
 		~block_chain_t()
 		{
-			remove_last_blocks(m_blocksData.size());
+			remove_last_blocks(_Base::m_blocksData.size());
 			/*for (block_info_t & bd : m_blocksData)
 			{
 				if (bd.modified)
@@ -286,15 +291,15 @@ class buffered_complex_hashset : public complex_hashset_base<T, S, W, H>
 		{
 			for (int i = 0; i < count; ++i)
 			{
-				int idx = m_blocksData.size() - i - 1;
-				block_info_t & bd = m_blocksData[idx];
+				int idx = _Base::m_blocksData.size() - i - 1;
+				block_info_t & bd = _Base::m_blocksData[idx];
 
 				if (bd.modified)
 					m_blocksStorage.set_modified(bd.pBlock->meta.id);
 				m_blocksStorage.clear_used(bd.pBlock->meta.id);
 			}
 
-			m_blocksData.resize(m_blocksData.size() - count);
+			_Base::m_blocksData.resize(_Base::m_blocksData.size() - count);
 		}
 	private:
 		storage_t & m_blocksStorage;
@@ -306,7 +311,7 @@ public:
 	{
 		//Create one empty block
 		size_t first_block_id = request_block();
-		m_index.create_mapping(0, chain_info_t(first_block_id, first_block_id, 1));
+		_Base::m_index.create_mapping(0, chain_info_t(first_block_id, first_block_id, 1));
 	}
 
 	template<typename It, typename HashFun, typename ValFun, typename CallbackFun>
@@ -331,26 +336,26 @@ public:
 		//cout << "Inserting" << std::endl;
 		//Find appropriate block, create if it does not exists
 
-		chain_info_t & chain_id = m_index.chain_with_hash(hash_val);
+		chain_info_t & chain_id = _Base::m_index.chain_with_hash(hash_val);
 		//cout << chain_id << std::endl;
 		//m_blocks.ensure_chain_in_cache(chain_id);
-		m_blocks.reserve(m_blocks.size() + 1);
-		block_chain_t chain(m_blocks, chain_id, m_valueStreamer, m_maxItemsInBlock);
+		_Base::m_blocks.reserve(_Base::m_blocks.size() + 1);
+		block_chain_t chain(_Base::m_blocks, chain_id, _Base::m_valueStreamer, _Base::m_maxItemsInBlock);
 
-		m_valueStreamer.serialize(&m_elementCache[sizeof(size_t)], val);
-		memcpy(&m_elementCache[0], &hash_val, sizeof(size_t));
+		_Base::m_valueStreamer.serialize(&_Base::m_elementCache[sizeof(size_t)], val);
+		memcpy(&_Base::m_elementCache[0], &hash_val, sizeof(size_t));
 
 		//chain.print();
 
-		auto res = insert_into_chain(chain, hash_val, byte_range(&m_elementCache[0], m_serializedElementSize));
+		auto res = insert_into_chain(chain, hash_val, byte_range(&_Base::m_elementCache[0], _Base::m_serializedElementSize));
 		//chain.print();
 
 		if (res)
 		{
 			chain_info_t new_chain_info;
-			if (try_ballance_chain(chain, new_chain_info))
-				m_index.create_mapping(m_blocks[new_chain_info.first].first_hash(), new_chain_info);
-			++m_size;
+			if (_Base::try_ballance_chain(chain, new_chain_info))
+				_Base::m_index.create_mapping(_Base::m_blocks[new_chain_info.first].first_hash(), new_chain_info);
+			++_Base::m_size;
 		}
 
 		return res;
@@ -360,7 +365,7 @@ public:
 	{
 		size_t hash_val = m_hasher(val);
 
-		block_chain_t chain(m_blocks, m_index.chain_with_hash(hash_val), m_valueStreamer, m_maxItemsInBlock);
+		block_chain_t chain(_Base::m_blocks, _Base::m_index.chain_with_hash(hash_val), _Base::m_valueStreamer, _Base::m_maxItemsInBlock);
 
 		return find_in_chain(chain, val, hash_val);
 	}
@@ -382,12 +387,12 @@ private:
 			}*/
 		}
 
-		if (chain.element_count() == m_maxItemsInBlock * chain.block_count())
+		if (chain.element_count() == _Base::m_maxItemsInBlock * chain.block_count())
 		{
 			chain.append_new_block([=](){
 				size_t block_id = this->request_block();
-				this->m_blocks.mark_used(block_id);
-				return &(this->m_blocks[block_id]);
+				_Base::m_blocks.mark_used(block_id);
+				return &(_Base::m_blocks[block_id]);
 			});
 		}
 
@@ -400,8 +405,8 @@ private:
 	{
 		if (m_freedBlocks.empty())
 		{
-			size_t new_id = m_blockCount++;
-			m_blocks.push_back(block_t(new_id));
+			size_t new_id = _Base::m_blockCount++;
+			_Base::m_blocks.push_back(block_t(new_id));
 			return new_id;
 		}
 		else
@@ -409,7 +414,7 @@ private:
 			size_t res = m_freedBlocks.front();
 			m_freedBlocks.pop();
 
-			block_t & block = m_blocks[res];
+			block_t & block = _Base::m_blocks[res];
 			block.meta.id = res;
 			block.set_next(res);
 			block.meta.prev = res;
@@ -421,7 +426,7 @@ private:
 	void delete_block(size_t block_id)
 	{
 		cout << "Deleting block " << block_id << std::endl;
-		block_t & block = m_blocks[block_id];
+		block_t & block = _Base::m_blocks[block_id];
 		block.item_count = 0;
 		block.set_next(std::numeric_limits<size_t>::max());
 		block.prev = std::numeric_limits<size_t>::max();
