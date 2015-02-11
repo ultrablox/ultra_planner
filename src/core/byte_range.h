@@ -77,6 +77,26 @@ struct byte_range
 		return val <= *((size_t*)rhs.start);
 	}
 
+	friend bool operator<(const byte_range & lhs, const byte_range & rhs)
+	{
+		if (lhs.begin_as<size_t>() < rhs.begin_as<size_t>())
+			return true;
+		else if (rhs.begin_as<size_t>() < lhs.begin_as<size_t>())
+			return false;
+		else
+			return (memcmp(lhs.start + sizeof(size_t), rhs.start + sizeof(size_t), lhs.size - sizeof(size_t)) < 0);
+	}
+
+	friend bool operator<=(const byte_range & lhs, const byte_range & rhs)
+	{
+		if (lhs.begin_as<size_t>() < rhs.begin_as<size_t>())
+			return true;
+		else if (rhs.begin_as<size_t>() < lhs.begin_as<size_t>())
+			return false;
+		else
+			return (memcmp(lhs.start + sizeof(size_t), rhs.start + sizeof(size_t), lhs.size - sizeof(size_t)) <= 0);
+	}
+
 	template<typename T>
 	const T & begin_as() const
 	{

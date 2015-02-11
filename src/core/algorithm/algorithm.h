@@ -15,7 +15,7 @@ It find_first_ge(It begin, It end, const Val & val)
 	//Check limits first
 	if (val <= *begin)
 		return begin;
-	else if (val > *(end - 1))
+	else if (*(end - 1) < val)
 		return end;
 	else
 	{
@@ -27,10 +27,6 @@ It find_first_ge(It begin, It end, const Val & val)
 			//It middle_it = begin + step;
 
 			//Check that edge crosses equal elements
-			/*if (*(middle_it - 1) < val)
-				begin = middle_it;
-			else
-				end = middle_it;*/
 			if (*(begin + step - 1) < val)
 				begin += step;
 			else

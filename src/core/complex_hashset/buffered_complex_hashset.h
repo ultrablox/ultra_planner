@@ -367,16 +367,19 @@ public:
 private:
 	bool insert_into_chain(block_chain_t & chain, size_t hash_val, const byte_range & br)
 	{
-		auto it = find_first_ge(chain.cbegin(), chain.cend(), hash_val);
+		//auto it = find_first_ge(chain.cbegin(), chain.cend(), hash_val);
+		auto it = find_first_ge(chain.cbegin(), chain.cend(), br);
 
 
 		if (it != chain.cend())	//If we found element with similar hash, check for duplication
 		{
-			for (; (it != chain.cend()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
+			if (br == *it)
+				return false;
+			/*for (; (it != chain.cend()) && ((*it).template begin_as<size_t>() == hash_val); ++it)
 			{
 				if (br == *it)	//Duplication detected
 					return false;
-			}
+			}*/
 		}
 
 		if (chain.element_count() == m_maxItemsInBlock * chain.block_count())
