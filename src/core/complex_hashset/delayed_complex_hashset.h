@@ -203,7 +203,7 @@ public:
 	void insert_delayed(const value_type & val, size_t hash_val, CallbackFun fun)
 	{
 		m_inputBuffer.safe_access_first([=](request_container_t & cont){
-			cont.push_back(insertion_request_t(hash_val, val, fun, _Base::m_serializedElementSize));
+			cont.push_back(insertion_request_t(hash_val, val, fun, this->m_serializedElementSize));
 		});
 /*		if (m_blockCount < 64)
 		{

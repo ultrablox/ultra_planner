@@ -52,7 +52,7 @@ void test_explicit_graph_search()
 		graph_t graph(vertices, edges);
 
 		{
-			bfs_engine<graph_t> eng(graph, streamer);
+			bfs_engine<graph_t> eng(streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 1, [](int vertex){
 				return vertex == 4;
@@ -63,7 +63,7 @@ void test_explicit_graph_search()
 		}
 
 		{
-			dfs_engine<graph_t> eng(graph, streamer);
+			dfs_engine<graph_t> eng(streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 1, [](int vertex){
 				return vertex == 4;
@@ -85,7 +85,7 @@ void test_explicit_graph_search()
 		graph_t graph(vertices, edges);
 
 		{
-			bfs_engine<graph_t> eng(graph, streamer);
+			bfs_engine<graph_t> eng(streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 21, [](int vertex){
 				return vertex == 13;
@@ -96,7 +96,7 @@ void test_explicit_graph_search()
 		}
 
 		{
-			dfs_engine<graph_t> eng(graph, streamer);
+			dfs_engine<graph_t> eng(streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 21, [](int vertex){
 				return vertex == 13;
@@ -118,7 +118,7 @@ void test_explicit_graph_search()
 		graph_t graph(vertices, edges);
 
 		{
-			bfs_engine<graph_t> eng(graph, streamer);
+			bfs_engine<graph_t> eng(streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 15, [](int vertex){
 				return vertex == 14;
@@ -129,7 +129,7 @@ void test_explicit_graph_search()
 		}
 
 		{
-			dfs_engine<graph_t> eng(graph, streamer);
+			dfs_engine<graph_t> eng(streamer);
 			std::vector<int> path;
 			bool found = eng(graph, 15, [](int vertex){
 				return vertex == 14;
@@ -223,7 +223,7 @@ void test_random_ladder(int ladder_size)
 	});
 
 	{
-		dfs_engine<graph_t> eng(graph, streamer);
+		dfs_engine<graph_t> eng(streamer);
 		std::vector<pair<int, int>> path;
 		bool found = eng(graph, make_pair(0, 0), [=](const pair<int, int> & vertex){
 			return vertex == make_pair(ladder_size, ladder_size);
@@ -234,7 +234,7 @@ void test_random_ladder(int ladder_size)
 	}
 
 	{
-		bfs_engine<graph_t> eng(graph, streamer);
+		bfs_engine<graph_t> eng(streamer);
 		std::vector<pair<int, int>> path;
 		bool found = eng(graph, make_pair(0, 0), [=](const pair<int, int> & vertex){
 			return vertex == make_pair(ladder_size, ladder_size);
@@ -274,7 +274,7 @@ void test_sliding_puzzle_blind()
 	cout << "Checking " << PuzzleW << "x" << PuzzleH << " puzzle blind search...";
 	{
 		auto puzzle = pr_puzzle;
-		dfs_engine<graph_t> eng(graph, streamer);
+		dfs_engine<graph_t> eng(streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
@@ -288,7 +288,7 @@ void test_sliding_puzzle_blind()
 
 	{
 		auto puzzle = pr_puzzle;
-		bfs_engine<graph_t> eng(graph, streamer);
+		bfs_engine<graph_t> eng(streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
@@ -344,7 +344,7 @@ void test_sliding_puzzle_heuristic()
 
 	{
 		puzzle_t puzzle = pr_puzzle;
-		astar_engine<graph_t, manhattan_heuristic<puzzle_t>, false> eng(graph, streamer);
+		astar_engine<graph_t, manhattan_heuristic<puzzle_t>, false> eng(streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){
@@ -360,7 +360,7 @@ void test_sliding_puzzle_heuristic()
 
 	{
 		auto puzzle = pr_puzzle;
-		batched_engine<graph_t, manhattan_heuristic<puzzle_t>, false> eng(graph, streamer);
+		batched_engine<graph_t, manhattan_heuristic<puzzle_t>, false> eng(streamer);
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [&](const puzzle_t::state_t & state){

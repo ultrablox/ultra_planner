@@ -25,8 +25,8 @@ class dfs_engine : public blind_engine<Gr, dfs_node_priority_cmp>
 	using _Base = blind_engine<Gr, dfs_node_priority_cmp>;
 public:
 	//template<typename Gr>
-	dfs_engine(const Gr & graph, const typename Gr::vertex_streamer_t & vstreamer)
-		:_Base(graph, vstreamer)
+	dfs_engine(const typename Gr::vertex_streamer_t & vstreamer)
+		:_Base(vstreamer)
 	{}
 };
 

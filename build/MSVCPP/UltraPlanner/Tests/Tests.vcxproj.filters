@@ -19,6 +19,9 @@
     <Filter Include="rubik">
       <UniqueIdentifier>{e9180104-6caf-4f9a-b24d-89165d8d70e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hannoi">
+      <UniqueIdentifier>{bb65a49d-0e4b-4a06-8685-671be8584893}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\tests\main.cpp">
@@ -60,6 +63,9 @@
     <ClCompile Include="..\..\..\..\src\tests\test_block_chain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tests\test_hannoi_tower.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\tests\test_sort.h">
@@ -73,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\rubik\rubiks_cube.h">
       <Filter>rubik</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\hannoi\hannoi_tower.h">
+      <Filter>hannoi</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -45,6 +45,7 @@ void test_avl_tree();
 void test_range_map();
 void test_complex_stack();
 void test_block_chain();
+void test_hannoi_tower_core();
 
 int main()
 {
@@ -53,6 +54,7 @@ int main()
 	test_avl_tree();
 	test_range_map();
 	
+	test_hannoi_tower_core();
 	test_puzzle_core();
 	test_rubik_core();
 

@@ -28,10 +28,10 @@ public:
 
 	}
 
-	transition_system(const transition_system & rhs)
-		:_Base(/*m_state, */rhs.m_size)//, m_state(rhs.m_state)
+	/*transition_system(const transition_system & rhs)
+		:_Base(rhs.m_size)
 	{
-	}
+	}*/
 
 	/*transition_system & operator=(const transition_system & rhs)
 	{
