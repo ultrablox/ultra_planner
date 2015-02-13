@@ -6,19 +6,19 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="src">
-      <UniqueIdentifier>{ce12809c-d031-49a5-a8b0-a50d38bc864c}</UniqueIdentifier>
+      <UniqueIdentifier>{9cc41982-7d45-4029-bf20-d39f6355a0cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\sliding_puzzle\sliding_puzzle.h">
+    <ClInclude Include="..\..\..\..\src\hannoi\hannoi_tower.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\sliding_puzzle\heuristic.h">
+    <ClInclude Include="..\..\..\..\src\hannoi\heuristic.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\sliding_puzzle\solver.cpp">
+    <ClCompile Include="..\..\..\..\src\hannoi\solver.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

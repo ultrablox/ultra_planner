@@ -36,7 +36,7 @@ public:
 				//Check that node is not expanded or discovered by trying to add
 				this->m_database.add(state, [=](const state_t & state){
 					search_node_t new_node = this->m_database.create_node(state, cur_node.id, cur_node.length + 1);
-					_Base::enqueue(goal_check_fun, new_node, node_estimation_t(cur_node.length + 1, 0));
+					this->enqueue(goal_check_fun, new_node, node_estimation_t(cur_node.length + 1, 0));
 				});
 			});
 			++step;

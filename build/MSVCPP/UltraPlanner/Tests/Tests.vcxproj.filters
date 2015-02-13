@@ -30,9 +30,6 @@
     <ClCompile Include="..\..\..\..\src\tests\test_cached_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\tests\helpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\tests\test_bitset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,9 +51,6 @@
     <ClCompile Include="..\..\..\..\src\tests\test_rubik.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\tests\test_bdd_map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\tests\test_avl_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,12 +60,12 @@
     <ClCompile Include="..\..\..\..\src\tests\test_hannoi_tower.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tests\test_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\tests\test_sort.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\tests\helpers.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\sliding_puzzle\sliding_puzzle.h">
@@ -84,6 +78,9 @@
       <Filter>hannoi</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\tests\transition_system_helpers.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\tests\test_helpers.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

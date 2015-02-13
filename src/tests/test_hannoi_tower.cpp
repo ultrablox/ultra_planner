@@ -86,4 +86,7 @@ void test_hannoi_tower_core()
 		hannoi.apply(sample_state, std::make_pair(2, 0));
 		cout << hasher(sample_state) << std::endl;
 	}
+
+	//Test heuristic
+
 }

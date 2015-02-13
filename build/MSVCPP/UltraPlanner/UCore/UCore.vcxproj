@@ -196,6 +196,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -285,7 +286,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\core\avl_tree.h" />
-    <ClInclude Include="..\..\..\..\src\core\bdd_map.h" />
     <ClInclude Include="..\..\..\..\src\core\byte_range.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_hashset\block.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_hashset\block_chain.h" />

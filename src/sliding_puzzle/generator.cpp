@@ -55,41 +55,15 @@ int main(int argc, const char ** argv)
 		cout << e.what();
 		return 1;
 	}
+	
+	auto problem_size = make_pair(puzzle_width.getValue(), puzzle_height.getValue());
+	//sliding_puzzle::default_state(problem_size)
+	transition_system<sliding_puzzle> puzzle(problem_size);
 
-	if (command_name.getValue() == "solve")
-	{
-		std::ifstream in_file(problem_fn_param.getValue());
-		if (!in_file)
-		{
-			cout << "Unable to open input file" << std::endl;
-			return 1;
-		}
+	auto random_state = random_init(puzzle, permutations.getValue());
 
-		//Initialize external memory storage if needed
-		std::unique_ptr<UExternalMemoryController> ext_memory_ctrl;
-		if (storage_type.getValue() == "ext")
-			ext_memory_ctrl.reset(new UExternalMemoryController());
-
-		//Read size
-
-		using puzzle_t = transition_system<sliding_puzzle>;
-		state_space_solver<puzzle_t> solver(in_file, cout);
-
-		bool r = solver.solve(storage_type.getValue() == "ext", algorithm_name.getValue());
-		if (!r)
-			cout << "Solution not found!" << std::endl;
-	}
-	else if(command_name.getValue() == "generate")
-	{
-		auto problem_size = make_pair(puzzle_width.getValue(), puzzle_height.getValue());
-		//sliding_puzzle::default_state(problem_size)
-		transition_system<sliding_puzzle> puzzle(problem_size);
-
-		auto random_state = random_init(puzzle, permutations.getValue());
-
-		std::ofstream out_file(problem_fn_param.getValue());
-		puzzle.serialize_state(out_file, random_state);
-	}
+	std::ofstream out_file(problem_fn_param.getValue());
+	puzzle.serialize_state(out_file, random_state);
 
 	return 0;
 }

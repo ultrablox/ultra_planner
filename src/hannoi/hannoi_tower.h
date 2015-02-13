@@ -25,7 +25,7 @@ namespace std {
 template<>
 class hash<hannoi_state>
 {
-	using element_t = typename hannoi_state::number_t;
+	using element_t = hannoi_state::number_t;
 public:
 	hash()
 	{
@@ -41,7 +41,11 @@ public:
 			cache.Pi.insert(cache.Pi.end(), tower.begin(), tower.end());
 		}
 
+
 		const int size = cache.Pi.size();
+		for (int i = 0; i < size; ++i)
+			--cache.Pi[i];
+
 		if (cache.m_size != size)
 		{
 			cache.m_size = size;
@@ -232,6 +236,11 @@ public:
 		}
 
 		return os;
+	}
+
+	const size_description_t & size() const
+	{
+		return m_size;
 	}
 private:
 	size_description_t m_size;

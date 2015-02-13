@@ -28,17 +28,15 @@ public:
 		int sum = 0;
 		int y = 0;
 		auto & last_tower = *state.towers.rbegin();
-		for(int expected_block_id = m_hannoi.m_size.first; expected_block_id > 0; --expected_block_id, ++y)
+		for(int expected_block_id = m_hannoi.size().first; expected_block_id > 0; --expected_block_id, ++y)
 		{
 			if(y > last_tower.size())
 				break;
 			if(last_tower[y] != expected_block_id)
 				break;
 		}
-		//for(int t = 0; t < m_hannoi.size().second - 1; ++t)
 
-
-		return m_hannoi.m_size.first - sum;
+		return m_hannoi.size().first - sum;
 	}
 private:
 	const hannoi_problem_t & m_hannoi;

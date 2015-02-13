@@ -186,6 +186,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../../../src;../../../../include;../../../../include/win32</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -257,9 +258,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\sliding_puzzle\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\sliding_puzzle\heuristic.h" />
     <ClInclude Include="..\..\..\..\src\sliding_puzzle\sliding_puzzle.h" />
   </ItemGroup>
   <ItemGroup>
@@ -269,6 +268,9 @@
     <ProjectReference Include="..\USolver\USolver.vcxproj">
       <Project>{4e5e705d-5c01-44b3-8667-346cecff7a3e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\sliding_puzzle\solver.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
