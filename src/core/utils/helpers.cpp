@@ -177,3 +177,9 @@ bool check_radix(size_t val, size_t radix_id)
 	size_t digit = 1ULL << (sizeof(size_t)* 8 - 1 - radix_id);
 	return (val & digit) != 0;
 }
+
+std::ostream & operator<<(std::ostream & os, const std::pair<unsigned char, unsigned char> & pair)
+{
+	os << '{' << pair.first << ',' << pair.second << '}';
+	return os;
+}

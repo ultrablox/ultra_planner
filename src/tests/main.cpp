@@ -1,5 +1,5 @@
 
-#include "helpers.h"
+#include "test_helpers.h"
 #include "test_sort.h"
 #include <core/UMatrix.h>
 #include <string>
@@ -39,7 +39,6 @@ void test_complex_hashmap();
 void test_cached_file();
 void test_merge();
 void test_rubik_core();
-void test_bdd_map();
 void test_complex_queue();
 void test_avl_tree();
 void test_range_map();
@@ -58,7 +57,6 @@ int main()
 	test_puzzle_core();
 	test_rubik_core();
 
-	test_bdd_map();
 	test_complex_vector();
 	
 	test_complex_queue();

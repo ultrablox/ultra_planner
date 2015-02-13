@@ -6,6 +6,7 @@
 #include <limits>
 #include <iterator>
 #include <vector>
+#include <iostream>
 
 struct chain_info_t
 {
@@ -546,20 +547,20 @@ public:
 
 	void print()
 	{
-		cout << "Chain (" << m_blocksData.size() << " blocks): ";
+		std::cout << "Chain (" << m_blocksData.size() << " blocks): ";
 		int last_block = -1;
 		for (auto it = begin(); it != end(); ++it)
 		{
 			if (it.address().block != last_block)
 			{
-				cout << '|';
+				std::cout << '|';
 				last_block = it.address().block;
 			}
 			else
-				cout << ',';
-			cout << (*it).template begin_as<size_t>();
+				std::cout << ',';
+			std::cout << (*it).template begin_as<size_t>();
 		}
-		cout << std::endl;
+		std::cout << std::endl;
 		//for (auto bid : m_blockIds)
 		//	m_hb.print_block(m_hb.m_blocks[bid]);
 

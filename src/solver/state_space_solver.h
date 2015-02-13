@@ -5,6 +5,7 @@
 #include "search_algorithms/astar_engine.h"
 #include "search_algorithms/greedy_bfs_engine.h"
 #include "search_algorithms/batched_engine.h"
+#include <core/UExternalMemoryController.h>
 #include <thread>
 #include <chrono>
 
@@ -13,14 +14,13 @@ using namespace std::chrono;
 template<typename T>
 class state_space_solver
 {
-	typedef T transition_system_t;
-
-	template<typename X>
+	/*template<typename X>
 	struct engine_generator
 	{
 
-	};
+	};*/
 
+	using transition_system_t = T;
 	using graph_t = transition_system_graph<transition_system_t>;
 	using state_t = typename transition_system_t::state_t;
 	using streamer_t = typename graph_t::vertex_streamer_t;
@@ -29,29 +29,34 @@ public:
 	state_space_solver(std::istream & in_stream, std::ostream & out_stream)
 		:m_system(transition_system_t::deserialize_problem_size(in_stream)), m_inStream(in_stream), m_outStream(out_stream)
 	{
-		size_t state_power = m_system.max_state_count_10();
+		size_t state_power = 0;//m_system.max_state_count_10();
 
 		m_maxStateCount = pow(10, state_power);
 		cout << "Search space contains maximum 10^" << state_power << " states" << std::endl;
 	}
 
+	template<template<typename> class HeuristicT>
 	bool solve(bool ext_mem, const std::string & alg_name)
 	{
+		using heuristic_t = HeuristicT<transition_system_t>;
 		if (ext_mem)
-			return select_memory<true>(alg_name);
+		{
+			UExternalMemoryController ext_memory_ctrl;
+			return select_memory<true, heuristic_t>(alg_name);
+		}
 		else
-			return select_memory<true>(alg_name);
+			return select_memory<false, heuristic_t>(alg_name);
 	}
 private:
-	template<bool ExtMem>
+	template<bool ExtMem, typename HeuristicT>
 	bool select_memory(const std::string & alg_name)
 	{
 		if (alg_name == "A*")
-			return select_engine<astar_engine<graph_t, manhattan_heuristic<transition_system_t>, ExtMem>>();
+			return select_engine<astar_engine<graph_t, HeuristicT, ExtMem>>();
 		else if (alg_name == "BA*")
-			return select_engine<batched_engine<graph_t, manhattan_heuristic<transition_system_t>, ExtMem>>();
+			return select_engine<batched_engine<graph_t, HeuristicT, ExtMem>>();
 		else if (alg_name == "GBFS")
-			return select_engine<greedy_bfs_engine<graph_t, manhattan_heuristic<transition_system_t>, ExtMem>>();
+			return select_engine<greedy_bfs_engine<graph_t, HeuristicT, ExtMem>>();
 		else
 			return false;
 	}

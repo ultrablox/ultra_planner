@@ -1,7 +1,7 @@
 
 #include <core/cached_file.h>
 #include <random>
-#include "helpers.h"
+#include "test_helpers.h"
 
 struct sample_block_t
 {

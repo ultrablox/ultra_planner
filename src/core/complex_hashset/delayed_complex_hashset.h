@@ -196,7 +196,7 @@ public:
 	template<typename CallbackFun>
 	void insert_delayed(const value_type & val, CallbackFun fun)
 	{
-		insert_delayed(val, m_hasher(val), fun);
+		insert_delayed(val, _Base::m_hasher(val), fun);
 	}
 
 	template<typename CallbackFun>
@@ -370,7 +370,7 @@ public:
 
 	iterator find(const value_type & val)
 	{
-		size_t hash_val = m_hasher(val);
+		size_t hash_val = _Base::m_hasher(val);
 		chain_info_t & info = _Base::m_index.chain_with_hash(hash_val);
 
 		//Read sequentional all the chain
@@ -387,7 +387,7 @@ public:
 		//Build chain
 		block_chain_t chain(m_blocksBuffer, 0, info, _Base::m_valueStreamer, _Base::m_maxItemsInBlock);
 
-		return find_in_chain(chain, val, hash_val);
+		return _Base::find_in_chain(chain, val, hash_val);
 	}
 
 	void merge_loop()

@@ -326,7 +326,7 @@ public:
 	//It will work faster, if you know hash in advance
 	bool insert(const value_type & val)
 	{
-		size_t hash_val = m_hasher(val);
+		size_t hash_val = _Base::m_hasher(val);
 
 		return insert(val, hash_val);
 	}
@@ -363,11 +363,11 @@ public:
 
 	iterator find(const value_type & val)
 	{
-		size_t hash_val = m_hasher(val);
+		size_t hash_val = _Base::m_hasher(val);
 
 		block_chain_t chain(_Base::m_blocks, _Base::m_index.chain_with_hash(hash_val), _Base::m_valueStreamer, _Base::m_maxItemsInBlock);
 
-		return find_in_chain(chain, val, hash_val);
+		return _Base::find_in_chain(chain, val, hash_val);
 	}
 private:
 	bool insert_into_chain(block_chain_t & chain, size_t hash_val, const byte_range & br)

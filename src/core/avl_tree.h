@@ -137,7 +137,7 @@ public:
 		//Update heights
 		update_height(res_node);
 
-		return make_pair(iterator(res_node), res_node != nullptr);
+		return std::make_pair(iterator(res_node), res_node != nullptr);
 	}
 
 	std::pair<iterator, bool> insert(const std::pair<key_t, satelite_data_t> & val)
@@ -271,7 +271,7 @@ private:
 			}
 		}
 		else
-			cout << "#" << std::endl;
+			std::cout << "#" << std::endl;
 	}
 
 	size_t subtree_size(node_t * p_node) const
@@ -298,7 +298,7 @@ private:
 		if (p_node->right)
 			right_h = calculate_node_height(p_node->right) + 1;
 
-		return max(left_h, right_h);
+		return std::max(left_h, right_h);
 	}
 
 	template<typename Fun>
@@ -316,7 +316,7 @@ protected:
 	{
 		while (p_node)
 		{
-			p_node->height = max(subtree_height(p_node->left), subtree_height(p_node->right));
+			p_node->height = std::max(subtree_height(p_node->left), subtree_height(p_node->right));
 			p_node = p_node->parent;
 		}
 	}
@@ -376,7 +376,7 @@ public:
 						else if (par->right == n)
 							par->right = ballanced_root;
 						else
-							throw runtime_error("Invalid parent link");
+							throw std::runtime_error("Invalid parent link");
 
 						_Base::update_height(par);
 					}
@@ -450,8 +450,8 @@ private:
 		case ballance_operation_t::double_rotate_left:
 			return double_rotate_left(node);
 		default:
-			cout << *this;
-			throw runtime_error("Invalid situation");
+			std::cout << *this;
+			throw std::runtime_error("Invalid situation");
 		}
 	}
 
@@ -470,8 +470,8 @@ private:
 			node_B->parent = r;
 
 		//Heights
-		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
-		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
+		r->height = std::max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		x->height = std::max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
 
 		return x;
 	}
@@ -492,8 +492,8 @@ private:
 			node_B->parent = r;
 
 		//Heights
-		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
-		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
+		r->height = std::max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		x->height = std::max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
 
 		return x;
 	}
@@ -521,9 +521,9 @@ private:
 			node_C->parent = r;
 
 		//Heights
-		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
-		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
-		w->height = max(_Base::subtree_height(w->left), _Base::subtree_height(w->right));
+		x->height = std::max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
+		r->height = std::max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		w->height = std::max(_Base::subtree_height(w->left), _Base::subtree_height(w->right));
 
 		return w;
 	}
@@ -552,9 +552,9 @@ private:
 
 
 		//Heights
-		x->height = max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
-		r->height = max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
-		w->height = max(_Base::subtree_height(w->left), _Base::subtree_height(w->right));
+		x->height = std::max(_Base::subtree_height(x->left), _Base::subtree_height(x->right));
+		r->height = std::max(_Base::subtree_height(r->left), _Base::subtree_height(r->right));
+		w->height = std::max(_Base::subtree_height(w->left), _Base::subtree_height(w->right));
 
 		return w;
 	}
@@ -597,7 +597,7 @@ public:
 
 	std::pair<iterator, bool> insert(const key_t & key, const value_t & val)
 	{
-		return insert(make_pair(key, val));
+		return insert(std::make_pair(key, val));
 	}
 
 	/*

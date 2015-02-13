@@ -90,6 +90,8 @@ struct SortTesterBase
 template<typename DataType, template<typename T, typename A> class S>
 struct SortTester : public SortTesterBase<DataType>
 {
+	using TestData = typename SortTesterBase<DataType>::TestData;
+
 	virtual void trySort(TestData & arr) const override
 	{
 		ultra_sort<S>(arr, std::less<DataType>());
@@ -100,6 +102,8 @@ struct SortTester : public SortTesterBase<DataType>
 template<typename DataType, template<typename T> class S>
 struct IntSortTester : public SortTesterBase<DataType>
 {
+	using TestData = typename SortTesterBase<DataType>::TestData;
+	
 	virtual void trySort(TestData & arr) const override
 	{
 		ultra_sort<S>(arr);

@@ -195,6 +195,8 @@ void sort_wrapper(It begin, It end, Pred pred)
 ULTRA_CORE_API std::pair<size_t, bool> different_radix(size_t lhs, size_t rhs);
 ULTRA_CORE_API bool check_radix(size_t val, size_t radix_id);
 
+ULTRA_CORE_API std::ostream & operator<<(std::ostream & os, const std::pair<unsigned char, unsigned char> & pair);
+
 template<typename It>
 void print_range(std::ostream & os, It first, It last, char delimeter)
 {

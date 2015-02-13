@@ -3,6 +3,8 @@
 #define UltraCore_sort_h
 
 #include <type_traits>
+#include <algorithm>
+#include <vector>
 
 namespace UltraCore
 {
@@ -46,7 +48,7 @@ namespace UltraCore
 				if(insertion_it != cur)
 				{
 					//Move key to temp
-					Iter::value_type tmp(std::move(*cur));
+					typename Iter::value_type tmp(std::move(*cur));
 
 					//Move all elements on the right of insertion_it 1 position righter
 					//Move key to its position
@@ -95,7 +97,7 @@ namespace UltraCore
 		void merge(Iter first, Iter middle, Iter last, Comparator cmp)
 		{
 			int range_size = std::distance(first, last);
-			vector<Iter::value_type> cache;
+			std::vector<typename Iter::value_type> cache;
 			cache.reserve(range_size);
 
 			Iter left_it = first, right_it = middle;
@@ -119,12 +121,6 @@ namespace UltraCore
 				*dst_it = *src_it;
 		}
 	};
-
-	template<typename T, typename C>
-	void insertion_sort(T first, T last, C cmp)
-	{
-		ultra_sort<insertion_sorter>(first, last, cmp);
-	}
 
 	/*
 	Heap sorter. Complexity N*lg(N)
@@ -219,6 +215,8 @@ namespace UltraCore
 	template<typename T>
 	class CountSorter : public sorter<T>
 	{
+		using Data = typename sorter<T>::Data;
+		using Iter = typename sorter<T>::Iter;
 	public:
 		
 		static_assert(std::is_integral<Data>::value, "Element type should be integral type.");
@@ -226,14 +224,14 @@ namespace UltraCore
 		void operator()(Iter first, Iter last)
 		{
 			//Find maximum
-			Data max = *(std::max_element(first, last, std::less<T::value_type>()));
+			Data max = *(std::max_element(first, last, std::less<typename T::value_type>()));
 
 			sort(first, last, max);
 		}
 
 		void sort(Iter first, Iter last, Data max_value)
 		{
-			vector<int> tmp;
+			std::vector<int> tmp;
 			const int tmp_size = max_value + 1;
 			tmp.resize(tmp_size);
 
@@ -269,6 +267,8 @@ namespace UltraCore
 	template<typename T>
 	class RadixSorter : public sorter<T>
 	{
+		using Data = typename sorter<T>::Data;
+		using Iter = typename sorter<T>::Iter;
 	public:
 		
 		static_assert(std::is_integral<Data>::value, "Element type should be integral type.");
@@ -298,6 +298,12 @@ namespace UltraCore
 		sorter.m_pArr = &container;
 #endif
 		sorter(container.begin(), container.end());
+	}
+
+	template<typename T, typename C>
+	void insertion_sort(T first, T last, C cmp)
+	{
+		ultra_sort<insertion_sorter>(first, last, cmp);
 	}
 };
 

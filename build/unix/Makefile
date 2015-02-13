@@ -2,12 +2,33 @@ include standard_defs.mk
 
 SRC_DIR = ../../src
 SRC_CORE_DIR = $(SRC_DIR)/core
+SRC_TESTS_DIR = ../../src/tests
 OUT_DIR = ../../bin/osx
 
-puzzle_solver: core.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LIBS) UExternalMemoryController.o helpers.o $(SRC_DIR)/sliding_puzzle/main.cpp -o puzzle_solver $(INCLUDE_DIRS)
+hannoi_solver: libcore.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LIBS) -L. -lcore $(SRC_DIR)/hannoi/solver.cpp -o hannoi_solver $(INCLUDE_DIRS)
+	cp hannoi_solver $(OUT_DIR)/hannoi_solver
+
+puzzle_solver: libcore.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LIBS) -L. -lcore $(SRC_DIR)/sliding_puzzle/solver.cpp -o puzzle_solver $(INCLUDE_DIRS)
 #	$(DSYM) puzzle_solver -o puzzle_solver.dSYM
 	cp puzzle_solver $(OUT_DIR)/puzzle_solver
 
-core.o:
-	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_CORE_DIR)/utils/helpers.cpp $(SRC_CORE_DIR)/UExternalMemoryController.cpp
+puzzle_generator: libcore.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LIBS) -L. -lcore $(SRC_DIR)/sliding_puzzle/generator.cpp -o puzzle_generator $(INCLUDE_DIRS)
+
+tests: libtests.a libcore.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LIBS) -L. -ltests -lcore $(SRC_TESTS_DIR)/main.cpp -o tests $(INCLUDE_DIRS)
+
+libtests.a: 
+	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_TESTS_DIR)/test_helpers.cpp $(SRC_TESTS_DIR)/test_avl_tree.cpp $(SRC_TESTS_DIR)/test_bitset.cpp $(SRC_TESTS_DIR)/test_block_chain.cpp $(SRC_TESTS_DIR)/test_cached_file.cpp $(SRC_TESTS_DIR)/test_complex_vector.cpp $(SRC_TESTS_DIR)/test_merge.cpp $(SRC_TESTS_DIR)/test_puzzle.cpp $(SRC_TESTS_DIR)/test_hannoi_tower.cpp $(SRC_TESTS_DIR)/test_rubik.cpp $(SRC_TESTS_DIR)/test_search.cpp $(SRC_TESTS_DIR)/test_sort.cpp
+	ar cr libtests.a test_helpers.o test_block_chain.o test_avl_tree.o test_bitset.o test_block_chain.o test_cached_file.o test_complex_vector.o test_merge.o test_puzzle.o test_hannoi_tower.o test_rubik.o test_search.o test_sort.o
+
+libcore.a:
+	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_CORE_DIR)/utils/helpers.cpp $(SRC_CORE_DIR)/UExternalMemoryController.cpp $(SRC_CORE_DIR)/UBitset.cpp $(SRC_CORE_DIR)/UError.cpp
+	ar cr libcore.a helpers.o UExternalMemoryController.o UBitset.o UError.o
+
+clean:
+	rm *.o
+	rm *.a
+	

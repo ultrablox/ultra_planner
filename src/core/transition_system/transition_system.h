@@ -6,6 +6,7 @@
 #include <functional>
 #include <list>
 #include <utility>
+#include <iostream>
 
 template<typename T>
 class transition_system : public T
@@ -100,9 +101,9 @@ public:
 	bool verify_solution(state_t initial_state, const PlanContainerT & path) const
 	{
 		for (auto tr : path)
-			apply(initial_state, tr);
+			_Base::apply(initial_state, tr);
 
-		return initial_state == sliding_puzzle::default_state();
+		return initial_state == _Base::default_state();
 	}
 
 	template<typename StateIt, typename TransIt>

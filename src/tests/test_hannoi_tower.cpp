@@ -2,7 +2,7 @@
 #include "transition_system_helpers.h"
 #include <hannoi/hannoi_tower.h>
 #include <core/transition_system/transition_system.h>
-#include "helpers.h"
+#include "test_helpers.h"
 #include <utility>
 
 using namespace std;
@@ -73,5 +73,17 @@ void test_hannoi_tower_core()
 												  * * * \
 												  * 1 * \
 												  4 2 3", make_pair(0, 2)), "Hannoi: applying transition.");
+	}
+
+	//Test hash
+	{
+		cout << "Testing Hannoi hash function..." << std::endl;
+
+		auto sample_state = hannoi.default_state();
+		std::hash<hannoi_t::state_t> hasher;
+		cout << hasher(sample_state) << std::endl;
+
+		hannoi.apply(sample_state, std::make_pair(2, 0));
+		cout << hasher(sample_state) << std::endl;
 	}
 }

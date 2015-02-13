@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <core/streamer.h>
+#include <core/hash.h>
 
 struct hannoi_state
 {
@@ -19,6 +20,52 @@ struct hannoi_state
 		return lhs.towers == rhs.towers;
 	}
 };
+
+namespace std {
+template<>
+class hash<hannoi_state>
+{
+	using element_t = typename hannoi_state::number_t;
+public:
+	hash()
+	{
+		cache.m_size = 0;
+	}
+
+	size_t operator()(const hannoi_state & state) const
+	{
+		cache.Pi.resize(0);
+
+		for(auto & tower : state.towers)
+		{
+			cache.Pi.insert(cache.Pi.end(), tower.begin(), tower.end());
+		}
+
+		const int size = cache.Pi.size();
+		if (cache.m_size != size)
+		{
+			cache.m_size = size;
+			cache.Pi.resize(size);
+			cache.PiInv.resize(size);
+			cache.cache.resize(size-1);
+		}
+
+		for (int i = 0; i < size; ++i)
+			cache.PiInv[cache.Pi[i]] = i;
+		
+		return mr_hash(size, cache.Pi, cache.PiInv, cache.cache);
+	}
+private:
+	mutable struct
+	{
+		int m_size;
+		vector<element_t> Pi, PiInv;/**/
+		vector<size_t> cache;
+	} cache;
+};
+}
+
+
 
 class hannoi_tower
 {
@@ -36,7 +83,7 @@ public:
 	{
 	public:
 		state_streamer_t(const hannoi_tower & h_tower)
-			:m_size(h_tower.m_size), streamer_base((m_size.first + m_size.second) * sizeof(number_t))
+			:m_size(h_tower.m_size), streamer_base((h_tower.m_size.first + h_tower.m_size.second) * sizeof(number_t))
 		{}
 
 		void serialize(void * dst, const state_t & state) const
@@ -134,6 +181,58 @@ public:
 		state.towers[transition.second].push_back(block_id);
 	}
 
+	state_t default_state() const
+	{
+		state_t res;
+		res.towers.resize(m_size.second);
+		for(number_t d = m_size.first; d > 0; --d)
+			res.towers[m_size.second - 1].push_back(d);
+		return std::move(res);
+	}
+
+	bool is_solved(const state_t & cur_state) const
+	{
+		return cur_state.towers[m_size.second - 1].size() == m_size.first;
+	}
+
+	transition_t difference(const state_t & lhs, const state_t & rhs)
+	{
+		transition_t res;
+		for(number_t i = 0; i < m_size.second; ++i)
+		{
+			int delta = lhs.towers[i].size() - rhs.towers[i].size();
+			if(delta < 0)
+				res.second = i;
+			else if(delta > 0)
+				res.first = i;
+		}
+
+		return std::move(res);
+	}
+
+	std::ostream & interpret_transition(std::ostream & os, const state_t & state, const transition_t & transition) const
+	{
+		os << " Move block " << (int)(*state.towers[transition.first].rbegin()) << " " << transition.first << "->" << transition.second;
+		return os;
+	}
+
+	std::ostream & interpet_state(std::ostream & os, const state_t & state) const
+	{
+		for(number_t l = m_size.first; l > 0 ; --l)
+		{
+			for(number_t t = 0; t < m_size.second; ++t)
+			{
+				if(l >= state.towers[t].size())
+					os << '*';
+				else
+					os << state.towers[t][l];
+				os << ' ';
+			}
+			os << std::endl;
+		}
+
+		return os;
+	}
 private:
 	size_description_t m_size;
 };

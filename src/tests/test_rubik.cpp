@@ -1,5 +1,5 @@
 
-#include "helpers.h"
+#include "test_helpers.h"
 #include <rubik/rubiks_cube.h>
 #include <core/transition_system/transition_system.h>
 

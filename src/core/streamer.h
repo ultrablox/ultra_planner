@@ -1,5 +1,4 @@
 
-
 #ifndef UltraCore_streamer_h
 #define UltraCore_streamer_h
 

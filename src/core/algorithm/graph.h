@@ -58,7 +58,7 @@ public:
 	{
 		auto it = m_vertices.find(vertex);
 		if(it == m_vertices.end())
-			throw runtime_error("Vertex not found in graph");
+			throw std::runtime_error("Vertex not found in graph");
 
 		auto adj_it = m_adjacentLists.find(vertex);
 		if(adj_it != m_adjacentLists.end())
