@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <core/streamer.h>
 
 struct hannoi_state
 {
@@ -12,6 +13,11 @@ struct hannoi_state
 	using tower_t = std::vector<number_t>;
 
 	std::vector<tower_t> towers;
+
+	friend bool operator==(const hannoi_state & lhs, const hannoi_state & rhs)
+	{
+		return lhs.towers == rhs.towers;
+	}
 };
 
 class hannoi_tower
@@ -26,17 +32,12 @@ public:
 	//Source Tower -> Destination Tower
 	using transition_t = std::pair<number_t, number_t>;
 
-	class state_streamer_t
+	class state_streamer_t : public streamer_base
 	{
 	public:
 		state_streamer_t(const hannoi_tower & h_tower)
-			:m_size(h_tower.m_size), m_serializedStateSize((m_size.first + m_size.second) * sizeof(number_t))
+			:m_size(h_tower.m_size), streamer_base((m_size.first + m_size.second) * sizeof(number_t))
 		{}
-
-		size_t serialized_size() const
-		{
-			return m_serializedStateSize;
-		}
 
 		void serialize(void * dst, const state_t & state) const
 		{
@@ -71,7 +72,6 @@ public:
 
 	private:
 		size_description_t m_size;
-		size_t m_serializedStateSize;
 	};
 
 	hannoi_tower(const size_description_t & description)
@@ -88,17 +88,50 @@ public:
 
 	void deserialize_state(std::istream & is, state_t & state) const
 	{
-		//Read first delimeter
+		state.towers.resize(m_size.second);
+	
 		number_t el;
-		is >> el;
-		/*for (int i = 0; i < height() * width(); ++i)
+		for (number_t l = 0; l < m_size.first; ++l)
 		{
-		is >> el;
-		state.data[i] = el;
+			for (number_t t = 0; t < m_size.second; ++t)
+			{
+				is >> el;
+				if (el != '*')
+					state.towers[t].push_back((int)el);
+			}
+		}
 
-		if (el == 0)
-		state.empty_pos = i;
-		}*/
+		for (auto & tower : state.towers)
+			std::reverse(tower.begin(), tower.end());
+	}
+
+	template<typename F>
+	void forall_available_transitions(const state_t & base_state, F fun) const
+	{
+		for (number_t src_t = 0; src_t < m_size.second; ++src_t)
+		{
+			for (number_t dst_t = src_t + 1; dst_t < m_size.second; ++dst_t)
+			{			
+				if (base_state.towers[src_t].empty() && base_state.towers[dst_t].empty())
+					continue;
+
+				if ((!base_state.towers[src_t].empty()) && (base_state.towers[dst_t].empty()))
+					fun(transition_t(src_t, dst_t));
+				else if ((!base_state.towers[dst_t].empty()) && (base_state.towers[src_t].empty()))
+					fun(transition_t(dst_t, src_t));
+				else if (*base_state.towers[src_t].rbegin() < *base_state.towers[dst_t].rbegin())
+					fun(transition_t(src_t, dst_t));
+				else
+					fun(transition_t(dst_t, src_t));
+			}
+		}
+	}
+
+	void apply(state_t & state, transition_t transition) const
+	{
+		number_t block_id = *state.towers[transition.first].rbegin();
+		state.towers[transition.first].pop_back();
+		state.towers[transition.second].push_back(block_id);
 	}
 
 private:

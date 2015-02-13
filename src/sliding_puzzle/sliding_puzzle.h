@@ -3,6 +3,7 @@
 #define UltraTest_sliding_puzzle_h
 
 #include <core/algorithm/math.h>
+#include <core/streamer.h>
 #include <array>
 #include <iostream>
 #include <iomanip>
@@ -148,27 +149,23 @@ public:
 	typedef int transition_t;
 	typedef std::pair<int, int> size_description_t;
 	
-	class state_streamer_t
+	class state_streamer_t : public streamer_base
 	{
 	public:
 		state_streamer_t(const sliding_puzzle & _puzzle)
-			:m_size(_puzzle.m_size), m_serializedStateSize(m_size.first * m_size.second * sizeof(state_t::plate_t))
+			:m_size(_puzzle.m_size), streamer_base(m_size.first * m_size.second * sizeof(state_t::plate_t))
 		{}
 
-		size_t serialized_size() const
-		{
-			return m_serializedStateSize;
-		}
 
 		void serialize(void * dst, const state_t & state) const
 		{
-			memcpy(dst, &state.data[0], m_serializedStateSize);
+			memcpy(dst, &state.data[0], serialized_size());
 		}
 
 		void deserialize(const void * src, state_t & state) const
 		{
-			state.data.resize(m_serializedStateSize);
-			memcpy(&state.data[0], src, m_serializedStateSize);
+			state.data.resize(serialized_size());
+			memcpy(&state.data[0], src, serialized_size());
 
 			//Obtain empty pos
 			auto it = std::find(state.data.begin(), state.data.end(), 0);
@@ -177,7 +174,6 @@ public:
 
 	private:
 		size_description_t m_size;
-		size_t m_serializedStateSize;
 	};
 
 	
@@ -330,6 +326,7 @@ public:
 
 	void deserialize_state(std::istream & is, state_t & state) const
 	{
+		state.data.resize(m_size.first * m_size.second);
 		int el;
 		for(int i = 0; i < height() * width(); ++i)
 		{

@@ -1,9 +1,11 @@
 
 #include "helpers.h"
+#include "transition_system_helpers.h"
 #include <sliding_puzzle/sliding_puzzle.h>
 #include <core/transition_system/transition_system.h>
 #include <sstream>
 
+/*
 void test_available_transitions(const std::string & state_data, transition_system<sliding_puzzle> & puzzle, const std::vector<transition_system<sliding_puzzle>::transition_t> & correct_res)
 {
 	auto state = puzzle.default_state();
@@ -21,7 +23,7 @@ void test_available_transitions(const std::string & state_data, transition_syste
 	std::sort(res.begin(), res.end());
 
 	assert_test(res == correct_res, "Iterating available transitions.");
-}
+}*/
 
 
 void test_puzzle_core()
@@ -51,7 +53,7 @@ void test_puzzle_core()
 		correct_res.push_back(7);
 		correct_res.push_back(11);
 
-		test_available_transitions("7 2 4 5 3 6 8 1 0 9 10 11 ", puzzle, correct_res);
+		assert_test(test_available_transitions(puzzle, "7 2 4 5 3 6 8 1 0 9 10 11 ", correct_res), "Puzzle: iterating available transitions.");
 	}
 
 	{
@@ -71,7 +73,7 @@ void test_puzzle_core()
 		correct_res.push_back(5);
 		correct_res.push_back(7);
 
-		test_available_transitions("7 2 4 5 0 6 8 3 1 9 10 11 ", puzzle, correct_res);
+		assert_test(test_available_transitions(puzzle, "7 2 4 5 0 6 8 3 1 9 10 11 ", correct_res), "Puzzle: iterating available transitions.");
 	}
 
 
@@ -84,7 +86,8 @@ void test_puzzle_core()
 			9 10 11			9 10 11
 		*/
 
-		auto state = puzzle_t::default_state(puzzle_size);
+		assert_test(test_apply_transition(puzzle, "7 2 4 5 3 6 8 1 0 9 10 11 ", "7 2 4  5 3 6  8 0 1  9 10 11 ", 7), "Puzzle: applying transition.");
+		/*auto state = puzzle_t::default_state(puzzle_size);
 		{
 			std::stringstream ss;
 			ss << "7 2 4 5 3 6 8 1 0 9 10 11 " ;
@@ -102,7 +105,7 @@ void test_puzzle_core()
 
 		puzzle.apply(state, 7);
 
-		assert_test(state == correct_state, "Applying transition.");
+		assert_test(state == correct_state, "Applying transition.");*/
 	}
 		
 }

@@ -290,6 +290,7 @@
     <ClInclude Include="..\..\..\..\src\sliding_puzzle\sliding_puzzle.h" />
     <ClInclude Include="..\..\..\..\src\tests\helpers.h" />
     <ClInclude Include="..\..\..\..\src\tests\test_sort.h" />
+    <ClInclude Include="..\..\..\..\src\tests\transition_system_helpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

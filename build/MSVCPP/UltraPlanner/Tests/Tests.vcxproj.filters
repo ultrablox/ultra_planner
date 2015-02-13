@@ -83,5 +83,8 @@
     <ClInclude Include="..\..\..\..\src\hannoi\hannoi_tower.h">
       <Filter>hannoi</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\tests\transition_system_helpers.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

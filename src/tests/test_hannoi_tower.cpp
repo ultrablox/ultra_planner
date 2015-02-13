@@ -1,30 +1,12 @@
 
+#include "transition_system_helpers.h"
 #include <hannoi/hannoi_tower.h>
 #include <core/transition_system/transition_system.h>
+#include "helpers.h"
 #include <utility>
-#include <sstream>
 
 using namespace std;
 
-void test_available_transitions(const std::string & state_data, transition_system<hannoi_tower> & htower, const std::vector<transition_system<hannoi_tower>::transition_t> & correct_res)
-{
-	hannoi_tower::state_t state;
-	
-	std::stringstream ss;
-	ss << state_data;
-
-	htower.deserialize_state(ss, state);
-
-	/*std::vector<transition_system<sliding_puzzle>::transition_t> res;
-
-	puzzle.forall_available_transitions(state, [&](transition_system<sliding_puzzle>::transition_t plate_index){
-		res.push_back(plate_index);
-	});
-
-	std::sort(res.begin(), res.end());
-
-	assert_test(res == correct_res, "Iterating available transitions.");*/
-}
 
 void test_hannoi_tower_core()
 {
@@ -33,9 +15,63 @@ void test_hannoi_tower_core()
 	auto hannoi_size = make_pair(4, 3);
 	hannoi_t hannoi(hannoi_size);
 
-	std::vector<transition_system<hannoi_tower>::transition_t> correct_trans;
+	{
+		std::vector<transition_system<hannoi_tower>::transition_t> correct_trans;
+		correct_trans.push_back(make_pair(0, 1));
+		correct_trans.push_back(make_pair(0, 2));
+		bool r = test_available_transitions(hannoi, "1 * * \
+													2 * * \
+													3 * * \
+													4 * *", correct_trans);
 
-	correct_trans.push_back(make_pair(0, 1));
-	correct_trans.push_back(make_pair(0, 2));
-	test_available_transitions("* 1 2 3 * *", hannoi, correct_trans);
+		assert_test(r, "Hannoi: iterating available transitions.");
+	}
+
+	{
+		std::vector<transition_system<hannoi_tower>::transition_t> correct_trans;
+		correct_trans.push_back(make_pair(1, 0));
+		correct_trans.push_back(make_pair(1, 2));
+		correct_trans.push_back(make_pair(2, 0));
+		bool r = test_available_transitions(hannoi, "* * * \
+													* * * \
+													* 1 * \
+													4 2 3", correct_trans);
+
+		assert_test(r, "Hannoi: iterating available transitions.");
+	}
+
+	{
+		std::vector<transition_system<hannoi_tower>::transition_t> correct_trans;
+		correct_trans.push_back(make_pair(0, 1));
+		correct_trans.push_back(make_pair(2, 1));
+		correct_trans.push_back(make_pair(2, 0));
+		bool r = test_available_transitions(hannoi, "* * * \
+													* * * \
+													2 * 1 \
+													4 * 3", correct_trans);
+
+		assert_test(r, "Hannoi: iterating available transitions.");
+	}
+
+
+	//Test applying transition
+	{
+		assert_test(test_apply_transition(hannoi, "* * * \
+													* * * \
+													* 1 * \
+													4 2 3", 
+													"* * * \
+													* * * \
+													1 * * \
+													4 2 3", make_pair(1, 0)), "Hannoi: applying transition.");
+
+		assert_test(test_apply_transition(hannoi, "* * * \
+												  * * * \
+												  3 1 * \
+												  4 2 *",
+												  "* * * \
+												  * * * \
+												  * 1 * \
+												  4 2 3", make_pair(0, 2)), "Hannoi: applying transition.");
+	}
 }
