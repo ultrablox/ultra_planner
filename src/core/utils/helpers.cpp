@@ -180,6 +180,6 @@ bool check_radix(size_t val, size_t radix_id)
 
 std::ostream & operator<<(std::ostream & os, const std::pair<unsigned char, unsigned char> & pair)
 {
-	os << '{' << pair.first << ',' << pair.second << '}';
+	os << '{' << (int)pair.first << ',' << (int)pair.second << '}';
 	return os;
 }

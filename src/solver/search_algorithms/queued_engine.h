@@ -60,7 +60,7 @@ protected:
 			if (m_cmp(m_searchQueue.best_estimation(), node_estimation))
 			{
 				cout << "Goal found, but it is not optimal (length " << node.length << ")" << std::endl;
-				//_Base::m_goalNodes.push_back(node);
+				_Base::m_goalNodes.push_back(node);
 				return true;
 			}
 			else
