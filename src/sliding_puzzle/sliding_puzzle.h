@@ -4,6 +4,7 @@
 
 #include <core/algorithm/math.h>
 #include <core/streamer.h>
+#include <core/utils/helpers.h>
 #include <core/hash.h>
 #include <array>
 #include <iostream>
@@ -11,6 +12,8 @@
 #include <algorithm>
 #include <vector>
 #include <random>
+
+#define STATE_COMPRESSION 1
 
 using namespace std;
 
@@ -45,10 +48,11 @@ struct pos_t
 
 struct puzzle_state
 {
+	using size_description_t = std::pair<int, int>;
 	typedef unsigned char plate_t;
 
-	puzzle_state(int element_count = 0)
-		:data(element_count)
+	puzzle_state(const size_description_t & size = size_description_t())
+		:data(size.first * size.second)
 	{}
 
 	friend bool operator==(const puzzle_state & lhs, const puzzle_state & rhs)
@@ -60,78 +64,88 @@ struct puzzle_state
 	plate_t empty_pos;
 };
 
-namespace std {
-template<>
-class hash<puzzle_state>
-{
-	typedef unsigned char element_t;
-public:
-	hash()
-	{
-		cache.m_size = 0;
-	}
-
-	size_t operator()(const puzzle_state & state) const
-	{
-		const int size = state.data.size();
-		if (cache.m_size != size)
-		{
-			cache.m_size = size;
-			cache.Pi.resize(size);
-			cache.PiInv.resize(size);
-			cache.cache.resize(size-1);
-		}
-
-		//vector<element_t> Pi = state.data;
-		cache.Pi = state.data;
-
-		//vector<element_t> Pi = state.data, PiInv(size);
-		for (int i = 0; i < size; ++i)
-			cache.PiInv[cache.Pi[i]] = i;
-		
-		//return mr_hash(size, cache.Pi, cache.PiInv);
-		return mr_hash(size, cache.Pi, cache.PiInv, cache.cache);
-
-		//return mr_hash(size, Pi, PiInv) % 2;
-	}
-private:
-	mutable struct
-	{
-		int m_size;
-		vector<element_t> Pi, PiInv;/**/
-		vector<size_t> cache;
-	} cache;
-};
-}
-
-
 class sliding_puzzle
 {
 public:
 	typedef puzzle_state::plate_t plate_t;
 	typedef puzzle_state state_t;
-
 	typedef int transition_t;
-	typedef std::pair<int, int> size_description_t;
+	using size_description_t = state_t::size_description_t;
 	
 	class state_streamer_t : public streamer_base
 	{
+#if STATE_COMPRESSION
+		struct conversion_element
+		{
+			int byte_offset;
+			int bit_offset;
+			int mask;
+		};
+#endif
 	public:
 		state_streamer_t(const sliding_puzzle & _puzzle)
-			:streamer_base(_puzzle.m_size.first * _puzzle.m_size.second * sizeof(state_t::plate_t)), m_size(_puzzle.m_size)
-		{}
+#if STATE_COMPRESSION
+			:streamer_base(integer_ceil(_puzzle.m_size.first * _puzzle.m_size.second * bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1), 8)), m_conversionTable(_puzzle.m_size.first * _puzzle.m_size.second),
+#else
+			:streamer_base(_puzzle.m_size.first * _puzzle.m_size.second * sizeof(state_t::plate_t)),
+#endif
+				m_size(_puzzle.m_size)
+		{
+
+#if STATE_COMPRESSION
+			//Generate conversion table
+			const int max_bits = bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1);
+			int cur_bit = 0, cur_byte = 0;
+			for (int i = 0; i < _puzzle.m_size.first * _puzzle.m_size.second; ++i, cur_bit += max_bits)
+			{
+				while (cur_bit >= 8)
+				{
+					cur_bit -= 8;
+					++cur_byte;
+				}
+
+				m_conversionTable[i].byte_offset = cur_byte;
+				m_conversionTable[i].bit_offset = cur_bit;
+				m_conversionTable[i].mask = ((1 << max_bits) - 1) << cur_bit;
+			}
+#endif
+		}
 
 
 		void serialize(void * dst, const state_t & state) const
 		{
+#if STATE_COMPRESSION
+			char * dst_ptr = (char*)dst;
+			for (int i = 0; i < state.data.size(); ++i)
+			{
+				auto & el = m_conversionTable[i];
+				int * el_ptr = (int*)(dst_ptr + el.byte_offset);
+				int val = state.data[i];
+				val = val << el.bit_offset;
+				*el_ptr = (el.mask & val) | ((~el.mask) & *el_ptr);
+			}
+#else
 			memcpy(dst, &state.data[0], serialized_size());
+#endif
 		}
 
 		void deserialize(const void * src, state_t & state) const
 		{
+#if STATE_COMPRESSION
+			state.data.resize(m_size.first * m_size.second);
+
+			const char * src_ptr = (char*)src;
+			for (int i = 0; i < state.data.size(); ++i)
+			{
+				auto & el = m_conversionTable[i];
+				const int * el_ptr = (const int*)(src_ptr + el.byte_offset);
+				
+				state.data[i] = ((*el_ptr) & el.mask) >> el.bit_offset;
+			}
+#else
 			state.data.resize(serialized_size());
 			memcpy(&state.data[0], src, serialized_size());
-
+#endif
 			//Obtain empty pos
 			auto it = std::find(state.data.begin(), state.data.end(), 0);
 			state.empty_pos = std::distance(state.data.begin(), it);
@@ -139,6 +153,9 @@ public:
 
 	private:
 		size_description_t m_size;
+#if STATE_COMPRESSION
+		std::vector<conversion_element> m_conversionTable;
+#endif
 	};
 
 	
@@ -222,50 +239,16 @@ public:
 		puzzle.serialize_state(cout, puzzle.state());
 	}*/
 
-	friend state_t random_init(sliding_puzzle & puzzle, int permutation_count = 10)
+	state_t solved_state() const
 	{
-		//Random shuffle
-		//std::random_shuffle(puzzle.m_state.begin(), puzzle.m_state.end());
-
-		std::default_random_engine generator;
-		std::uniform_int_distribution<int> distribution(0, 3);
-
-		
-		transition_t last_transition(-1);
-		state_t state = puzzle.default_state();
-
-		for(int i = 0; i < permutation_count; ++i)
-		{
-			vector<transition_t> possible_trans;
-			puzzle.forall_available_transitions(state, [&](const transition_t & transition){
-				if(last_transition != transition)
-					possible_trans.push_back(transition);
-			});
-
-			int random_index = distribution(generator);
-			transition_t selected_trans = possible_trans[random_index % possible_trans.size()];
-
-			puzzle.apply(state, selected_trans);
-		}
-
-		return state;
-	}
-
-	state_t default_state() const
-	{
-		return default_state(m_size);	
-	}
-
-	static state_t default_state(const size_description_t & descr)
-	{
-		state_t res(descr.first * descr.second);
+		state_t res(m_size);
 		res.empty_pos = 0;
-		for(int i = 0; i < descr.first * descr.second; ++i)
+		for (int i = 0; i < m_size.first * m_size.second; ++i)
 		{
 			//res[i] = pos_t(i % descr.first, i / descr.first);
 			res.data[i] = i;
 		}
-		return res;
+		return std::move(res);
 	}
 
 	void serialize_state(std::ostream & os, const state_t & state) const
@@ -366,9 +349,60 @@ public:
 		}
 		return os;
 	}
+
+	const size_description_t & size() const
+	{
+		return m_size;
+	}
 protected:
 	//state_t & m_state;
 	size_description_t m_size;
 };
+
+namespace std {
+	template<>
+	class hash<puzzle_state>
+	{
+		typedef unsigned char element_t;
+	public:
+		/*hash()
+			:m_hasher(0)
+		{
+			cache.m_size = 0;
+		}*/
+
+		size_t operator()(const puzzle_state & state) const
+		{
+			const int size = state.data.size();
+			if (m_hasher.m_size != size)
+				m_hasher = mr_hasher<element_t>(size);
+
+			/*if (cache.m_size != size)
+			{
+				cache.m_size = size;
+				cache.Pi.resize(size);
+				cache.PiInv.resize(size);
+				cache.cache.resize(size - 1);
+			}
+
+			cache.Pi = state.data;
+			for (int i = 0; i < size; ++i)
+				cache.PiInv[cache.Pi[i]] = i;
+			return mr_hash(size, cache.Pi, cache.PiInv, cache.cache);*/
+
+			m_hasher.cache.Pi = state.data;
+			return m_hasher();
+		}
+	private:
+		/*mutable struct
+		{
+			int m_size;
+			vector<element_t> Pi, PiInv;
+			vector<size_t> cache;
+		} cache;*/
+
+		mutable mr_hasher<element_t> m_hasher;
+	};
+}
 
 #endif

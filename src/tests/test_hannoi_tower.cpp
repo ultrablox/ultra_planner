@@ -12,7 +12,7 @@ void test_hannoi_tower_core()
 {
 	using hannoi_t = transition_system<hannoi_tower>;
 
-	auto hannoi_size = make_pair(4, 3);
+	hannoi_t::size_description_t hannoi_size(4, 3);
 	hannoi_t hannoi(hannoi_size);
 
 	{

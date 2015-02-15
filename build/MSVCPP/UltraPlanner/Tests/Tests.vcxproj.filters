@@ -63,6 +63,9 @@
     <ClCompile Include="..\..\..\..\src\tests\test_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\tests\test_explicit_graph_search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\tests\test_sort.h">

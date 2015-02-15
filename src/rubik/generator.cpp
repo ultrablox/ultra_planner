@@ -1,5 +1,5 @@
 
-#include "sliding_puzzle.h"
+#include "rubiks_cube.h"
 #include <core/transition_system/transition_system.h>
 #include <solver/problem_instance_generator.h>
 #include <tclap/CmdLine.h>
@@ -18,11 +18,8 @@ int main(int argc, const char ** argv)
 
 	//===============Generating==================
 
-	ValueArg<int> puzzle_width("c", "width", "Puzzle width.", false, 4, "int");
-	cmd.add(puzzle_width);
-
-	ValueArg<int> puzzle_height("r", "height", "Puzzle height.", false, 4, "int");
-	cmd.add(puzzle_height);
+	ValueArg<int> problem_size_param("c", "size", "Problem size.", false, 4, "int");
+	cmd.add(problem_size_param);
 
 	ValueArg<int> permutations("p", "permutations", "Number of permutations.", false, 20, "int");
 	cmd.add(permutations);
@@ -43,9 +40,9 @@ int main(int argc, const char ** argv)
 	
 	std::ofstream out_file(problem_fn_param.getValue());
 	
-	using problem_t = transition_system<sliding_puzzle>;
+	using problem_t = transition_system<rubiks_cube>;
 	problem_instance_generator<problem_t> problem_generator;
-	problem_t::size_description_t problem_size(puzzle_width.getValue(), puzzle_height.getValue());
+	problem_t::size_description_t problem_size(problem_size_param.getValue());
 	
 	problem_generator.generate(problem_size, permutations.getValue(), out_file);
 

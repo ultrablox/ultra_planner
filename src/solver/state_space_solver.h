@@ -66,7 +66,7 @@ private:
 	{
 		graph_t graph(m_system);
 
-		state_t initial_state;
+		state_t initial_state(m_system.size());
 		m_system.deserialize_state(m_inStream, initial_state);
 
 		EngType search_engine(streamer_t(graph.transition_system()));

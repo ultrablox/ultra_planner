@@ -32,6 +32,7 @@ void test_matrix()
 }
 
 void test_bitset();
+void test_explicit_graph_search();
 void test_search();
 void test_puzzle_core();
 void test_complex_vector();
@@ -69,7 +70,7 @@ int main()
 	//test_matrix();
 
 	//test_sorting();
-
+	test_explicit_graph_search();
 	test_search();
 
 	return 0;

@@ -4,6 +4,7 @@
 #include <solver/search_algorithms/dfs_engine.h>
 #include <solver/search_algorithms/astar_engine.h>
 #include <solver/search_algorithms/batched_engine.h>
+#include <solver/problem_instance_generator.h>
 #include <core/algorithm/graph.h>
 #include <sliding_puzzle/sliding_puzzle.h>
 #include <sliding_puzzle/heuristic.h>
@@ -11,136 +12,6 @@
 #include <array>
 #include <functional>
 #include <sstream>
-
-template<typename It1, typename It2>
-bool compare_paths(It1 begin1, It1 end1, It2 begin2, It2 end2)
-{
-	if(std::distance(begin1, end1) != std::distance(begin2, end2))
-		return false;
-
-	while(begin1 != end1)
-	{
-		if(*begin1 != *begin2)
-			return false;
-
-		++begin1;
-		++begin2;
-	}
-
-	return true;
-}
-
-template<typename C1, typename C2>
-bool compare_paths(C1 path1, C2 path2)
-{
-	return compare_paths(path1.begin(), path1.end(), path2.begin(), path2.end());
-}
-
-void test_explicit_graph_search()
-{
-	typedef explicit_graph<int> graph_t;
-	graph_t::vertex_streamer_t streamer;
-
-	/*
-	Simpliest graph.
-	*/
-	{
-		int vertices[] = {1,2,3,4,5,6,7,8};
-		int edges[][2] = {{1,2}, {1,5}, {2,5}, {5,6}, {2,7}, {3,7}, {3,4}, {7,8}};
-		std::array<int, 5> correct_path = {1, 2, 7, 3, 4};
-
-		
-		graph_t graph(vertices, edges);
-
-		{
-			bfs_engine<graph_t> eng(streamer);
-			std::vector<int> path;
-			bool found = eng(graph, 1, [](int vertex){
-				return vertex == 4;
-			}, path);
-
-			assert_test(found, "BFS (simple) failed to find existing solution");
-			assert_test(compare_paths(correct_path, path), "BFS (simple) invalid solution");
-		}
-
-		{
-			dfs_engine<graph_t> eng(streamer);
-			std::vector<int> path;
-			bool found = eng(graph, 1, [](int vertex){
-				return vertex == 4;
-			}, path);
-
-			assert_test(found, "DFS (simple) failed to find existing solution");
-			assert_test(compare_paths(correct_path, path), "DFS (simple) invalid solution");
-		}
-	}
-
-	/*
-	Spiral.
-	*/
-	{
-		int vertices[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};
-		int edges[][2] = {{13,12},{12,7},{7,8},{8,9},{9,14},{14,19},{19,18},{18,17},{17,16},{16,11},{11,6},{6,1},{1,2},{2,3},{3,4},{4,5},{5,10},{10,15},{15,20},{20,25},{25,24},{24,23},{23,22},{22,21}};
-		std::array<int, 25> correct_path = {21,22,23,24,25,20,15,10,5,4,3,2,1,6,11,16,17,18,19,14,9,8,7,12,13};
-
-		graph_t graph(vertices, edges);
-
-		{
-			bfs_engine<graph_t> eng(streamer);
-			std::vector<int> path;
-			bool found = eng(graph, 21, [](int vertex){
-				return vertex == 13;
-			}, path);
-
-			assert_test(found, "BFS (spiral) failed to find existing solution");
-			assert_test(compare_paths(correct_path, path), "BFS (spiral) invalid solution");
-		}
-
-		{
-			dfs_engine<graph_t> eng(streamer);
-			std::vector<int> path;
-			bool found = eng(graph, 21, [](int vertex){
-				return vertex == 13;
-			}, path);
-
-			assert_test(found, "DFS (spiral) failed to find existing solution");
-			assert_test(compare_paths(correct_path, path), "DFS (spiral) invalid solution");
-		}
-	}
-
-	/*
-	Christmas tree.
-	*/
-	{
-		int vertices[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28};
-		int edges[][2] = {{15,9},{9,3},{9,10},{9,17},{17,23},{17,24},{10,18},{18,11},{11,5},{18,12},{12,20},{12,19},{19,27},{20,13},{20,14},{13,7}};
-		std::array<int, 7> correct_path = {15,9,10,18,12,20,14};
-
-		graph_t graph(vertices, edges);
-
-		{
-			bfs_engine<graph_t> eng(streamer);
-			std::vector<int> path;
-			bool found = eng(graph, 15, [](int vertex){
-				return vertex == 14;
-			}, path);
-
-			assert_test(found, "BFS (christmas) failed to find existing solution");
-			assert_test(compare_paths(correct_path, path), "BFS (christmas) invalid solution");
-		}
-
-		{
-			dfs_engine<graph_t> eng(streamer);
-			std::vector<int> path;
-			bool found = eng(graph, 15, [](int vertex){
-				return vertex == 14;
-			}, path);
-
-			assert_test(found, "DFS (christmas) failed to find existing solution");
-			assert_test(compare_paths(correct_path, path), "DFS (christmas) invalid solution");
-		}
-	}
-}
 
 namespace std {
 template<>
@@ -260,10 +131,10 @@ void test_sliding_puzzle_blind()
 	puzzle_t pr_puzzle(make_pair(PuzzleW, PuzzleH));
 //	assert_test(pr_puzzle.is_solved(), "Sliding puzzle invalid initial state");
 	
-	//print_puzzle(pr_puzzle);
-	auto initial_state = random_init(pr_puzzle, 2 * PuzzleW * PuzzleH);
-	//random_init(pr_puzzle, 1);
-	//print_puzzle(pr_puzzle);
+	problem_instance_generator<puzzle_t> instance_gen;
+
+	auto initial_state = instance_gen.generate_state(pr_puzzle, 2 * PuzzleW * PuzzleH); //random_init(pr_puzzle, 2 * PuzzleW * PuzzleH);
+
 	assert_test(pr_puzzle.has_solution(), "Sliding puzzle does not have solution");
 
 	typedef transition_system_graph<puzzle_t> graph_t;
@@ -279,7 +150,7 @@ void test_sliding_puzzle_blind()
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
-			return puzzle_state == puzzle.default_state();
+			return puzzle_state == puzzle.solved_state();
 		}, path);
 		assert_test(found, "DFS (puzzle) failed to find existing solution");
 
@@ -293,7 +164,7 @@ void test_sliding_puzzle_blind()
 		std::vector<puzzle_t::state_t> path;
 
 		bool found = eng(graph, initial_state, [=](const puzzle_t::state_t & puzzle_state){
-			return puzzle_state == puzzle.default_state();
+			return puzzle_state == puzzle.solved_state();
 		}, path);
 		assert_test(found, "BFS (puzzle) failed to find existing solution");
 
@@ -312,10 +183,9 @@ void test_sliding_puzzle_heuristic()
 	puzzle_t pr_puzzle(make_pair(PuzzleWidth, PuzzleHeight));
 //	assert_test(pr_puzzle.is_solved(), "Sliding puzzle invalid initial state");
 	
-	//print_puzzle(pr_puzzle);
-	auto initial_state = random_init(pr_puzzle, 2 * PuzzleWidth * PuzzleHeight);
-	//random_init(pr_puzzle, 1);
-	//print_puzzle(pr_puzzle);
+	problem_instance_generator<puzzle_t> instance_gen;
+	auto initial_state = instance_gen.generate_state(pr_puzzle, 2 * PuzzleWidth * PuzzleHeight); // random_init(pr_puzzle, 2 * PuzzleWidth * PuzzleHeight);
+	
 	assert_test(pr_puzzle.has_solution(), "Sliding puzzle does not have solution");
 
 	typedef transition_system_graph<puzzle_t> graph_t;
@@ -398,7 +268,7 @@ void test_heuristics()
 
 		Expected value: 31
 		*/
-		auto state = puzzle_t::default_state(puzzle_size);
+		auto state = puzzle_t::state_t(puzzle_size);
 
 		std::stringstream ss;
 		ss << "5 10 14 7 " << "8 3 6 1 " << "15 0 12 9 " << "2 11 4 13 ";
@@ -424,7 +294,7 @@ void test_heuristics()
 		Expected value: 18
 		*/
 
-		auto state = puzzle_t::default_state(puzzle_size);
+		auto state = puzzle_t::state_t(puzzle_size);
 
 		std::stringstream ss;
 		ss << "7 2 4 " << "5 0 6 " << "8 3 1 ";
@@ -441,7 +311,7 @@ void test_hash()
 {
 	typedef transition_system<sliding_puzzle> puzzle_t;
 	auto puzzle_size = make_pair(3, 5);
-	auto state = puzzle_t::default_state(puzzle_size);
+	auto state = puzzle_t::state_t(puzzle_size);
 
 	std::hash<puzzle_t::state_t> hash;
 	size_t res = hash(state);
@@ -452,7 +322,6 @@ void test_search()
 {
 	test_hash();
 	test_heuristics();
-	test_explicit_graph_search();
 	test_implicit_graph_search();
 	//test_sliding_puzzle_heuristic<1, 2>();
 	test_sliding_puzzle_blind<2,2>();

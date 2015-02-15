@@ -14,12 +14,33 @@ struct hannoi_state
 	using number_t = unsigned char;
 	using tower_t = std::vector<number_t>;
 
-	std::vector<tower_t> towers;
+	//Number of disks + Number of towers
+	struct size_description_t
+	{
+		size_description_t(number_t disk_count, number_t peg_count)
+			:diskCount(disk_count), pegCount(peg_count)
+		{}
+
+		number_t diskCount, pegCount;
+	};
+
+	hannoi_state()
+	{
+	}
+
+	hannoi_state(const size_description_t & size)
+		:towers(size.pegCount, tower_t(size.diskCount))
+	{
+		for (auto & tower : towers)
+			tower.resize(0);
+	}
 
 	friend bool operator==(const hannoi_state & lhs, const hannoi_state & rhs)
 	{
 		return lhs.towers == rhs.towers;
 	}
+
+	std::vector<tower_t> towers;
 };
 
 namespace std {
@@ -77,16 +98,8 @@ class hannoi_tower
 public:
 	using number_t = hannoi_state::number_t;
 	using state_t = hannoi_state;
-
-	//Number of disks + Number of towers
-	struct size_description_t
-	{
-		size_description_t(number_t disk_count, number_t peg_count)
-			:diskCount(disk_count), pegCount(peg_count)
-		{}
-
-		number_t diskCount, pegCount;
-	};
+	using size_description_t = hannoi_state::size_description_t;
+	
 
 	//Source Tower -> Destination Tower
 	using transition_t = std::pair<number_t, number_t>;
@@ -203,8 +216,7 @@ public:
 
 	state_t default_state() const
 	{
-		state_t res;
-		res.towers.resize(m_size.pegCount);
+		state_t res(m_size);
 		for (number_t d = m_size.diskCount; d > 0; --d)
 			res.towers[m_size.pegCount - 1].push_back(d);
 		return std::move(res);

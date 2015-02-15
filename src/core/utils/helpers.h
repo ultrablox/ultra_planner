@@ -208,4 +208,27 @@ void print_range(std::ostream & os, It first, It last, char delimeter)
 		os << delimeter << *first++;
 }
 
+template<typename ValueT>
+void loop_offset(bool inversed, ValueT & ref1, ValueT & ref2, ValueT & ref3, ValueT & ref4)
+{
+	if (inversed)
+	{
+		ValueT last_val = ref1;
+		ref1 = ref2;
+		ref2 = ref3;
+		ref3 = ref4;
+		ref4 = last_val;
+	}
+	else
+	{
+		ValueT last_val = ref4;
+		ref4 = ref3;
+		ref3 = ref2;
+		ref2 = ref1;
+		ref1 = last_val;
+	}
+}
+
+ULTRA_CORE_API int bits_for_representing(int max_value);
+
 #endif

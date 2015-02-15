@@ -164,5 +164,8 @@
     <ClInclude Include="..\..\..\..\src\solver\state_space_solver.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\problem_instance_generator.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

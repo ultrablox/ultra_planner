@@ -38,4 +38,36 @@ size_t mr_hash(int _n, T & Pi, T & PiInv, std::vector<size_t> & cache)
     return res;
 }
 
+/*
+Nice permutation hasher
+*/
+template<typename T>
+struct mr_hasher
+{
+	using element_t = T;
+
+	mr_hasher(int size = 1)
+		:m_size(size)
+	{
+		cache.Pi.resize(size);
+		cache.PiInv.resize(size);
+		cache.cache.resize(size - 1);
+	}
+
+	size_t operator()()
+	{
+		for (int i = 0; i < m_size; ++i)
+			cache.PiInv[cache.Pi[i]] = i;
+		return mr_hash(m_size, cache.Pi, cache.PiInv, cache.cache);
+	}
+
+	struct
+	{
+		std::vector<element_t> Pi, PiInv;
+		std::vector<size_t> cache;
+	} cache;
+
+	int m_size;
+};
+
 #endif

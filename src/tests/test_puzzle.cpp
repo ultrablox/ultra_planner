@@ -84,22 +84,22 @@ void test_puzzle_core()
 			5 0 6  + '3' -> 5 3 6
 			8 3 1			8 0 1
 			9 10 11			9 10 11
-		*/
+			*/
 
 		assert_test(test_apply_transition(puzzle, "7 2 4 5 3 6 8 1 0 9 10 11 ", "7 2 4  5 3 6  8 0 1  9 10 11 ", 7), "Puzzle: applying transition.");
 		/*auto state = puzzle_t::default_state(puzzle_size);
 		{
-			std::stringstream ss;
-			ss << "7 2 4 5 3 6 8 1 0 9 10 11 " ;
-			puzzle.deserialize_state(ss, state);
+		std::stringstream ss;
+		ss << "7 2 4 5 3 6 8 1 0 9 10 11 " ;
+		puzzle.deserialize_state(ss, state);
 		}
 
 		auto correct_state = puzzle_t::default_state(puzzle_size);
-		
+
 		{
-			std::stringstream ss;
-			ss << "7 2 4 " << "5 3 6 " << "8 0 1 " <<  "9 10 11 " ;
-			puzzle.deserialize_state(ss, correct_state);
+		std::stringstream ss;
+		ss << "7 2 4 " << "5 3 6 " << "8 0 1 " <<  "9 10 11 " ;
+		puzzle.deserialize_state(ss, correct_state);
 		}
 
 
@@ -107,5 +107,20 @@ void test_puzzle_core()
 
 		assert_test(state == correct_state, "Applying transition.");*/
 	}
-		
+
+
+	//Streamer
+	{
+		puzzle_t::state_streamer_t streamer(puzzle);
+		std::vector<unsigned char> buffer(streamer.serialized_size());
+
+		auto sample_state = deserialize_state(puzzle, "7 2 4  5 3 6  8 0 1  9 10 11 ");
+
+		streamer.serialize(buffer.data(), sample_state);
+
+		puzzle_t::state_t deserialized_state;
+		streamer.deserialize(buffer.data(), deserialized_state);
+		assert_test(sample_state == deserialized_state, "Puzzle Streamer: serializing/deserializing.");
+	}
+
 }

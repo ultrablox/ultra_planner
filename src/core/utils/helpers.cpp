@@ -183,3 +183,14 @@ std::ostream & operator<<(std::ostream & os, const std::pair<unsigned char, unsi
 	os << '{' << (int)pair.first << ',' << (int)pair.second << '}';
 	return os;
 }
+
+int bits_for_representing(int max_value)
+{
+	int count = 0;
+	while (max_value)
+	{
+		max_value = max_value >> 1;
+		++count;
+	}
+	return count;
+}

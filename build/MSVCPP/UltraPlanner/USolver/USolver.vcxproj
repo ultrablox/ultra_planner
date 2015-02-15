@@ -329,6 +329,7 @@
     <ClInclude Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.h" />
     <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.h" />
     <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.h" />
+    <ClInclude Include="..\..\..\..\src\solver\problem_instance_generator.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\astar_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\batched_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\bfs_engine.h" />

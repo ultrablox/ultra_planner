@@ -17,14 +17,9 @@ public:
 	typedef typename _Base::transition_t transition_t;
 	typedef typename _Base::size_description_t size_description_t;
 
-	/*transition_system(const state_t & _state)
-		:_Base(m_state), m_state(_state)
-	{
-	}*/
-
 	template<typename Args>
 	transition_system(Args descr)
-		:_Base(/*m_state,*/ descr)
+		:_Base(descr)
 	{
 
 	}
@@ -103,7 +98,8 @@ public:
 		for (auto tr : path)
 			_Base::apply(initial_state, tr);
 
-		return initial_state == _Base::default_state();
+		//return initial_state == _Base::solved_state();
+		return _Base::is_solved(initial_state);
 	}
 
 	template<typename StateIt, typename TransIt>
