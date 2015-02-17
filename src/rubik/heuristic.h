@@ -61,7 +61,7 @@ public:
 	manhattan_3D_distance_heuristic(const rubik_t & _rubik)
 		:m_rubik(_rubik), m_destPositions(_rubik.size() * _rubik.size() * _rubik.size() - 6 - 1), m_currentPositions(m_destPositions.size()), m_cornerIds({ 0, 2, 5, 7, 12, 14, 17, 19 }), m_edgeIds({1, 3, 4, 6, 8, 9, 10, 11, 13, 15, 16, 18})
 	{
-		state_t solved_state = _rubik.solved_state();
+		/*state_t solved_state = _rubik.solved_state();
 
 		for (int x = 0; x < _rubik.size(); ++x)
 		{
@@ -74,12 +74,12 @@ public:
 						m_destPositions[cube_id] = point3d(x, y, z);
 				}
 			}
-		}
+		}*/
 	}
 
 	int operator()(const state_t & state) const
 	{
-		for (int x = 0; x < m_rubik.size(); ++x)
+		/*for (int x = 0; x < m_rubik.size(); ++x)
 		{
 			for (int y = 0; y < m_rubik.size(); ++y)
 			{
@@ -102,7 +102,9 @@ public:
 		for (auto edge_id : m_edgeIds)
 			edges_sum += edge_distance(m_destPositions[edge_id], m_currentPositions[edge_id]);
 
-		return max((float)corners_sum / 4, (float)edges_sum / 4);
+		return max((float)corners_sum / 4, (float)edges_sum / 4);*/
+
+		return 0;
 	}
 private:
 	const rubik_t & m_rubik;

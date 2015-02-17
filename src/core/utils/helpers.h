@@ -209,9 +209,9 @@ void print_range(std::ostream & os, It first, It last, char delimeter)
 }
 
 template<typename ValueT>
-void loop_offset(bool inversed, ValueT & ref1, ValueT & ref2, ValueT & ref3, ValueT & ref4)
+void loop_offset(/*bool inversed,*/ ValueT & ref1, ValueT & ref2, ValueT & ref3, ValueT & ref4)
 {
-	if (inversed)
+	/*if (inversed)
 	{
 		ValueT last_val = ref1;
 		ref1 = ref2;
@@ -220,15 +220,32 @@ void loop_offset(bool inversed, ValueT & ref1, ValueT & ref2, ValueT & ref3, Val
 		ref4 = last_val;
 	}
 	else
-	{
+	{*/
 		ValueT last_val = ref4;
 		ref4 = ref3;
 		ref3 = ref2;
 		ref2 = ref1;
 		ref1 = last_val;
-	}
+	//}
+}
+
+template<typename C>
+void loop_offset(C & container)
+{
+	auto last_val = *container.rbegin();
+	for (int i = container.size() - 1; i > 0; --i)
+		container[i] = container[i - 1];
+	container[0] = last_val;
 }
 
 ULTRA_CORE_API int bits_for_representing(int max_value);
+
+template<typename It, typename PIt>
+void permutate(It first, It last, PIt permutation_first)
+{
+	std::vector<typename It::value_type> tmp(first, last);
+	for (; first != last; ++first, ++permutation_first)
+		*first = tmp[*permutation_first];
+}
 
 #endif

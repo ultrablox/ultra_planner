@@ -86,6 +86,8 @@ public:
 			memcpy(&node.id, cur_ptr, sizeof(size_t));
 			memcpy(&node.parent_id, cur_ptr + sizeof(size_t), sizeof(size_t));
 			memcpy(&node.length, cur_ptr + 2 * sizeof(size_t), sizeof(int));
+
+			//node.state = m_baseStreamer.allocated_value();
 			m_baseStreamer.deserialize(cur_ptr + 2 * sizeof(size_t)+sizeof(int), node.state);
 		}
 

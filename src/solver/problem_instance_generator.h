@@ -18,12 +18,17 @@ public:
 	{
 		problem_t problem(size);
 		
-		state_t state = generate_state(problem, permutation_count);
+		std::vector<transition_t> path;
+
+		state_t state = generate_state(problem, permutation_count, path);
 
 		problem.serialize_state(os, state);
+
+		std::reverse(path.begin(), path.end());
+		os << "Solution (" << path.size() << " length): ";
 	}
 
-	state_t generate_state(const problem_t & problem, int permutation_count)
+	state_t generate_state(const problem_t & problem, int permutation_count, std::vector<transition_t> & transitions)
 	{
 		std::default_random_engine generator;
 		std::uniform_int_distribution<int> distribution(0, 999);
@@ -41,6 +46,8 @@ public:
 			transition_t selected_trans = possible_trans[random_index % possible_trans.size()];
 
 			problem.apply(state, selected_trans);
+
+			transitions.push_back(selected_trans);
 		}
 
 		return std::move(state);

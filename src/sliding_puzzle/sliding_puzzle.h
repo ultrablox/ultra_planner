@@ -151,6 +151,11 @@ public:
 			state.empty_pos = std::distance(state.data.begin(), it);
 		}
 
+		/*puzzle_state allocated_value() const
+		{
+			return puzzle_state(m_size);
+		}*/
+
 	private:
 		size_description_t m_size;
 #if STATE_COMPRESSION
