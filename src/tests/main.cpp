@@ -46,6 +46,7 @@ void test_range_map();
 void test_complex_stack();
 void test_block_chain();
 void test_hannoi_tower_core();
+void test_compressed_stream();
 
 int main()
 {
@@ -53,6 +54,7 @@ int main()
 	test_merge();
 	test_avl_tree();
 	test_range_map();
+	test_compressed_stream();
 	
 	test_hannoi_tower_core();
 	test_puzzle_core();

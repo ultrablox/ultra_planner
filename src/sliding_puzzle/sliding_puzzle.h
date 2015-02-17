@@ -6,6 +6,7 @@
 #include <core/streamer.h>
 #include <core/utils/helpers.h>
 #include <core/hash.h>
+#include <core/compressed_stream.h>
 #include <array>
 #include <iostream>
 #include <iomanip>
@@ -74,18 +75,18 @@ public:
 	
 	class state_streamer_t : public streamer_base
 	{
-#if STATE_COMPRESSION
+/*#if STATE_COMPRESSION
 		struct conversion_element
 		{
 			int byte_offset;
 			int bit_offset;
 			int mask;
 		};
-#endif
+#endif*/
 	public:
 		state_streamer_t(const sliding_puzzle & _puzzle)
 #if STATE_COMPRESSION
-			:streamer_base(integer_ceil(_puzzle.m_size.first * _puzzle.m_size.second * bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1), 8)), m_conversionTable(_puzzle.m_size.first * _puzzle.m_size.second),
+			:streamer_base(integer_ceil(_puzzle.m_size.first * _puzzle.m_size.second * bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1), 8)), /*m_conversionTable(_puzzle.m_size.first * _puzzle.m_size.second),*/ m_bitsPerSlide(bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1)),
 #else
 			:streamer_base(_puzzle.m_size.first * _puzzle.m_size.second * sizeof(state_t::plate_t)),
 #endif
@@ -93,8 +94,10 @@ public:
 		{
 
 #if STATE_COMPRESSION
+			m_bitsPerSlide = bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1);
+
 			//Generate conversion table
-			const int max_bits = bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1);
+/*			const int max_bits = bits_for_representing(_puzzle.m_size.first * _puzzle.m_size.second - 1);
 			int cur_bit = 0, cur_byte = 0;
 			for (int i = 0; i < _puzzle.m_size.first * _puzzle.m_size.second; ++i, cur_bit += max_bits)
 			{
@@ -107,7 +110,7 @@ public:
 				m_conversionTable[i].byte_offset = cur_byte;
 				m_conversionTable[i].bit_offset = cur_bit;
 				m_conversionTable[i].mask = ((1 << max_bits) - 1) << cur_bit;
-			}
+			}*/
 #endif
 		}
 
@@ -115,7 +118,10 @@ public:
 		void serialize(void * dst, const state_t & state) const
 		{
 #if STATE_COMPRESSION
-			char * dst_ptr = (char*)dst;
+			compressed_stream wstrem(dst);
+			wstrem.write(state.data.begin(), state.data.end(), m_bitsPerSlide);
+
+			/*char * dst_ptr = (char*)dst;
 			for (int i = 0; i < state.data.size(); ++i)
 			{
 				auto & el = m_conversionTable[i];
@@ -123,7 +129,7 @@ public:
 				int val = state.data[i];
 				val = val << el.bit_offset;
 				*el_ptr = (el.mask & val) | ((~el.mask) & *el_ptr);
-			}
+			}*/
 #else
 			memcpy(dst, &state.data[0], serialized_size());
 #endif
@@ -134,14 +140,17 @@ public:
 #if STATE_COMPRESSION
 			state.data.resize(m_size.first * m_size.second);
 
-			const char * src_ptr = (char*)src;
+			compressed_stream rstrem(src);
+			rstrem.read(state.data.begin(), state.data.end(), m_bitsPerSlide);
+
+			/*const char * src_ptr = (char*)src;
 			for (int i = 0; i < state.data.size(); ++i)
 			{
 				auto & el = m_conversionTable[i];
 				const int * el_ptr = (const int*)(src_ptr + el.byte_offset);
 				
 				state.data[i] = ((*el_ptr) & el.mask) >> el.bit_offset;
-			}
+			}*/
 #else
 			state.data.resize(serialized_size());
 			memcpy(&state.data[0], src, serialized_size());
@@ -159,7 +168,8 @@ public:
 	private:
 		size_description_t m_size;
 #if STATE_COMPRESSION
-		std::vector<conversion_element> m_conversionTable;
+//		std::vector<conversion_element> m_conversionTable;
+		int m_bitsPerSlide;
 #endif
 	};
 

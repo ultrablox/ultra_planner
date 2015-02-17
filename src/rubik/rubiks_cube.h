@@ -7,6 +7,7 @@
 #include <core/utils/helpers.h>
 #include <core/streamer.h>
 #include <core/hash.h>
+#include <core/compressed_stream.h>
 #include <numeric>
 #include <map>
 
@@ -212,29 +213,28 @@ public:
 	{
 	public:
 		state_streamer_t(const rubiks_cube & _rubik)
-			:streamer_base(_rubik.m_size * _rubik.m_size * 6 * sizeof(element_t)), m_size(_rubik.m_size)
+			:streamer_base(integer_ceil(8 * 3 + 12 * 4 + 8 * 2 + 12 * 1, 8)), m_size(_rubik.m_size)
 		{}
 
 		void serialize(void * dst, const state_t & state) const
 		{
-			/*const int step_size = m_size * m_size * sizeof(element_t);
-
-			char * dest_ptr = (char*)dst;
-			for (int i = 0; i < 6; ++i, dest_ptr += step_size)
-				memcpy(dest_ptr, state.faces[i].data.data(), step_size);*/
+			compressed_stream wstream(dst);
+			wstream.write(state.m_cornerCubies.begin(), state.m_cornerCubies.end(), 3);
+			wstream.write(state.m_edgeCubies.begin(), state.m_edgeCubies.end(), 4);
+			wstream.write(state.m_cornerMarkers.begin(), state.m_cornerMarkers.end(), 2);
+			wstream.write(state.m_edgeMarkers.begin(), state.m_edgeMarkers.end(), 1);
 		}
 
 		void deserialize(const void * src, state_t & state) const
 		{
-			/*const int step_size = m_size * m_size * sizeof(element_t);
+			state.m_edgeCubies.resize(12);
+			state.m_edgeMarkers.resize(12);
 
-			char * src_ptr = (char*)src;
-
-			for (int i = 0; i < 6; ++i, src_ptr += step_size)
-			{
-				state.faces[i].data.resize(m_size * m_size);
-				memcpy(state.faces[i].data.data(), src_ptr, step_size);
-			}*/
+			compressed_stream rstream(src);
+			rstream.read(state.m_cornerCubies.begin(), state.m_cornerCubies.end(), 3);
+			rstream.read(state.m_edgeCubies.begin(), state.m_edgeCubies.end(), 4);
+			rstream.read(state.m_cornerMarkers.begin(), state.m_cornerMarkers.end(), 2);
+			rstream.read(state.m_edgeMarkers.begin(), state.m_edgeMarkers.end(), 1);
 		}
 
 	private:

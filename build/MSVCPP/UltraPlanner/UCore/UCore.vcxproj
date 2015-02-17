@@ -297,6 +297,7 @@
     <ClInclude Include="..\..\..\..\src\core\complex_queue.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_stack.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_vector.h" />
+    <ClInclude Include="..\..\..\..\src\core\compressed_stream.h" />
     <ClInclude Include="..\..\..\..\src\core\data_file_win.h" />
     <ClInclude Include="..\..\..\..\src\core\delayed_buffer.h" />
     <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h" />

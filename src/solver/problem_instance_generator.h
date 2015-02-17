@@ -20,7 +20,7 @@ public:
 		
 		std::vector<transition_t> path;
 
-		state_t state = generate_state(problem, permutation_count, path);
+		state_t state = generate_state(problem, permutation_count, &path);
 
 		problem.serialize_state(os, state);
 
@@ -28,7 +28,7 @@ public:
 		os << "Solution (" << path.size() << " length): ";
 	}
 
-	state_t generate_state(const problem_t & problem, int permutation_count, std::vector<transition_t> & transitions)
+	state_t generate_state(const problem_t & problem, int permutation_count, std::vector<transition_t> * p_transitions = nullptr)
 	{
 		std::default_random_engine generator;
 		std::uniform_int_distribution<int> distribution(0, 999);
@@ -47,7 +47,8 @@ public:
 
 			problem.apply(state, selected_trans);
 
-			transitions.push_back(selected_trans);
+			if (p_transitions)
+				p_transitions->push_back(selected_trans);
 		}
 
 		return std::move(state);

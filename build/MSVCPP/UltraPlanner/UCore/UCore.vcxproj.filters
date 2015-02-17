@@ -170,5 +170,8 @@
     <ClInclude Include="..\..\..\..\src\core\data_file_win.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\compressed_stream.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
