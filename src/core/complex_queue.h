@@ -7,7 +7,7 @@
 #include <stxxl/queue>
 #include <stdexcept>
 
-template<typename T, typename S = base_type_streamer<T>, unsigned int BlockSize = 8192>
+template<typename T, typename S = base_type_streamer<T>, unsigned int BlockSize = 8192, bool ExtMem = false>
 class complex_queue
 {
 	using value_type = T;
@@ -26,7 +26,8 @@ class complex_queue
 		char data[DataSize];
 	};
 
-	typedef stxxl::queue<block_t> base_container_t;
+
+	using base_container_t = typename std::conditional<ExtMem, stxxl::queue<block_t>, std::queue<block_t>>::type;
 
 public:
 	complex_queue(const streamer_t & streamer)

@@ -158,8 +158,8 @@ public:
 		if (m_serializedElementSize > block_t::DataSize)
 			throw runtime_error("Serialized element is bigger than page size");
 
-		cout << "Hashset block_size: " << sizeof(block_t) << ", DataSize " << block_t::DataSize << std::endl;
-		cout << "Hashset page can store " << m_maxItemsInBlock << " elements." << std::endl;
+		//cout << "Hashset block_size: " << sizeof(block_t) << ", DataSize " << block_t::DataSize << std::endl;
+		//cout << "Hashset page can store " << m_maxItemsInBlock << " elements." << std::endl;
 	}
 
 	complex_hashset_base(const complex_hashset_base & rhs)

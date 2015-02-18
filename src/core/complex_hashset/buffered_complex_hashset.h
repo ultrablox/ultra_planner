@@ -151,7 +151,7 @@ public:
 	
 	vector_wrapper()
 	{
-		m_storage.reserve(1000000);
+		m_storage.reserve(1000);
 	}
 
 	size_t size() const

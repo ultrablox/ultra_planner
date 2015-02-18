@@ -82,13 +82,21 @@ public:
 	};
 
 	//using layer_container_t = complex_stack<combined_value_t, combined_val_streamer_t, 8192U, ExtMemory>;
-	using layer_container_t = complex_queue<combined_value_t, combined_val_streamer_t, 8192U>;
+	using layer_container_t = complex_queue<combined_value_t, combined_val_streamer_t, 8192U, ExtMemory>;
 public:
 
 	search_queue(const value_streamer & node_streamer)
 		:m_secondaryData(combined_val_streamer_t(node_streamer)), m_nodeStreamer(node_streamer)
 	{
 
+	}
+
+	~search_queue()
+	{
+		for (auto & layer : m_primaryData)
+			delete layer.second;
+
+		m_primaryData.clear();
 	}
 
 	bool empty() const

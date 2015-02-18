@@ -56,7 +56,7 @@ public:
 	grained_vector_base(size_t serialized_value_size)
 		:m_elementsPerBlock(_Base::BlockSize / serialized_value_size), m_size(0)
 	{
-		cout << "Creating complex vector with block_size=" << _Base::BlockSize << ", " << m_elementsPerBlock << ", " << m_elementsPerBlock << " elements per block" << std::endl;
+		//cout << "Creating complex vector with block_size=" << _Base::BlockSize << ", " << m_elementsPerBlock << ", " << m_elementsPerBlock << " elements per block" << std::endl;
 		m_cache.item_count = 0;
 	}
 
@@ -122,7 +122,7 @@ public:
 	grained_vector_base(size_t serialized_value_size)
 		:m_elementSize(integer_ceil(serialized_value_size, _Base::BlockSize)), m_valueTmp(m_elementSize)
 	{
-		cout << "Creating complex vector with element_size = " << serialized_value_size << ", block_size = " << _Base::BlockSize << " (" << m_elementSize << " blocks per element)" << std::endl;
+		//cout << "Creating complex vector with element_size = " << serialized_value_size << ", block_size = " << _Base::BlockSize << " (" << m_elementSize << " blocks per element)" << std::endl;
 	}
 
 	//Return {BlockIndex, 0}

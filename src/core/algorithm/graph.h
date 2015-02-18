@@ -109,7 +109,7 @@ public:
 	using vertex_t = typename transition_system_t::state_t;
 	using vertex_streamer_t = typename transition_system_t::state_streamer_t;
 
-	transition_system_graph(transition_system_t & ts)
+	transition_system_graph(const transition_system_t & ts)
 		:m_system(ts)
 	{
 	}
@@ -140,7 +140,7 @@ public:
 		m_system.deserialize_state(src, vertex);
 	}*/
 private:
-	transition_system_t & m_system;
+	const transition_system_t & m_system;
 };
 
 #endif

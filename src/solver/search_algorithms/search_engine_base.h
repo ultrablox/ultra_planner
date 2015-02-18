@@ -52,12 +52,12 @@ protected:
 		node_fun(node);
 
 		std::vector<state_t> res;
-		do
+		while (node.id != node.parent_id)
 		{
 			res.push_back(node.state);
 			node = m_database.parent_node(node);
 			node_fun(node);
-		} while (node.id != node.parent_id);
+		} 
 
 		res.push_back(node.state);
 

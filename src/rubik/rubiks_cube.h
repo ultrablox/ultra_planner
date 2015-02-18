@@ -28,20 +28,6 @@ D
 
 enum class face_id { face_L = 0, face_F, face_R, face_B, face_U, face_D, face_count = 6 };
 
-struct point2
-{
-	point2(int _x, int _y)
-		:x(_x), y(_y)
-	{}
-
-	friend bool operator==(const point2 & lhs, const point2 & rhs)
-	{
-		return (lhs.x == rhs.x) && (lhs.y == rhs.y);
-	}
-
-	int x, y;
-};
-
 struct face_t
 {
 	using element_t = unsigned char;
@@ -82,46 +68,13 @@ struct rubik_state
 	using element_t = unsigned char;
 
 	rubik_state(int size = 0)
-		:m_size(size), /*m_cubes(size * size * size, std::numeric_limits<element_t>::max()),*/ m_edgeCubies(12), m_edgeMarkers(12, 0)
+		:m_edgeCubies(12), m_edgeMarkers(12, 0)
 	{
-		//faces.fill(face_t(size));
 		m_cornerMarkers.fill(0);
 	}
 
-	/*face_t & face(face_id id)
-	{
-		return faces[static_cast<int>(id)];
-	}
-
-	const face_t & face(face_id id) const
-	{
-		return faces[static_cast<int>(id)];
-	}
-
-	element_t & element(face_id f_id, int x, int y)
-	{
-		return face(f_id).data[y * m_size + x];
-	}
-
-	const element_t & element(face_id f_id, int x, int y) const
-	{
-		return face(f_id).data[y * m_size + x];
-	}
-
-	element_t & cube(int x, int y, int z)
-	{
-		return m_cubes[z * m_size * m_size + y * m_size + x];
-	}
-
-	const element_t & cube(int x, int y, int z) const
-	{
-		return m_cubes[z * m_size * m_size + y * m_size + x];
-	}
-*/
 	friend bool operator==(const rubik_state & lhs, const rubik_state & rhs)
 	{
-		//return lhs.faces == rhs.faces;
-		//return lhs.m_cubes == rhs.m_cubes;
 		return (lhs.m_cornerCubies == rhs.m_cornerCubies) &&
 			(lhs.m_edgeCubies == rhs.m_edgeCubies) &&
 			(lhs.m_cornerMarkers == rhs.m_cornerMarkers) &&
@@ -133,8 +86,6 @@ struct rubik_state
 
 	std::array<element_t, 8> m_cornerMarkers;
 	std::vector<element_t> m_edgeMarkers;
-
-	int m_size;
 };
 
 struct rubik_state_snapshot
@@ -193,14 +144,14 @@ public:
 	typedef int size_description_t;
 	using element_t = rubik_state::element_t;
 
-	enum class transition_t { R = 0, L, U, D, F, B, count, F_, B_, U_, D_, L_, R_ };
+	enum class transition_t { R = 0, L, U, D, F, B, R_, L_, U_, D_, F_, B_, count};
 
 	struct transition_data_t
 	{
 		using permutation_loop = std::vector<element_t>;
 		using marker_deltas = std::vector<element_t>;
 
-		transition_data_t(const std::initializer_list<element_t> & corners_list, const std::initializer_list<element_t> & edges_list, const std::initializer_list<element_t> & _corners_deltas, const std::initializer_list<element_t> & _edges_deltas)
+		transition_data_t(const permutation_loop & corners_list, const permutation_loop & edges_list, const marker_deltas & _corners_deltas, const marker_deltas & _edges_deltas)
 			:corners_loop(corners_list), edges_loop(edges_list), corner_markers_deltas(_corners_deltas), edge_markers_deltas(_edges_deltas)
 		{
 		}
@@ -406,6 +357,24 @@ public:
 			transition_data_t({ 2, 6, 7, 3 }, { 2, 6, 10, 7 }, { 0, 0, 1, 2, 0, 0, 2, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }), //F
 			transition_data_t({ 0, 4, 5, 1 }, { 0, 4, 8, 5 }, { 1, 2, 0, 0, 2, 1, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }) //B
 		};
+
+		//Initialize reversed transitions
+		int delta = static_cast<int>(transition_t::R_) - static_cast<int>(transition_t::R);
+		for (int i = static_cast<int>(transition_t::R_); i <= static_cast<int>(transition_t::B_); ++i)
+		{
+			state_t state = solved_state();
+			for (int j = 0; j < 3; ++j)
+				apply(state, static_cast<transition_t>(i - delta));
+
+
+			transition_data_t::permutation_loop corn_loop = m_transitions[i - delta].corners_loop;
+			std::reverse(corn_loop.begin(), corn_loop.end());
+
+			transition_data_t::permutation_loop edge_loop = m_transitions[i - delta].edges_loop;
+			std::reverse(edge_loop.begin(), edge_loop.end());
+
+			m_transitions.push_back(transition_data_t(corn_loop, edge_loop, transition_data_t::marker_deltas(state.m_cornerMarkers.begin(), state.m_cornerMarkers.end()), state.m_edgeMarkers));
+		}
 	}
 
 	static size_description_t deserialize_problem_size(std::istream & is)
@@ -621,47 +590,22 @@ public:
 
 	friend std::ostream & operator<<(std::ostream & os, const transition_t & transition)
 	{
-		switch (transition)
-		{
-		case rubiks_cube::transition_t::F_:
-			os << "F'";
-			break;
-		case rubiks_cube::transition_t::F:
-			os << "F";
-			break;
-		case rubiks_cube::transition_t::B_:
-			os << "B'";
-			break;
-		case rubiks_cube::transition_t::B:
-			os << "B";
-			break;
-		case rubiks_cube::transition_t::U_:
-			os << "U'";
-			break;
-		case rubiks_cube::transition_t::U:
-			os << "U";
-			break;
-		case rubiks_cube::transition_t::D_:
-			os << "D'";
-			break;
-		case rubiks_cube::transition_t::D:
-			os << "D";
-			break;
-		case rubiks_cube::transition_t::L_:
-			os << "L'";
-			break;
-		case rubiks_cube::transition_t::L:
-			os << "L";
-			break;
-		case rubiks_cube::transition_t::R_:
-			os << "R'";
-			break;
-		case rubiks_cube::transition_t::R:
-			os << "R";
-			break;
-		default:
-			throw std::runtime_error("Unknown transition");
-		}
+		static std::map<rubiks_cube::transition_t, std::string> name_map = {
+			{ rubiks_cube::transition_t::F_ , "F'"},
+			{ rubiks_cube::transition_t::F, "F" },
+			{ rubiks_cube::transition_t::B, "B" },
+			{ rubiks_cube::transition_t::B_, "B_" },
+			{ rubiks_cube::transition_t::U, "U" },
+			{ rubiks_cube::transition_t::U_, "U_" },
+			{ rubiks_cube::transition_t::D, "D" },
+			{ rubiks_cube::transition_t::D_, "D_" },
+			{ rubiks_cube::transition_t::L, "L" },
+			{ rubiks_cube::transition_t::L_, "L_" },
+			{ rubiks_cube::transition_t::R, "R" },
+			{ rubiks_cube::transition_t::R_, "R_" },
+		};
+	
+		os << name_map[transition];
 
 		return os;
 	}
@@ -672,7 +616,7 @@ public:
 		{
 			state_t sample_state(lhs);
 			apply(sample_state, static_cast<transition_t>(i));
-			if (lhs == rhs)
+			if (sample_state == rhs)
 				return static_cast<transition_t>(i);
 		}
 
@@ -773,7 +717,7 @@ namespace std {
 
 		size_t operator()(const rubik_state & state) const
 		{
-			const int size = state.m_size * state.m_size * state.m_size - 6 - 1;
+			const int size = state.m_cornerCubies.size() + state.m_edgeCubies.size();
 			if (m_hasher.m_size != size)
 				m_hasher = mr_hasher<element_t>(size);
 

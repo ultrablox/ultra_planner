@@ -248,4 +248,18 @@ void permutate(It first, It last, PIt permutation_first)
 		*first = tmp[*permutation_first];
 }
 
+ULTRA_CORE_API struct point2
+{
+	point2(int _x, int _y)
+	:x(_x), y(_y)
+	{}
+
+	friend bool operator==(const point2 & lhs, const point2 & rhs)
+	{
+		return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+	}
+
+	int x, y;
+};
+
 #endif

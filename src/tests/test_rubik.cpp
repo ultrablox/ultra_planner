@@ -4,6 +4,7 @@
 #include <rubik/heuristic.h>
 #include "transition_system_helpers.h"
 #include <core/transition_system/transition_system.h>
+#include <solver/problem_instance_generator.h>
 
 void test_rubik_core()
 {
@@ -261,4 +262,49 @@ void test_rubik_core()
 	}
 
 	assert_test(solved_hash != another_hash, "Rubik: hash is not good distributed.");
+
+
+	
+	//Reversed transitions
+	{
+		problem_instance_generator<rubik_t> gen;
+		std::vector<rubik_t::transition_t> gen_transitions;
+		auto init_state = gen.generate_state(rubik, 18, &gen_transitions);
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				auto sample_state = init_state;
+				rubik.apply(sample_state, static_cast<rubik_t::transition_t>(i));
+				rubik.apply(sample_state, static_cast<rubik_t::transition_t>((int)rubik_t::transition_t::R_ + i));
+
+				assert_test(sample_state == init_state, "Rubik: inversed transition");
+			}
+		}
+
+		std::reverse(gen_transitions.begin(), gen_transitions.end());
+		for (auto tr : gen_transitions)
+		{
+			int reversed_tr = (int)tr < (int)rubik_t::transition_t::R_ ? (int)tr + (int)rubik_t::transition_t::R_ : (int)tr - (int)rubik_t::transition_t::R_;
+			rubik.apply(init_state, static_cast<rubik_t::transition_t>(reversed_tr));
+		}
+		
+		assert_test(rubik.solved_state() == init_state, "Rubik: random transition chain reversing");
+	}
+
+	//Difference
+	{
+		auto gen = std::bind(uniform_int_distribution<int>(0, static_cast<int>(rubik_t::transition_t::count) - 1), default_random_engine());
+		problem_instance_generator<rubik_t> sys_gen;
+		auto init_state = sys_gen.generate_state(rubik, 18);
+
+		for (int i = 0; i < 1000; ++i)
+		{
+			auto prev_state = init_state;
+			auto trans = static_cast<rubik_t::transition_t>(gen());
+			rubik.apply(init_state, trans);
+
+			auto computed_trans = rubik.difference(prev_state, init_state);
+			assert_test(computed_trans == trans, "Rubik: state difference");
+		}
+	}
 }

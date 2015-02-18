@@ -4,11 +4,11 @@
 
 #include "queued_engine.h"
 
-template<typename Gr, template<typename> class Cmp>
-class blind_engine : public queued_search_engine<Gr, Cmp, false, hashset_t::Buffered>
+template<typename Gr, template<typename> class Cmp, bool ExtMemory = false, hashset_t HT = hashset_t::Internal>
+class blind_engine : public queued_search_engine<Gr, Cmp, false, HT>
 {
 	using graph_t = Gr;
-	typedef queued_search_engine<Gr, Cmp, false, hashset_t::Buffered> _Base;
+	typedef queued_search_engine<Gr, Cmp, false, HT> _Base;
 	using state_t = typename _Base::state_t;
 //	using comparison_t = typename _Base::comparison_t;
 	using search_node_t = typename _Base::search_node_t;
@@ -68,6 +68,7 @@ public:
 	bool operator()(const graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
 	{
 		heuristic_t h_fun(graph.transition_system());
+		heuristic_t * p_fun = &h_fun;
 
 		this->enqueue(is_goal_fun, this->create_node(init_state, 0), node_estimation_t(0, h_fun(init_state)));
 		this->m_database.add(init_state, [=](const state_t & state){});
@@ -79,9 +80,9 @@ public:
 		{
 			search_node_t cur_node = this->dequeue(/*&current_data*/);
 
-			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){			
-				this->m_database.add(state, [=](const state_t & state){
-					this->enqueue(is_goal_fun, this->m_database.create_node(state, cur_node.id, cur_node.length + 1), node_estimation_t(cur_node.length + 1, h_fun(state)));
+			graph.forall_adj_verts(cur_node.state, [=](const state_t & adjacent_state){			
+				this->m_database.add(adjacent_state, [=](const state_t & success_state){
+					this->enqueue(is_goal_fun, this->m_database.create_node(success_state, cur_node.id, cur_node.length + 1), node_estimation_t(cur_node.length + 1, (*p_fun)(success_state)));
 				});
 			});
 		}
