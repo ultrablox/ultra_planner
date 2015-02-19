@@ -274,11 +274,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\core\data_file.cpp" />
-    <ClCompile Include="..\..\..\..\src\core\expression\UNumericExpression.cpp" />
-    <ClCompile Include="..\..\..\..\src\core\transition_system\UState.cpp" />
-    <ClCompile Include="..\..\..\..\src\core\transition_system\UTransition.cpp" />
-    <ClCompile Include="..\..\..\..\src\core\transition_system\UTransitionSystem.cpp" />
-    <ClCompile Include="..\..\..\..\src\core\UBitset.cpp" />
+    <ClCompile Include="..\..\..\..\src\core\bit_container.cpp" />
+    <ClCompile Include="..\..\..\..\src\core\masked_bit_vector.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UError.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UExternalMemoryController.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UMatrix.cpp" />
@@ -300,7 +297,6 @@
     <ClInclude Include="..\..\..\..\src\core\compressed_stream.h" />
     <ClInclude Include="..\..\..\..\src\core\data_file_win.h" />
     <ClInclude Include="..\..\..\..\src\core\delayed_buffer.h" />
-    <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\math.h" />
@@ -309,17 +305,19 @@
     <ClInclude Include="..\..\..\..\src\core\cache.h" />
     <ClInclude Include="..\..\..\..\src\core\cached_file.h" />
     <ClInclude Include="..\..\..\..\src\core\config.h" />
+    <ClInclude Include="..\..\..\..\src\core\masked_bit_vector.h" />
     <ClInclude Include="..\..\..\..\src\core\streamer.h" />
     <ClInclude Include="..\..\..\..\src\core\thread_pool.h" />
-    <ClInclude Include="..\..\..\..\src\core\transition_system\transition_system.h" />
-    <ClInclude Include="..\..\..\..\src\core\transition_system\UState.h" />
-    <ClInclude Include="..\..\..\..\src\core\transition_system\UTransition.h" />
-    <ClInclude Include="..\..\..\..\src\core\transition_system\UTransitionSystem.h" />
-    <ClInclude Include="..\..\..\..\src\core\UBitset.h" />
+    <ClInclude Include="..\..\..\..\src\core\transition_system.h" />
+    <ClInclude Include="..\..\..\..\src\core\bit_container.h" />
     <ClInclude Include="..\..\..\..\src\core\UError.h" />
     <ClInclude Include="..\..\..\..\src\core\UExternalMemoryController.h" />
     <ClInclude Include="..\..\..\..\src\core\UMatrix.h" />
     <ClInclude Include="..\..\..\..\src\core\utils\helpers.h" />
+    <ClInclude Include="..\..\..\..\src\core\varset_system\boolvar_system.h" />
+    <ClInclude Include="..\..\..\..\src\core\varset_system\floatvar_system.h" />
+    <ClInclude Include="..\..\..\..\src\core\varset_system\multivar_system.h" />
+    <ClInclude Include="..\..\..\..\src\core\varset_system\varset_system_base.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

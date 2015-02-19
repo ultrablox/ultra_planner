@@ -32,7 +32,7 @@ public:
 	template<bool dummy>
 	struct generate<hashset_t::Buffered, dummy>
 	{
-		using storage_wrapper_t = cached_file_wrapper<cached_file<block_t, 500000>>;//65536U
+		using storage_wrapper_t = cached_file_wrapper<cached_file<block_t, 2000000>>;//65536U //500000
 		using result = buffered_complex_hashset<T, S, storage_wrapper_t, H>;
 	};
 

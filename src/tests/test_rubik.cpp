@@ -3,7 +3,7 @@
 #include <rubik/rubiks_cube.h>
 #include <rubik/heuristic.h>
 #include "transition_system_helpers.h"
-#include <core/transition_system/transition_system.h>
+#include <core/transition_system.h>
 #include <solver/problem_instance_generator.h>
 
 void test_rubik_core()

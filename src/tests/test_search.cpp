@@ -8,7 +8,7 @@
 #include <core/algorithm/graph.h>
 #include <sliding_puzzle/sliding_puzzle.h>
 #include <sliding_puzzle/heuristic.h>
-#include <core/transition_system/transition_system.h>
+#include <core/transition_system.h>
 #include <array>
 #include <functional>
 #include <sstream>

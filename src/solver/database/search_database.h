@@ -117,7 +117,7 @@ public:
 		return (storage.find(state) != storage.end());
 	}
 
-	/*bool add(const state_t & state)
+	bool add(const state_t & state)
 	{
 		size_t hash_val = m_hasher(state);
 		auto & storage = m_storages[hash_val % storage_count];
@@ -127,7 +127,7 @@ public:
 			++m_nodeCount;
 
 		return res;
-	}*/
+	}
 
 	template<typename CallbackFun>
 	void add(const state_t & state, CallbackFun call_fun)

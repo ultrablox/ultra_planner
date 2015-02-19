@@ -15,7 +15,7 @@ public:
 	typedef T _Base;
 	typedef typename _Base::state_t state_t;
 	typedef typename _Base::transition_t transition_t;
-	typedef typename _Base::size_description_t size_description_t;
+	//typedef typename _Base::size_description_t size_description_t;
 
 	template<typename Args>
 	transition_system(Args descr)
@@ -58,6 +58,32 @@ public:
 		return m_diffFun(lhs, rhs);
 	}*/
 
+	//
+	/*typename std::enable_if<std::is_member_function_pointer<decltype(&_Base::difference)>::value, transition_t>::type difference(const state_t & lhs, const state_t & rhs) const
+	{
+		return _Base::difference(lhs, rhs);
+	}*/
+
+	transition_t difference(const state_t & lhs, const state_t & rhs) const
+	{
+		bool found = false;
+		transition_t res_transition;
+		this->forall_available_transitions(lhs, [&](const transition_t & transition){
+			state_t sample_state(lhs);
+			apply(sample_state, transition);
+			if (sample_state == rhs)
+			{
+				res_transition = transition;
+				found = true;
+			}
+		});
+
+		if (!found)
+			throw std::runtime_error("Transition not found");
+
+		return std::move(res_transition);
+	}
+
 	template<typename It>
 	std::list<transition_t> build_transition_path(It begin_state, It end_state)
 	{
@@ -85,7 +111,7 @@ public:
 	template<typename F>
 	void forall_generated_states(const state_t & base_state, F fun) const
 	{
-		this->forall_available_transitions(base_state, [&](transition_t transition){
+		this->forall_available_transitions(base_state, [&](const transition_t & transition){
 			state_t new_state(base_state);
 			_Base::apply(new_state, transition);
 			fun(new_state);

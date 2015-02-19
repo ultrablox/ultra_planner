@@ -1,6 +1,7 @@
 
 #include "test_helpers.h"
-#include <core/UBitset.h>
+#include <core/bit_container.h>
+#include <core/masked_bit_vector.h>
 
 void test_bitset()
 {
@@ -130,7 +131,7 @@ void test_bitset()
 
 	//Set masked
 	{
-		UMaskedBitVector bv(10);
+		masked_bit_vector bv(10);
 		bv.clear();
 
 		UBitset b1(10);
@@ -145,14 +146,14 @@ void test_bitset()
 		bv.set(4, false);
 		bv.set(5, false);
 
-		b1.setMasked(bv.state, bv.mask);
+		b1.setMasked(bv.value, bv.mask);
 		res = b1.toString();
 		assert_test(res == "0111001000", "setMasked");
 	}
 
 	//Equal masked
 	{
-		UMaskedBitVector bv(10);
+		masked_bit_vector bv(10);
 		bv.clear();
 		bv.set(1, false);
 		bv.set(2, true);
@@ -166,7 +167,7 @@ void test_bitset()
 		b1[5] = true;
 		b1[7] = true;		
 
-		assert_test(b1.equalMasked(bv.state, bv.mask), "setMasked positive");
+		assert_test(b1.equalMasked(bv.value, bv.mask), "setMasked positive");
 
 		UBitset b2(10);
 		b2.clear();
@@ -174,13 +175,13 @@ void test_bitset()
 		b2[4] = true;
 		b2[6] = true;		
 
-		bool r = b2.equalMasked(bv.state, bv.mask);
+		bool r = b2.equalMasked(bv.value, bv.mask);
 		assert_test(!r, "setMasked negative");
 	}
 
 	//Equal masked
 	{
-		UMaskedBitVector bv(10);
+		masked_bit_vector bv(10);
 		bv.clear();
 		bv.set(1, false);
 		bv.set(2, true);
@@ -194,7 +195,7 @@ void test_bitset()
 		b1[5] = true;
 		b1[7] = true;		
 
-		assert_test(b1.equalCountMasked(bv.state, bv.mask) == 5, "equalCountMasked positive");
+		assert_test(b1.equalCountMasked(bv.value, bv.mask) == 5, "equalCountMasked positive");
 	}
 
 	//Positive bits iteration

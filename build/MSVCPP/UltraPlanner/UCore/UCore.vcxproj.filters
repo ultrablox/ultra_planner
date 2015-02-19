@@ -19,9 +19,6 @@
     <Filter Include="src\utils">
       <UniqueIdentifier>{2f56499e-cecb-4c79-9a15-ec53bded8165}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\transition_system">
-      <UniqueIdentifier>{8ea3d03c-6a3d-449a-a07c-c5a2bef6c413}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\solver">
       <UniqueIdentifier>{4b2db11e-b599-4b44-a62a-eb01b23cb0c6}</UniqueIdentifier>
     </Filter>
@@ -34,30 +31,18 @@
     <Filter Include="src\complex_hashset">
       <UniqueIdentifier>{7d5bd49f-963b-4382-963e-dedd239b0268}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\varset_system">
+      <UniqueIdentifier>{0eecd23b-d139-4e2f-8dba-99e824143c4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\core\transition_system\UTransitionSystem.cpp">
-      <Filter>src\transition_system</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\core\UError.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\core\UBitset.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\core\transition_system\UState.cpp">
-      <Filter>src\transition_system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\core\transition_system\UTransition.cpp">
-      <Filter>src\transition_system</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\core\UMatrix.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\core\expression\UNumericExpression.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\core\UExternalMemoryController.cpp">
@@ -66,28 +51,22 @@
     <ClCompile Include="..\..\..\..\src\core\data_file.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\bit_container.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\masked_bit_vector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\core\utils\helpers.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\transition_system\UTransitionSystem.h">
-      <Filter>src\transition_system</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\config.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\UBitset.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\UError.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\transition_system\UState.h">
-      <Filter>src\transition_system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\transition_system\UTransition.h">
-      <Filter>src\transition_system</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\algorithm\sort.h">
       <Filter>src\algorithm</Filter>
@@ -97,9 +76,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h">
       <Filter>src\algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\transition_system\transition_system.h">
-      <Filter>src\transition_system</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h">
       <Filter>src\algorithm</Filter>
@@ -117,9 +93,6 @@
       <Filter>src\algorithm</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\complex_vector.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\expression\UNumericExpression.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\UExternalMemoryController.h">
@@ -172,6 +145,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\compressed_stream.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\transition_system.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\varset_system\boolvar_system.h">
+      <Filter>src\varset_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\varset_system\floatvar_system.h">
+      <Filter>src\varset_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\varset_system\multivar_system.h">
+      <Filter>src\varset_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\bit_container.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\masked_bit_vector.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\varset_system\varset_system_base.h">
+      <Filter>src\varset_system</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

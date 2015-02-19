@@ -1,7 +1,7 @@
 
 #include "rubiks_cube.h"
 #include "heuristic.h"
-#include <core/transition_system/transition_system.h>
+#include <core/transition_system.h>
 #include <solver/state_space_solver.h>
 #include <tclap/CmdLine.h>
 #include <string>

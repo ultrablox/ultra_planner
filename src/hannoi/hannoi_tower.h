@@ -227,7 +227,7 @@ public:
 		return cur_state.towers[m_size.pegCount - 1].size() == m_size.diskCount;
 	}
 
-	transition_t difference(const state_t & lhs, const state_t & rhs)
+	/*transition_t difference(const state_t & lhs, const state_t & rhs)
 	{
 		transition_t res;
 		for (number_t i = 0; i < m_size.pegCount; ++i)
@@ -240,7 +240,7 @@ public:
 		}
 
 		return std::move(res);
-	}
+	}*/
 
 	std::ostream & interpret_transition(std::ostream & os, const state_t & state, const transition_t & transition) const
 	{

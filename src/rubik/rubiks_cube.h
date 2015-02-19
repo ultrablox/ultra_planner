@@ -610,6 +610,7 @@ public:
 		return os;
 	}
 
+	/*
 	transition_t difference(const state_t & lhs, const state_t & rhs)
 	{
 		for (int i = 0; i < static_cast<int>(transition_t::count); ++i)
@@ -623,6 +624,7 @@ public:
 		throw std::runtime_error("Transition not found");
 		return transition_t::count;
 	}
+	*/
 private:
 	void deserialize_state(rubik_state_snapshot & ss, state_t & state) const
 	{

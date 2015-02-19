@@ -8,7 +8,7 @@
 #include <pddl/translator/UParser.h>
 #include <pddl/UTaskGenerator.h>
 #include <solver/USolver.h>
-#include <solver/UExternalMemoryController.h>
+//#include <solver/UExternalMemoryController.h>
 //#include <multicore_solver/UMultiCoreSolver.h>
 #include "planner/UPDDLSolver.h"
 #include <stdio.h>
@@ -80,7 +80,7 @@ int main(int argc, const char ** argv)
 		return 1;
 	}
 
-	UExternalMemoryController ext_ctrl(ignored_drives.getValue(), ext_mem_subdir.getValue());
+	//UExternalMemoryController ext_ctrl(ignored_drives.getValue(), ext_mem_subdir.getValue());
 
 	/*UPDDLLanguage pddlLanguage;
 	UParser parser(&pddlLanguage);

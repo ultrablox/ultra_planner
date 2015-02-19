@@ -2,7 +2,7 @@
 #include "test_helpers.h"
 #include "transition_system_helpers.h"
 #include <sliding_puzzle/sliding_puzzle.h>
-#include <core/transition_system/transition_system.h>
+#include <core/transition_system.h>
 #include <sstream>
 
 /*

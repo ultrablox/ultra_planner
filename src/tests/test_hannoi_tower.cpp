@@ -1,7 +1,7 @@
 
 #include "transition_system_helpers.h"
 #include <hannoi/hannoi_tower.h>
-#include <core/transition_system/transition_system.h>
+#include <core/transition_system.h>
 #include "test_helpers.h"
 #include <utility>
 

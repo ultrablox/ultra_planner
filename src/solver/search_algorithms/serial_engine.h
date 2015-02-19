@@ -34,10 +34,11 @@ public:
 
 			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){
 				//Check that node is not expanded or discovered by trying to add
-				this->m_database.add(state, [=](const state_t & state){
+				if(this->m_database.add(state))
+				{
 					search_node_t new_node = this->m_database.create_node(state, cur_node.id, cur_node.length + 1);
 					this->enqueue(goal_check_fun, new_node, node_estimation_t(cur_node.length + 1, 0));
-				});
+				}
 			});
 			++step;
 		}
@@ -81,9 +82,10 @@ public:
 			search_node_t cur_node = this->dequeue(/*&current_data*/);
 
 			graph.forall_adj_verts(cur_node.state, [=](const state_t & adjacent_state){			
-				this->m_database.add(adjacent_state, [=](const state_t & success_state){
-					this->enqueue(is_goal_fun, this->m_database.create_node(success_state, cur_node.id, cur_node.length + 1), node_estimation_t(cur_node.length + 1, (*p_fun)(success_state)));
-				});
+				if(this->m_database.add(adjacent_state))
+				{
+					this->enqueue(is_goal_fun, this->m_database.create_node(adjacent_state, cur_node.id, cur_node.length + 1), node_estimation_t(cur_node.length + 1, (*p_fun)(adjacent_state)));
+				}
 			});
 		}
 
