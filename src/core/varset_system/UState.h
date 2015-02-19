@@ -3,7 +3,7 @@
 #define UltraCore_UState_h
 
 #include "../config.h"
-#include "../UBitset.h"
+#include "../bit_container.h"
 //#include "UTransition.h"
 #include <vector>
 

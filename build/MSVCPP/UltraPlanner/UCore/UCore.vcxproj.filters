@@ -155,9 +155,6 @@
     <ClInclude Include="..\..\..\..\src\core\varset_system\floatvar_system.h">
       <Filter>src\varset_system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\varset_system\multivar_system.h">
-      <Filter>src\varset_system</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\bit_container.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -165,6 +162,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\varset_system\varset_system_base.h">
+      <Filter>src\varset_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\varset_system\combinedvar_system.h">
       <Filter>src\varset_system</Filter>
     </ClInclude>
   </ItemGroup>

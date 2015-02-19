@@ -7,6 +7,15 @@
 #include <list>
 #include <utility>
 #include <iostream>
+#include <type_traits>
+
+template<bool B, typename T>
+using Enable_if = typename std::enable_if<B, T>::type;
+
+template<typename T> bool Is_class()
+{
+	return std::is_class<T>::value;
+}
 
 template<typename T>
 class transition_system : public T
@@ -21,7 +30,12 @@ public:
 	transition_system(Args descr)
 		:_Base(descr)
 	{
+	}
 
+	template<typename ...Args>
+	transition_system(Args... descr)
+		: _Base(descr...)
+	{
 	}
 
 	/*transition_system(const transition_system & rhs)
@@ -62,6 +76,13 @@ public:
 	/*typename std::enable_if<std::is_member_function_pointer<decltype(&_Base::difference)>::value, transition_t>::type difference(const state_t & lhs, const state_t & rhs) const
 	{
 		return _Base::difference(lhs, rhs);
+	}*/
+
+//	using has_fast_difference_implementation = Is_class<typename std::is_member_function_pointer<transition_t(&T::difference)>::value>();
+
+	/*Enable_if<Is_class<has_fast_difference_implementation>(), has_fast_difference_implementation> int test()
+	{
+		return 0;
 	}*/
 
 	transition_t difference(const state_t & lhs, const state_t & rhs) const

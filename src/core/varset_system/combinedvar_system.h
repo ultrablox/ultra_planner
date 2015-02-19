@@ -1,8 +1,12 @@
-#ifndef UltraPlanner_UTransitionSystem_h
-#define UltraPlanner_UTransitionSystem_h
+#ifndef UltraPlanner_combinedvar_system_h
+#define UltraPlanner_combinedvar_system_h
+
+#include "varset_system_base.h"
+#include "boolvar_system.h"
+#include "floatvar_system.h"
 
 #include "../config.h"
-#include "../UBitset.h"
+/*#include "../bit_container.h"
 #include "UState.h"
 #include "UTransition.h"
 #include <bitset>
@@ -14,9 +18,9 @@
 #include <list>
 #include <set>
 
-/*
-System that consists from rules about state changing.
-*/
+
+//System that consists from rules about state changing.
+
 class ULTRA_CORE_API UTransitionSystem
 {
 public:
@@ -27,23 +31,17 @@ public:
 		mTransitions.push_back(new_transition);
 	}
 
-	/*
-	Returns a number of boolean-variables.
-	*/
+	//Returns a number of boolean-variables.
 	int boolCount() const;
 	int floatCount() const;
 
 	std::vector<size_t> getAvalibleTransitions(const UState & state) const;
 
-	/*
-	Checks avalible transitions in given state and sets to
-	1 bits in corresponding positions.
-	*/
+	
+	//Checks avalible transitions in given state and sets to 1 bits in corresponding positions.
 	UBitset getAvalibleTransitionsMask(const UState & state) const;
 
-	/*
-	Checks if given transition can be applied in given state.
-	*/
+	//Checks if given transition can be applied in given state.
 	bool checkTransition(const UState & state, const UTransition & transition) const;
 
 	const UTransition & transition(const size_t transition_index) const;
@@ -56,10 +54,7 @@ public:
 			tr.condition.flags.state.print();
 	}
 
-	/*
-	Applies transition with given index to given state
-	and returns result state.
-	*/
+	//Applies transition with given index to given state and returns result state.
 	UState applyTransition(const UState & base_state, const size_t transition_index) const;
 
 	void removeTransition(const size_t transition_index);
@@ -87,6 +82,46 @@ private:
 	std::vector<std::string> m_flagsDescription, m_floatsDescription;
 	int mBoolCount, m_floatCount;
 	//UState mState;
+};*/
+
+
+struct combined_transition
+{
+	boolvar_transition bool_part;
+	floatvar_transition float_part;
 };
+
+struct combined_state
+{
+	boolvar_system_base::state_t bool_part;
+	floatvar_system_base::state_t float_part;
+};
+
+class combinedvar_system_base
+{
+public:
+	using transition_t = combined_transition;
+	using state_t = combined_state;
+
+	combinedvar_system_base(int bool_count, int float_count)
+		:m_boolPart(bool_count), m_floatPart(float_count)
+	{}
+
+	void apply(state_t & state, const transition_t & transition) const
+	{
+		m_boolPart.apply(state.bool_part, transition.bool_part);
+		m_floatPart.apply(state.float_part, transition.float_part);
+	}
+
+	bool transition_available(const state_t & state, const transition_t & transition) const
+	{
+		return m_boolPart.transition_available(state.bool_part, transition.bool_part) && m_floatPart.transition_available(state.float_part, transition.float_part);
+	}
+private:
+	boolvar_system_base m_boolPart;
+	floatvar_system_base m_floatPart;
+};
+
+typedef varset_system_base<combinedvar_system_base> combinedvar_system;
 
 #endif
