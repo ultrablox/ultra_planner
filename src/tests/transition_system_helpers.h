@@ -20,7 +20,7 @@ typename TrSys::state_t deserialize_state(const TrSys & tr_system, const std::st
 
 
 template<typename TrSys>
-bool test_available_transitions(const TrSys & tr_system, const typename TrSys::state_t & state, std::vector<typename TrSys::transition_t> & correct_res)
+bool test_available_transitions(const TrSys & tr_system, const typename TrSys::state_t & state, std::vector<typename TrSys::transition_t> correct_res)
 {
 	std::vector<typename TrSys::transition_t> res;
 
@@ -35,7 +35,7 @@ bool test_available_transitions(const TrSys & tr_system, const typename TrSys::s
 }
 
 template<typename TrSys>
-bool test_available_transitions(const TrSys & tr_system, const std::string & state_data, std::vector<typename TrSys::transition_t> & correct_res)
+bool test_available_transitions(const TrSys & tr_system, const std::string & state_data, const std::vector<typename TrSys::transition_t> & correct_res)
 {
 	typename TrSys::state_t state(tr_system.size());
 

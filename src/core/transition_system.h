@@ -92,7 +92,7 @@ public:
 		transition_t res_transition;
 		this->forall_available_transitions(lhs, [&](const transition_t & transition){
 			state_t sample_state(lhs);
-			apply(sample_state, transition);
+			this->apply(sample_state, transition);
 			if (sample_state == rhs)
 			{
 				res_transition = transition;
@@ -102,11 +102,13 @@ public:
 
 		if (!found)
 		{
-			cout << "Unable to find transition between states:" << std::endl;
-			cout << "State #1:" << std::endl;
+#if _DEBUG
+			std::cout << "Unable to find transition between states:" << std::endl;
+			std::cout << "State #1:" << std::endl;
 			_Base::interpet_state(cout, lhs);
-			cout << "State #2:" << std::endl;
+			std::cout << "State #2:" << std::endl;
 			_Base::interpet_state(cout, rhs);
+#endif
 			throw std::runtime_error("Transition not found");
 		}
 

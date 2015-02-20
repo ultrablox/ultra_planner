@@ -101,8 +101,8 @@ private:
 				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, get<0>(*it), state, get<3>(*it) + 1), -1.0f));
 			});*/
 
-			graph.forall_adj_verts(it->state, [&](const state_t & state){
-				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, it->id, state, it->length + 1)/*, -1.0f*/));
+			graph.forall_adj_verts(it->state, [&](const state_t & state, float transition_cost){
+				res.push_back(expanded_node_t(m_hasher(state), search_node_t(-1, it->id, state, it->length + transition_cost)/*, -1.0f*/));
 			});
 		}
 

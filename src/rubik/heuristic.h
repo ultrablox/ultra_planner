@@ -26,7 +26,7 @@ template<typename P>
 class manhattan_3D_distance_heuristic
 {
 	typedef P rubik_t;
-	typedef typename rubik_t::state_t state_t;
+	using state_t = typename rubik_t::state_t;
 	using element_t = typename state_t::element_t;
 
 	struct point3d
@@ -175,13 +175,13 @@ public:
 		else
 		{
 			using graph_t = transition_system_graph<rubik_t>;
-			rubik_t::state_streamer_t streamer(m_rubik);
+			typename rubik_t::state_streamer_t streamer(m_rubik);
 			bfs_engine<graph_t, false, hashset_t::Internal> eng(streamer);
 
 			graph_t graph(m_rubik);
 
-			std::vector<rubik_t::state_t> path;
-			bool found = eng(graph, est_state, [&](const rubik_t::state_t & state){
+			std::vector<state_t> path;
+			bool found = eng(graph, est_state, [&](const state_t & state){
 
 				if (descr.type == 0)
 					return (state.m_cornerCubies[descr.cubie_id] == descr.cubie_id) && (state.m_cornerMarkers[descr.cubie_id] == 0);
@@ -198,7 +198,7 @@ public:
 		}
 	}
 
-	float masked_estimation(const state_t & state, const state_mask_t & mask)
+	/*float masked_estimation(const state_t & state, const state_mask_t & mask)
 	{
 		using graph_t = transition_system_graph<rubik_t>;
 		rubik_t::state_streamer_t streamer(m_rubik);
@@ -232,7 +232,7 @@ public:
 		}, path);
 
 		return path.size() - 1;
-	}
+	}*/
 private:
 	const rubik_t & m_rubik;
 	/*std::vector<point3d> m_destPositions;

@@ -77,7 +77,7 @@ public:
 	{
 		for (auto & transition : m_transitions)
 		{
-			if (transition_available(base_state, transition))
+			if (_Base::transition_available(base_state, transition))
 				fun(transition);
 		}
 	}
@@ -91,11 +91,6 @@ public:
 	const std::vector<transition_t> & transitions() const
 	{
 		return m_transitions;
-	}
-
-	const masked_state_t & solved_state() const
-	{
-		return m_goalState;
 	}
 
 	void to_relaxed()

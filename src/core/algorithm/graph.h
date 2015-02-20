@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <core/streamer.h>
+#include <list>
 
 template<typename V>
 class simple_graph
