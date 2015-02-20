@@ -40,13 +40,11 @@ int  bitScan (const U64 bb)
 
 */
 
-struct UBitContainer
+struct ULTRA_CORE_API bit_vector
 {
 	typedef int value_type;
+	using base_value_t = value_type;
 	friend class UMaskedBitVector;
-
-	//typedef T byte;
-	typedef UBitContainer BC;
 
 	struct BitReference
 	{
@@ -61,14 +59,14 @@ struct UBitContainer
 
 	class positive_iterator
 	{
-		friend class UBitContainer;
+		friend class bit_vector;
 	private:
-		positive_iterator(const UBitContainer & container_, size_t bit_index)
+		positive_iterator(const bit_vector & container_, size_t bit_index)
 			:m_container(container_), m_bitIndex(bit_index)
 		{
 		}
 
-		const UBitContainer & m_container;
+		const bit_vector & m_container;
 		size_t m_bitIndex;
 
 	public:
@@ -85,24 +83,8 @@ struct UBitContainer
 		}
 	};
 
-	UBitContainer(const size_t bit_count = 0)
-	{
-		//cout << "Creating bitset with " << elementBitCount() << "-bit base type\n";
-		resize(bit_count);
-	}
-
-	UBitContainer(const std::initializer_list<bool> & _value)
-	{
-		resize(_value.size());
-
-		size_t i = 0;
-		for (auto _bit : _value)
-			set(i++, _bit);
-	}
-
-	~UBitContainer()
-	{
-	}
+	bit_vector(const size_t bit_count = 0);
+	bit_vector(const std::initializer_list<bool> & _value);
 
 	positive_iterator pbegin() const;
 
@@ -133,14 +115,15 @@ struct UBitContainer
 		res = res & mask;
 	}
 
-	void resize(const int bit_count, const bool value = false)
+	void resize(int bit_count)
 	{
+		mData.resize(integer_ceil(bit_count, sizeof(base_value_t)* 8), 0);
 		mBitCount = bit_count;
 
-		const size_t byte_count = ceil(static_cast<double>(bit_count) / elementBitCount());
+		/*const size_t byte_count = ceil(static_cast<double>(bit_count) / elementBitCount());
 		mData.resize(byte_count);
 
-		setValues(value);
+		setValues(value);*/
 	}
 
 	void resizeContainer(int element_count)
@@ -151,7 +134,7 @@ struct UBitContainer
 	/*
 	Returns bit count in array.
 	*/
-	size_t size()
+	size_t size() const
 	{
 		return mBitCount;
 	}
@@ -193,7 +176,7 @@ struct UBitContainer
 		return std::make_pair(byte_index, local_bit_index);
 	}
 
-	void set(const size_t bit_index, const bool value);
+	void set(size_t bit_index, bool value);
 
 	void setValues(const bool value);
 
@@ -223,61 +206,62 @@ struct UBitContainer
 	/*
 	Bitwise OR.
 	*/
-	friend BC operator|(const BC & bs1, const BC & bs2)
+	friend bit_vector operator|(const bit_vector & bs1, const bit_vector & bs2)
 	{
-		BC result(bs1);
+		bit_vector result(bs1);
 
 		for(size_t i = 0; i < bs2.mData.size(); ++i)
 			result.mData[i] = result.mData[i] | bs2.mData[i];
 		//result.
 
-		return result;
+		return std::move(result);
 	}
 
 	/*
 	XOR (1 if bits are different)
 	*/
-	friend BC operator^(const BC & bs1, const BC & bs2)
+	friend bit_vector operator^(const bit_vector & bs1, const bit_vector & bs2)
 	{
-		BC result(bs1);
+		bit_vector result(bs1);
 
 		for(size_t i = 0; i < bs2.mData.size(); ++i)
 			result.mData[i] = result.mData[i] ^ bs2.mData[i];
 		//result.
 
-		return result;
+		return std::move(result);
 	}
 
 	/*
 	Bitwise AND.
 	*/
-	friend BC operator&(const BC & bs1, const BC & bs2)
+	friend bit_vector operator&(const bit_vector & bs1, const bit_vector & bs2)
 	{
-		BC result(bs1);
+		bit_vector result(bs1);
 
 		for(size_t i = bs2.mData.size(); i > 0; --i)
 			result.mData[i-1] = result.mData[i-1] & bs2.mData[i-1];
 
-		return result;
+		return std::move(result);
 	}
 
-	friend bool operator==(const BC & bs1, const BC & bs2)
+	friend bool operator==(const bit_vector & bs1, const bit_vector & bs2)
 	{
-		return (memcmp(bs1.mData.data(), bs2.mData.data(), bs1.mData.size()*sizeof(value_type)) == 0);
+		return (memcmp(bs1.mData.data(), bs2.mData.data(), bs1.mData.size() * sizeof(base_value_t)) == 0);
+		//return (memcmp(bs1.mData.data(), bs2.mData.data(), integerbs1.mBitCount) == 0);
 	}
 
-	friend BC operator~(const BC & bc)
+	friend bit_vector operator~(const bit_vector & bc)
 	{
-		BC result(bc);
+		bit_vector result(bc);
 
 		for(size_t i = 0; i < bc.mData.size(); ++i)
 			result.mData[i] = ~ bc.mData[i];
 
-		return result;
+		return std::move(result);
 	}
 
-	BitReference operator[](const size_t bit_index);
-	bool operator[](const size_t bit_index) const;
+	BitReference operator[](size_t bit_index);
+	bool operator[](size_t bit_index) const;
 
 	/*
 	Returns vector of indices of positive bits.
@@ -290,31 +274,11 @@ struct UBitContainer
 	int trueCount() const;
 
 	//Main operations
-	void setMasked(const BC & value, const BC & mask);
-	bool equalMasked(const BC & value, const BC & mask) const;
-	size_t equalCountMasked(const BC & _value, const BC & _mask) const;
+	void setMasked(const bit_vector & value, const bit_vector & mask);
+	bool equalMasked(const bit_vector & value, const bit_vector & mask) const;
+	size_t equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const;
 
-	size_t hash() const
-	{
-		//const size_t _FNV_offset_basis = 14695981039346656037ULL;
-		//const size_t _FNV_prime = 1099511628211ULL;
-
-		/*return _Hash_seq((const unsigned char *)mData.data(), mData.size() * sizeof(T) / sizeof(const unsigned char *));*/
-		auto * ptr = mData.data();
-
-		size_t r = (*ptr);
-		for(size_t i = mData.size() - 1; i > 0; --i)
-		{
-			r = r ^ (*++ptr);
-			//r *= _FNV_prime;
-		}
-
-		
-		//return r;
-		return std::hash<value_type>()(r);
-	}
-
-	static void checkSizes(const BC & bc1, const BC & bc2, const BC & bc3);
+	static void checkSizes(const bit_vector & bc1, const bit_vector & bc2, const bit_vector & bc3);
 
 	size_t serialize(void * dest) const;
 	size_t deserialize(char * dest);
@@ -323,11 +287,36 @@ struct UBitContainer
 	int deserialize(std::ifstream & is);
 
 
-	std::vector<value_type> mData;
+	std::vector<base_value_t> mData;
 	size_t mBitCount;
 };
 
-typedef UBitContainer UBitset;
-typedef UBitContainer bit_vector;
+//typedef bit_vector UBitContainer;
+//typedef UBitContainer UBitset;
+
+
+namespace std {
+template<>
+class hash<bit_vector>
+{
+public:
+
+	size_t operator()(const bit_vector & bv) const
+	{
+		auto * ptr = bv.mData.data();
+
+		size_t r = (*ptr);
+		for (size_t i = bv.mData.size() - 1; i > 0; --i)
+		{
+			r = r ^ (*++ptr);
+			//r *= _FNV_prime;
+		}
+
+
+		//return r;
+		return std::hash<bit_vector::value_type>()(r);
+	}
+};
+}
 
 #endif

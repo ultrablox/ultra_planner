@@ -34,6 +34,9 @@
     <Filter Include="src\varset_system">
       <UniqueIdentifier>{0eecd23b-d139-4e2f-8dba-99e824143c4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\search_algorithms">
+      <UniqueIdentifier>{18490d11-43b9-4812-9a0a-0267158e0a1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp">
@@ -55,6 +58,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\core\masked_bit_vector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\numeric_expression.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -166,6 +172,45 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\varset_system\combinedvar_system.h">
       <Filter>src\varset_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\numeric_expression.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_database.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\problem_instance_generator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_queue.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\state_space_solver.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\astar_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\batched_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\bfs_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\dfs_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\greedy_bfs_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\queued_engine.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\search_engine_base.h">
+      <Filter>src\search_algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\serial_engine.h">
+      <Filter>src\search_algorithms</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

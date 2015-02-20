@@ -2,18 +2,47 @@
 #ifndef UltraCore_varset_system_base_h
 #define UltraCore_varset_system_base_h
 
+#include <string>
+#include <vector>
+
 template<typename T>
 class varset_transition_base : public T
 {
 	using _Base = T;
 public:
-	template<typename... Params>
-	varset_transition_base(const std::string & _name, Params... args)
-		:_Base(args...), name(_name)
+	template<typename A, typename B, typename C, typename D>
+	varset_transition_base(const A & a, const B & b, const C & c, const D & d)
+		:_Base(a, b, c, d)
+	{}
+
+	template<typename A, typename B>
+	varset_transition_base(const A & a, const B & b)
+		: _Base(a, b)
 	{}
 
 	varset_transition_base()
 	{}
+
+	varset_transition_base(const varset_transition_base & rhs)
+		:_Base(rhs), name(rhs.name)
+	{
+	}
+
+	friend bool operator==(const varset_transition_base & lhs, const varset_transition_base & rhs)
+	{
+		return (lhs.name == rhs.name) && (static_cast<const _Base&>(lhs) == static_cast<const _Base&>(rhs));
+	}
+
+	friend bool operator<(const varset_transition_base & lhs, const varset_transition_base & rhs)
+	{
+		return lhs.name < rhs.name;
+	}
+
+	friend std::ostream & operator<<(std::ostream & os, const varset_transition_base & transition)
+	{
+		os << transition.name;
+		return os;
+	}
 
 	std::string name;
 };
@@ -25,6 +54,7 @@ class varset_system_base : public T
 public:
 	using transition_t = typename _Base::transition_t;
 	using state_t = typename _Base::state_t;
+	using masked_state_t = typename _Base::masked_state_t;
 
 	template<typename... Params>
 	varset_system_base(Params... args)
@@ -51,8 +81,31 @@ public:
 				fun(transition);
 		}
 	}
+
+	std::ostream & interpret_transition(std::ostream & os, const state_t & state, const transition_t & transition) const
+	{
+		os << transition.name;
+		return os;
+	}
+
+	const std::vector<transition_t> & transitions() const
+	{
+		return m_transitions;
+	}
+
+	const masked_state_t & solved_state() const
+	{
+		return m_goalState;
+	}
+
+	void to_relaxed()
+	{
+		for (auto & tr : m_transitions)
+			tr.to_relaxed();
+	}
 protected:
 	std::vector<transition_t> m_transitions;
+	
 };
 
 #endif

@@ -41,7 +41,7 @@ public:
 		:m_fileName(file_name), m_blockCount(0), m_hFile(0), m_asyncCache(20000), m_pendingCount(0)
     {
 		cout << "Creating data file: " << m_fileName << std::endl;
-		m_hFile = CreateFile(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
+		m_hFile = CreateFileW(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
 
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{

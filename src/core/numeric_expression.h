@@ -1,13 +1,15 @@
 
 
-#ifndef UltraCore_UNumericExpression_h
-#define UltraCore_UNumericExpression_h
+#ifndef UltraCore_numeric_expression_h
+#define UltraCore_numeric_expression_h
 
-#include "../transition_system/UState.h"
+//#include "../transition_system/UState.h"
 #include <memory>
+#include <vector>
 
 struct UExpressionNode;
 
+using UFloatVector = std::vector<float>;
 struct UNumericExpression
 {
 	UNumericExpression()
@@ -55,5 +57,7 @@ struct UVariableExpressionNode : public UExpressionNode
 
 	int m_varIndex;
 };
+
+typedef UNumericExpression numeric_expression;
 
 #endif

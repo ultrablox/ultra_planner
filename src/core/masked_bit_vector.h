@@ -10,7 +10,7 @@
 struct ULTRA_CORE_API masked_bit_vector
 {
 	masked_bit_vector(size_t bit_count = 0);
-	masked_bit_vector(const std::initializer_list<bool> & _value, const std::initializer_list<bool> & _mask);
+	masked_bit_vector(const bit_vector & _value, const bit_vector & _mask);
 	~masked_bit_vector();
 
 	void clear();
@@ -21,7 +21,7 @@ struct ULTRA_CORE_API masked_bit_vector
 	Returns count of bits in given bitset that are masked
 	equal to this vector.
 	*/
-	size_t equalCount(const UBitset & bitset) const;
+	size_t equalCount(const bit_vector & bitset) const;
 
 	//Prints vector in 2 lines
 	void print(std::ostream & stream = std::cout) const;
@@ -41,12 +41,12 @@ struct ULTRA_CORE_API masked_bit_vector
 	friend bool operator==(const masked_bit_vector & lhs, const masked_bit_vector & rhs);
 
 	//0 - negative, 1 - true
-	UBitset value;
+	bit_vector value;
 
 	//0 - doesn't matter, 1 - matter
-	UBitset mask;
+	bit_vector mask;
 };
 
-typedef UBitContainer bit_vector;
+//typedef UBitContainer bit_vector;
 
 #endif

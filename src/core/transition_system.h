@@ -20,6 +20,7 @@ template<typename T> bool Is_class()
 template<typename T>
 class transition_system : public T
 {
+//	static_assert(std::is_class<T::state_streamer_t>::value, "Transition system base must have its state_streamer_t");
 public:
 	typedef T _Base;
 	typedef typename _Base::state_t state_t;
@@ -100,7 +101,14 @@ public:
 		});
 
 		if (!found)
+		{
+			cout << "Unable to find transition between states:" << std::endl;
+			cout << "State #1:" << std::endl;
+			_Base::interpet_state(cout, lhs);
+			cout << "State #2:" << std::endl;
+			_Base::interpet_state(cout, rhs);
 			throw std::runtime_error("Transition not found");
+		}
 
 		return std::move(res_transition);
 	}

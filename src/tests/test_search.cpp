@@ -1,10 +1,10 @@
 
 #include "test_helpers.h"
-#include <solver/search_algorithms/bfs_engine.h>
-#include <solver/search_algorithms/dfs_engine.h>
-#include <solver/search_algorithms/astar_engine.h>
-#include <solver/search_algorithms/batched_engine.h>
-#include <solver/problem_instance_generator.h>
+#include <core/search_algorithms/bfs_engine.h>
+#include <core/search_algorithms/dfs_engine.h>
+#include <core/search_algorithms/astar_engine.h>
+#include <core/search_algorithms/batched_engine.h>
+#include <core/problem_instance_generator.h>
 #include <core/algorithm/graph.h>
 #include <sliding_puzzle/sliding_puzzle.h>
 #include <sliding_puzzle/heuristic.h>

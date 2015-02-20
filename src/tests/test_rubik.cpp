@@ -4,7 +4,7 @@
 #include <rubik/heuristic.h>
 #include "transition_system_helpers.h"
 #include <core/transition_system.h>
-#include <solver/problem_instance_generator.h>
+#include <core/problem_instance_generator.h>
 
 void test_rubik_core()
 {

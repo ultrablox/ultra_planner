@@ -13,98 +13,18 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="src\heuristics">
-      <UniqueIdentifier>{ec71e7cd-f7f1-46a1-9cd6-c8baa29af8b4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\database">
       <UniqueIdentifier>{08018a23-1fa7-458c-b7be-7eb31267933c}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\search_algorithms">
       <UniqueIdentifier>{f7ebccce-77e6-4455-b4e4-61b87c1a5fec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\heuristics">
+      <UniqueIdentifier>{ec71e7cd-f7f1-46a1-9cd6-c8baa29af8b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\solver\UHeuristic.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\UInstantiator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\UMetric.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\UOutputMerger.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\USearchEngine.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\USearchNode.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\USolver.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\UNodeEstimator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\database\USearchDatabase.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeFactory.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeReference.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\database\UStateFactory.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\database\UStateReference.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\USolverBase.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.cpp">
-      <Filter>src\heuristics</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\solver\UHeuristic.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\UInstantiator.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\UMetric.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\UOutputMerger.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\USearchEngine.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\USearchNode.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\USolver.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\config.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\USolverBase.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\UNodeEstimator.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\search_engine_base.h">
@@ -134,30 +54,6 @@
     <ClInclude Include="..\..\..\..\src\solver\database\search_database.h">
       <Filter>src\database</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\database\USearchDatabase.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeFactory.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeReference.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\database\UStateFactory.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\database\UStateReference.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.h">
-      <Filter>src\heuristics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\serial_engine.h">
       <Filter>src\search_algorithms</Filter>
     </ClInclude>
@@ -166,6 +62,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\solver\problem_instance_generator.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\goal_count_heuristic.h">
+      <Filter>src\heuristics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

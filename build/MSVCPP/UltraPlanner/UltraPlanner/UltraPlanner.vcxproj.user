@@ -23,10 +23,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
     <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>--solver_type mt --optimal 0 --solver_max_ouput_size 45000 "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01.pddl"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-a "A*" -s ext "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p06-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p06.pddl"</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
-    <LocalDebuggerCommandArguments>--solver_type mt --solver_max_ouput_size 45000 "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p01.pddl"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-a "A*" -s ext "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p06-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-sat\openstacks-strips\p06.pddl"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
   </PropertyGroup>

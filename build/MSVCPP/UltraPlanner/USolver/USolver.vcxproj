@@ -121,7 +121,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -129,7 +129,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -137,12 +137,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -301,34 +303,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\solver\database\USearchDatabase.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeFactory.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\database\USearchNodeReference.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\database\UStateFactory.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\database\UStateReference.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\USolverBase.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\UHeuristic.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\UInstantiator.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\UMetric.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\UNodeEstimator.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\UOutputMerger.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\USearchEngine.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\USearchNode.cpp" />
-    <ClCompile Include="..\..\..\..\src\solver\USolver.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\..\..\src\solver\database\search_database.h" />
-    <ClInclude Include="..\..\..\..\src\solver\database\USearchDatabase.h" />
-    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeFactory.h" />
-    <ClInclude Include="..\..\..\..\src\solver\database\USearchNodeReference.h" />
-    <ClInclude Include="..\..\..\..\src\solver\database\UStateFactory.h" />
-    <ClInclude Include="..\..\..\..\src\solver\database\UStateReference.h" />
-    <ClInclude Include="..\..\..\..\src\solver\heuristics\UGoalCountHeuristic.h" />
-    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraph.h" />
-    <ClInclude Include="..\..\..\..\src\solver\heuristics\UPlanningGraphHeuristic.h" />
+    <ClInclude Include="..\..\..\..\src\solver\heuristics\goal_count_heuristic.h" />
     <ClInclude Include="..\..\..\..\src\solver\problem_instance_generator.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\astar_engine.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\batched_engine.h" />
@@ -341,15 +317,6 @@
     <ClInclude Include="..\..\..\..\src\solver\search_algorithms\search_engine_base.h" />
     <ClInclude Include="..\..\..\..\src\solver\search_queue.h" />
     <ClInclude Include="..\..\..\..\src\solver\state_space_solver.h" />
-    <ClInclude Include="..\..\..\..\src\solver\UHeuristic.h" />
-    <ClInclude Include="..\..\..\..\src\solver\UInstantiator.h" />
-    <ClInclude Include="..\..\..\..\src\solver\UMetric.h" />
-    <ClInclude Include="..\..\..\..\src\solver\UNodeEstimator.h" />
-    <ClInclude Include="..\..\..\..\src\solver\UOutputMerger.h" />
-    <ClInclude Include="..\..\..\..\src\solver\USearchEngine.h" />
-    <ClInclude Include="..\..\..\..\src\solver\USearchNode.h" />
-    <ClInclude Include="..\..\..\..\src\solver\USolver.h" />
-    <ClInclude Include="..\..\..\..\src\solver\USolverBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UCore\UCore.vcxproj">

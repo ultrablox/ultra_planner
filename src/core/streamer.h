@@ -5,7 +5,7 @@
 class streamer_base
 {
 public:
-	streamer_base(size_t serialized_size)
+	streamer_base(size_t serialized_size = 0)
 		:m_serializedSize(serialized_size)
 	{}
 
@@ -14,7 +14,7 @@ public:
 		return m_serializedSize;
 	}
 protected:
-	const size_t m_serializedSize;
+	size_t m_serializedSize;
 };
 
 template<typename T>

@@ -269,22 +269,17 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../../../lib/x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>stxxl.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\main.cpp" />
-    <ClCompile Include="..\..\..\..\src\planner\UPDDLSolver.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MultiCoreSolver\MultiCoreSolver.vcxproj">
-      <Project>{60ca66f3-df8c-43be-8eae-34e13547a7d3}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\UCore\UCore.vcxproj">
       <Project>{5fce4390-3dbd-4bb6-86fd-266a2bb90a44}</Project>
       <Private>false</Private>
@@ -301,12 +296,13 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\USolver\USolver.vcxproj">
-      <Project>{4e5e705d-5c01-44b3-8667-346cecff7a3e}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\planner\UPDDLSolver.h" />
+    <ClInclude Include="..\..\..\..\src\planner\goal_count_heuristic.h" />
+    <ClInclude Include="..\..\..\..\src\planner\planning_graph_heuristic.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\planner\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

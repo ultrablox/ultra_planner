@@ -6,7 +6,7 @@
 #include "common_objects.h"
 #include "UPDDLNamedObject.h"
 #include "UPDDLParametrizedObject.h"
-#include <core/transition_system/UTransitionSystem.h>
+#include <core/varset_system/floatvar_system.h>
 
 struct UPDDLPredicate;
 struct UPDDLFunction;

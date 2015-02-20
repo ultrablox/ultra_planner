@@ -121,7 +121,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -129,13 +129,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -143,6 +144,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -276,6 +278,7 @@
     <ClCompile Include="..\..\..\..\src\core\data_file.cpp" />
     <ClCompile Include="..\..\..\..\src\core\bit_container.cpp" />
     <ClCompile Include="..\..\..\..\src\core\masked_bit_vector.cpp" />
+    <ClCompile Include="..\..\..\..\src\core\numeric_expression.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UError.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UExternalMemoryController.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UMatrix.cpp" />
@@ -306,6 +309,19 @@
     <ClInclude Include="..\..\..\..\src\core\cached_file.h" />
     <ClInclude Include="..\..\..\..\src\core\config.h" />
     <ClInclude Include="..\..\..\..\src\core\masked_bit_vector.h" />
+    <ClInclude Include="..\..\..\..\src\core\numeric_expression.h" />
+    <ClInclude Include="..\..\..\..\src\core\problem_instance_generator.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\astar_engine.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\batched_engine.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\bfs_engine.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\dfs_engine.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\greedy_bfs_engine.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\queued_engine.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\search_engine_base.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_algorithms\serial_engine.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_database.h" />
+    <ClInclude Include="..\..\..\..\src\core\search_queue.h" />
+    <ClInclude Include="..\..\..\..\src\core\state_space_solver.h" />
     <ClInclude Include="..\..\..\..\src\core\streamer.h" />
     <ClInclude Include="..\..\..\..\src\core\thread_pool.h" />
     <ClInclude Include="..\..\..\..\src\core\transition_system.h" />

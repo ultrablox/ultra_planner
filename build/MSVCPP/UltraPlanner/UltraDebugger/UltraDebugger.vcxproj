@@ -110,9 +110,6 @@
     <ProjectReference Include="..\UPDDL\UPDDL.vcxproj">
       <Project>{37b69863-0e26-473c-8573-f6d67c0eae13}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\USolver\USolver.vcxproj">
-      <Project>{4e5e705d-5c01-44b3-8667-346cecff7a3e}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B12702AD-ABFB-343A-A199-8E24837244A3}</ProjectGuid>

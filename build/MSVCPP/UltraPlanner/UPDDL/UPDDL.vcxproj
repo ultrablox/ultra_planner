@@ -121,7 +121,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -129,13 +129,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -143,6 +144,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>..\..\..\..\tmp\$(Configuration)\$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
     <OutDir>$(SolutionDir)..\..\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -271,55 +273,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UInvariantGenerator.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UTaskGenerator.h" />
+    <ClInclude Include="..\..\..\..\src\pddl\UInvariantGenerator.h" />
+    <ClInclude Include="..\..\..\..\src\pddl\planning_task_converter.h" />
     <ClInclude Include="..\..\..\..\src\pddl\common_objects.h" />
     <ClInclude Include="..\..\..\..\src\pddl\config.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\translator\common_objects.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\translator\UGrammar.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\translator\ULexer.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\translator\UParser.h" />
     <ClInclude Include="..\..\..\..\src\pddl\UBoolTask.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\ULanguage.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UMultivalueTask.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLAction.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLDomain.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLFunction.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLGrammar.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLNamedObject.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLParametrizedObject.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLPredicates.h" />
-    <ClInclude Include="..\..\..\..\src\pddl\UPDDLTypes.h" />
+    <ClInclude Include="..\..\..\..\src\pddl\val_parser.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\FuncAnalysis.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\TIM.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\TimSupport.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\typecheck.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\dependencies\VAL\src\TypedAnalyser.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UInvariantGenerator.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Dropbox (Andrey Shakhramanyan)\Projects\UltraPlanner\src\pddl\UTaskGenerator.cpp" />
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\FuncAnalysis.cpp" />
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\TIM.cpp" />
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\TimSupport.cpp" />
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\typecheck.cpp" />
+    <ClCompile Include="..\..\..\..\dependencies\VAL\src\TypedAnalyser.cpp" />
+    <ClCompile Include="..\..\..\..\src\pddl\UInvariantGenerator.cpp" />
+    <ClCompile Include="..\..\..\..\src\pddl\planning_task_converter.cpp" />
     <ClCompile Include="..\..\..\..\dependencies\VAL\src\DebugWriteController.cpp" />
     <ClCompile Include="..\..\..\..\dependencies\VAL\src\instantiation.cpp" />
     <ClCompile Include="..\..\..\..\dependencies\VAL\src\pddl+.cpp" />
     <ClCompile Include="..\..\..\..\dependencies\VAL\src\ptree.cpp" />
     <ClCompile Include="..\..\..\..\dependencies\VAL\src\SASActions.cpp" />
     <ClCompile Include="..\..\..\..\dependencies\VAL\src\SimpleEval.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\translator\common_objects.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\translator\UGrammar.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\translator\ULexer.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\translator\UParser.cpp" />
     <ClCompile Include="..\..\..\..\src\pddl\UBoolTask.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\ULanguage.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UMultivalueTask.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLAction.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLDomain.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLFunction.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLGrammar.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLNamedObject.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLParametrizedObject.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLPredicates.cpp" />
-    <ClCompile Include="..\..\..\..\src\pddl\UPDDLTypes.cpp" />
+    <ClCompile Include="..\..\..\..\src\pddl\val_parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UCore\UCore.vcxproj">

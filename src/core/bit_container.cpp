@@ -4,14 +4,15 @@
 //#include <vld.h>
 //#include <intrin.h>
 #include <type_traits>
+#include <assert.h>
 
 //========================Bit reference===================
-UBitContainer::BitReference::BitReference(value_type & data_reference, const int bit_index)
+bit_vector::BitReference::BitReference(value_type & data_reference, const int bit_index)
 	:mDataReference(data_reference), mBitIndex(bit_index)
 {
 }
 
-UBitContainer::BitReference & UBitContainer::BitReference::operator=(const bool value)
+bit_vector::BitReference & bit_vector::BitReference::operator=(const bool value)
 {
 	value_type val = 1ULL << mBitIndex;
 
@@ -23,12 +24,12 @@ UBitContainer::BitReference & UBitContainer::BitReference::operator=(const bool 
 	return *this;
 }
 
-UBitContainer::BitReference::operator bool() const
+bit_vector::BitReference::operator bool() const
 {
 	return value();
 }
 
-bool UBitContainer::BitReference::value() const
+bool bit_vector::BitReference::value() const
 {
 	value_type val = 1 << mBitIndex;
 	value_type result = mDataReference & val;
@@ -39,8 +40,21 @@ bool UBitContainer::BitReference::value() const
 }
 
 //========================Bitset==========================
+bit_vector::bit_vector(const size_t bit_count)
+	:mData(integer_ceil(bit_count, sizeof(base_value_t)* 8), 0), mBitCount(bit_count)
+{
+}
 
-UBitContainer::positive_iterator & UBitContainer::positive_iterator::operator++()
+bit_vector::bit_vector(const std::initializer_list<bool> & _value)
+{
+	resize(_value.size());
+
+	size_t i = 0;
+	for (auto _bit : _value)
+		set(i++, _bit);
+}
+
+bit_vector::positive_iterator & bit_vector::positive_iterator::operator++()
 {
 	/*const int bits_per_element = sizeof(UBitContainer::value_type) * 8;
 	size_t cont_elem_index = m_bitIndex >> 64;
@@ -56,7 +70,7 @@ UBitContainer::positive_iterator & UBitContainer::positive_iterator::operator++(
 	return *this;
 }
 
-UBitContainer::positive_iterator UBitContainer::pbegin() const
+bit_vector::positive_iterator bit_vector::pbegin() const
 {
 	//Find first set bit
 	/*unsigned long index;
@@ -69,7 +83,7 @@ UBitContainer::positive_iterator UBitContainer::pbegin() const
 	return res;
 }
 
-void UBitContainer::set(const size_t bit_index, const bool value)
+void bit_vector::set(size_t bit_index, bool value)
 {
 #if USE_INTRINSIC
 	if(value)
@@ -81,7 +95,7 @@ void UBitContainer::set(const size_t bit_index, const bool value)
 #endif
 }
 
-void UBitContainer::setValues(const bool value)
+void bit_vector::setValues(const bool value)
 {
 	//T val = 0;
 	if(value)
@@ -92,13 +106,14 @@ void UBitContainer::setValues(const bool value)
 	clearTail();
 }
 
-UBitContainer::BitReference UBitContainer::operator[](const size_t bit_index)
+bit_vector::BitReference bit_vector::operator[](size_t bit_index)
 {
+#if _DEBUG
+	assert(bit_index < mBitCount);
+#endif
 	//Calculate address
 	auto addr = getBitAddress(bit_index);
-
-	BitReference ref(mData[addr.first], addr.second);
-	return ref;
+	return BitReference(mData[addr.first], addr.second);
 }
 
 #if USE_INTRINSIC
@@ -116,8 +131,12 @@ bool check_bit<4>(void * data, const size_t bit_index)
 }
 #endif
 
-bool UBitContainer::operator[](const size_t bit_index) const
+bool bit_vector::operator[](size_t bit_index) const
 {
+#if _DEBUG
+	assert(bit_index < mBitCount);
+#endif
+
 #if USE_INTRINSIC
 	return check_bit<sizeof(value_type)>((void*)mData.data(), bit_index);
 #else
@@ -129,7 +148,7 @@ bool UBitContainer::operator[](const size_t bit_index) const
 #endif
 }
 
-vector<size_t> UBitContainer::toIndices() const
+vector<size_t> bit_vector::toIndices() const
 {
 	vector<size_t> result;
 
@@ -142,7 +161,7 @@ vector<size_t> UBitContainer::toIndices() const
 	return result;
 }
 
-int UBitContainer::trueCount() const
+int bit_vector::trueCount() const
 {
 #if USE_INTRINSIC
 	int res(0);
@@ -156,7 +175,7 @@ int UBitContainer::trueCount() const
 #endif
 }
 
-void UBitContainer::setMasked(const BC & value, const BC & mask)
+void bit_vector::setMasked(const bit_vector & value, const bit_vector & mask)
 {
 	checkSizes(*this, value, mask);
 
@@ -172,7 +191,7 @@ void UBitContainer::setMasked(const BC & value, const BC & mask)
 	}
 }
 
-bool UBitContainer::equalMasked(const BC & value, const BC & mask) const
+bool bit_vector::equalMasked(const bit_vector & value, const bit_vector & mask) const
 {
 	checkSizes(*this, value, mask);
 
@@ -194,7 +213,7 @@ bool UBitContainer::equalMasked(const BC & value, const BC & mask) const
 	return r;
 }
 
-size_t UBitContainer::equalCountMasked(const BC & _value, const BC & _mask) const
+size_t bit_vector::equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const
 {
 	const value_type * cur_ptr = mData.data(), * val_ptr = _value.mData.data(), *mask_ptr = _mask.mData.data();
 
@@ -220,7 +239,7 @@ size_t UBitContainer::equalCountMasked(const BC & _value, const BC & _mask) cons
 	return sum;
 }
 
-size_t UBitContainer::serialize(void * dest) const
+size_t bit_vector::serialize(void * dest) const
 {
 	char * cdest = (char*)dest;
 	size_t res = 0;
@@ -235,7 +254,7 @@ size_t UBitContainer::serialize(void * dest) const
 	return res;
 }
 
-size_t UBitContainer::deserialize(char * dest)
+size_t bit_vector::deserialize(char * dest)
 {
 	size_t r(0);
 
@@ -250,14 +269,14 @@ size_t UBitContainer::deserialize(char * dest)
 	return r;
 }
 
-void UBitContainer::serialize(std::ofstream & os) const
+void bit_vector::serialize(std::ofstream & os) const
 {
 	serialize_int(os, mBitCount);
 
 	serialize_vector(os, mData);
 }
 
-int UBitContainer::deserialize(std::ifstream & is)
+int bit_vector::deserialize(std::ifstream & is)
 {
 	mBitCount = deserialize_int(is);
 	
@@ -266,7 +285,7 @@ int UBitContainer::deserialize(std::ifstream & is)
 	return 0;
 }
 
-void UBitContainer::checkSizes(const BC & bc1, const BC & bc2, const BC & bc3)
+void bit_vector::checkSizes(const bit_vector & bc1, const bit_vector & bc2, const bit_vector & bc3)
 {
 	const size_t s1 = bc1.mData.size(), s2 = bc2.mData.size(), s3 = bc3.mData.size();
 	if(!((s1 == s2) && (s2 == s3)))

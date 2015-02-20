@@ -6,7 +6,7 @@
 #include <core/algorithm/math.h>
 #include <core/algorithm/graph.h>
 #include <core/streamer.h>
-#include <solver/search_algorithms/bfs_engine.h>
+#include <core/search_algorithms/bfs_engine.h>
 #include <array>
 #include <iostream>
 #include <iomanip>

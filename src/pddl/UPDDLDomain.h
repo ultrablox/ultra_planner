@@ -155,11 +155,4 @@ struct ULTRA_PDDL_API UPDDLProblem
 	UPDDLStateDescription initialState, goal;
 };
 
-namespace VAL
-{
-	class analysis;
-};
-
-ULTRA_PDDL_API VAL::analysis* val_parse(const std::string & domain_file_name, const std::string & problem_file_name);
-
 #endif

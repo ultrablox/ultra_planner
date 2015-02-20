@@ -2,6 +2,9 @@
 #ifndef UltraCore_compressed_stream_h
 #define UltraCore_compressed_stream_h
 
+#include "bit_container.h"
+#include "masked_bit_vector.h"
+
 class compressed_stream
 {
 public:
@@ -45,6 +48,29 @@ public:
 			*first = read(bits_per_element);
 	}
 
+	void write(const masked_bit_vector & mbv)
+	{
+		write(mbv.mask);
+		write(mbv.value);
+	}
+
+	void read(masked_bit_vector & mbv)
+	{
+		read(mbv.mask);
+		read(mbv.value);
+	}
+
+	void write(const bit_vector & mbv)
+	{
+		memcpy(m_dataPtr, mbv.mData.data(), integer_ceil(mbv.bitCount(), 8));
+		m_dataPtr += mbv.byteCount();
+	}
+
+	void read(bit_vector & mbv)
+	{
+		memcpy(mbv.mData.data(), m_dataPtr, integer_ceil(mbv.bitCount(), 8));
+		m_dataPtr += mbv.byteCount();
+	}
 private:
 	void move_ptr(int bits_count)
 	{

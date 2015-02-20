@@ -7,7 +7,7 @@ masked_bit_vector::masked_bit_vector(size_t bit_count)
 {
 }
 
-masked_bit_vector::masked_bit_vector(const std::initializer_list<bool> & _value, const std::initializer_list<bool> & _mask)
+masked_bit_vector::masked_bit_vector(const bit_vector & _value, const bit_vector & _mask)
 : value(_value), mask(_mask)
 {
 }
@@ -34,7 +34,7 @@ void masked_bit_vector::set(const size_t bit_index, const bool val)
 	mask[bit_index] = true;
 }
 
-size_t masked_bit_vector::equalCount(const UBitset & bitset) const
+size_t masked_bit_vector::equalCount(const bit_vector & bitset) const
 {
 	return bitset.equalCountMasked(value, mask);
 }
