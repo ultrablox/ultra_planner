@@ -138,6 +138,11 @@ public:
 
 		return os;
 	}
+
+	float transition_cost(const floatvar_transition_base & trans) const
+	{
+		return trans.effect[0].value;
+	}
 private:
 	int m_size;
 	std::vector<string> m_varNames;

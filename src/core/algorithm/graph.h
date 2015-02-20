@@ -64,7 +64,7 @@ public:
 		if(adj_it != m_adjacentLists.end())
 		{
 			for(auto & vert : adj_it->second)
-				fun(vert);
+				fun(vert, 1);
 		}
 	}
 
@@ -94,7 +94,7 @@ public:
 	void forall_adj_verts(const vertex_t & vertex, F fun) const
 	{
 		for(auto & vert : m_adjGetter(vertex))
-			fun(vert);
+			fun(vert, 1);
 	}
 
 private:

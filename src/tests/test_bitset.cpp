@@ -7,7 +7,7 @@ void test_bitset()
 {
 	string res;
 	//Check that clear works fine
-	UBitset bs(10);
+	bit_vector bs(10);
 	bs.clear();
 	/*assert_test("0000000000" == bs.toString(), "Clear");*/
 
@@ -38,7 +38,7 @@ void test_bitset()
 	
 	//Check operator ==
 	{
-		UBitset b1(10), b2(10), b3(10);
+		bit_vector b1(10), b2(10), b3(10);
 		b1.clear();
 		b2.clear();
 		b3.clear();
@@ -64,7 +64,7 @@ void test_bitset()
 
 	//Operator &
 	{
-		UBitset b1(10), b2(10);
+		bit_vector b1(10), b2(10);
 		b1.clear();
 		b2.clear();
 
@@ -88,7 +88,7 @@ void test_bitset()
 
 	//Operator ^
 	{
-		UBitset b1(10), b2(10);
+		bit_vector b1(10), b2(10);
 		b1.clear();
 		b2.clear();
 
@@ -106,7 +106,7 @@ void test_bitset()
 
 	//Operator ~
 	{
-		UBitset b1(10);
+		bit_vector b1(10);
 		b1.clear();
 
 		b1[4] = true;
@@ -120,7 +120,7 @@ void test_bitset()
 
 	//Special []
 	{
-		UBitset b1(306);
+		bit_vector b1(306);
 		b1.clear();
 		//b1.print();
 		b1[226] = true;
@@ -134,7 +134,7 @@ void test_bitset()
 		masked_bit_vector bv(10);
 		bv.clear();
 
-		UBitset b1(10);
+		bit_vector b1(10);
 		b1.clear();
 		b1[3] = true;
 		b1[4] = true;
@@ -161,7 +161,7 @@ void test_bitset()
 		bv.set(6, false);
 		bv.set(9, false);
 
-		UBitset b1(10);
+		bit_vector b1(10);
 		b1.clear();
 		b1[2] = true;
 		b1[5] = true;
@@ -169,7 +169,7 @@ void test_bitset()
 
 		assert_test(b1.equalMasked(bv.value, bv.mask), "setMasked positive");
 
-		UBitset b2(10);
+		bit_vector b2(10);
 		b2.clear();
 		b2[2] = true;
 		b2[4] = true;
@@ -189,7 +189,7 @@ void test_bitset()
 		bv.set(6, false);
 		bv.set(9, false);
 
-		UBitset b1(10);
+		bit_vector b1(10);
 		b1.clear();
 		b1[2] = true;
 		b1[5] = true;
@@ -212,7 +212,7 @@ void test_bitset()
 		correct_vec.push_back(63);
 
 
-		UBitset b1(36);
+		bit_vector b1(36);
 		b1.clear();
 
 		for(auto i : correct_vec)

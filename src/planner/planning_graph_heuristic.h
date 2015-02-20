@@ -19,16 +19,20 @@ public:
 
 	float operator()(const state_t & state) const
 	{
-		state_t current_state(state);
+		state_t current_state(state), last_state;
 		int level_index = 0;
 
 		for (; !m_relaxedSystem.is_solved(current_state); ++level_index)
 		{
-			m_relaxedSystem.forall_available_transitions(current_state, [&](const transition_t & trans){
+			last_state = current_state;
+			m_relaxedSystem.forall_available_transitions(last_state, [&](const transition_t & trans){
 				m_relaxedSystem.apply(current_state, trans);
 			});
+			if (last_state == current_state)
+				return std::numeric_limits<float>::max();
 		}
 
+		//cout << level_index << std::endl;
 		return level_index;
 	}
 private:

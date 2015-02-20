@@ -9,6 +9,8 @@
 #include <vector>
 #include <functional>
 
+#define COMMENT_EVENTS 1
+
 struct node_estimation_t
 {
 	explicit node_estimation_t(float _path_cost = 0.0f, float _heuristic_estimation = std::numeric_limits<float>::max())
@@ -160,10 +162,10 @@ public:
 			bool res = m_primaryData.empty() ? true : m_cmp(val.first, m_primaryData.begin()->first);
 			m_primaryData.insert(make_pair(val.first, new layer_container_t(m_nodeStreamer, val)));
 
-#if _DEBUG
+#if COMMENT_EVENTS
 			if (res)
 			{
-				//cout << "Added layer with best estimation: " << val.first << std::endl;
+				cout << "Added layer with best estimation: " << val.first << std::endl;
 			}
 #endif
 			return res;
@@ -297,8 +299,8 @@ public:
 
 		if (it->second->empty())
 		{
-#if _DEBUG
-//			cout << "Layer with estimation " << it->first << " expanded" << std::endl;
+#if COMMENT_EVENTS
+			cout << "Layer with estimation " << it->first << " expanded" << std::endl;
 #endif
 			delete it->second;
 			m_primaryData.erase(it);

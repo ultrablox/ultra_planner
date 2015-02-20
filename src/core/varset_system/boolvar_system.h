@@ -99,6 +99,10 @@ public:
 		m_varNames[index] = _name;
 	}
 
+	float transition_cost(const transition_t &) const
+	{
+		return 1.0f;
+	}
 private:
 	int m_size;
 	std::vector<string> m_varNames;

@@ -143,7 +143,7 @@ public:
 		this->forall_available_transitions(base_state, [&](const transition_t & transition){
 			state_t new_state(base_state);
 			_Base::apply(new_state, transition);
-			fun(new_state);
+			fun(new_state, this->transition_cost(transition));
 		});
 	}
 

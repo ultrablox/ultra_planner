@@ -610,21 +610,11 @@ public:
 		return os;
 	}
 
-	/*
-	transition_t difference(const state_t & lhs, const state_t & rhs)
+	float transition_cost(transition_t) const
 	{
-		for (int i = 0; i < static_cast<int>(transition_t::count); ++i)
-		{
-			state_t sample_state(lhs);
-			apply(sample_state, static_cast<transition_t>(i));
-			if (sample_state == rhs)
-				return static_cast<transition_t>(i);
-		}
-
-		throw std::runtime_error("Transition not found");
-		return transition_t::count;
+		return 1.0f;
 	}
-	*/
+
 private:
 	void deserialize_state(rubik_state_snapshot & ss, state_t & state) const
 	{
@@ -698,7 +688,6 @@ private:
 		auto it = std::find(m_colorMapper.begin(), m_colorMapper.end(), color_book);
 		return std::distance(m_colorMapper.begin(), it);
 	}
-
 private:
 	size_description_t m_size;
 	rubik_state_snapshot m_markerMap, m_facetToCubieMap;

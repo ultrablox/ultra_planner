@@ -32,12 +32,12 @@ public:
 			search_node_t cur_node = this->dequeue();
 
 
-			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){
+			graph.forall_adj_verts(cur_node.state, [=](const state_t & state, float transition_cost){
 				//Check that node is not expanded or discovered by trying to add
 				if(this->m_database.add(state))
 				{
-					search_node_t new_node = this->m_database.create_node(state, cur_node.id, cur_node.length + 1);
-					this->enqueue(goal_check_fun, new_node, node_estimation_t(cur_node.length + 1, 0));
+					search_node_t new_node = this->m_database.create_node(state, cur_node.id, cur_node.length + transition_cost);
+					this->enqueue(goal_check_fun, new_node, node_estimation_t(cur_node.length + transition_cost, 0));
 				}
 			});
 			++step;
@@ -81,10 +81,10 @@ public:
 		{
 			search_node_t cur_node = this->dequeue(/*&current_data*/);
 
-			graph.forall_adj_verts(cur_node.state, [=](const state_t & adjacent_state){			
+			graph.forall_adj_verts(cur_node.state, [=](const state_t & adjacent_state, float transition_cost){			
 				if(this->m_database.add(adjacent_state))
 				{
-					this->enqueue(is_goal_fun, this->m_database.create_node(adjacent_state, cur_node.id, cur_node.length + 1), node_estimation_t(cur_node.length + 1, (*p_fun)(adjacent_state)));
+					this->enqueue(is_goal_fun, this->m_database.create_node(adjacent_state, cur_node.id, cur_node.length + transition_cost), node_estimation_t(cur_node.length + transition_cost, (*p_fun)(adjacent_state)));
 				}
 			});
 		}
@@ -137,14 +137,14 @@ public:
 
 			db_flush_needed = false;
 
-			graph.forall_adj_verts(cur_node.state, [=](const state_t & state){
+			graph.forall_adj_verts(cur_node.state, [=](const state_t & state, float transition_cost){
 
 				node_estimation_t new_est(cur_node.length + 1, h_fun(state));
 				if (this->m_cmp(new_est, this->m_searchQueue.best_estimation()))
 					*p_flush_flag = true;
 				
 				this->m_database.add_delayed(state, [=](const state_t & _state){
-					if (this->enqueue(is_goal_fun, this->m_database.create_node(_state, cur_node.id, cur_node.length + 1), new_est))	//If given node created the best layer or it is a goal
+					if (this->enqueue(is_goal_fun, this->m_database.create_node(_state, cur_node.id, cur_node.length + transition_cost), new_est))	//If given node created the best layer or it is a goal
 						*p_flush_flag = true;
 
 					//

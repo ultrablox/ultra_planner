@@ -232,6 +232,11 @@ public:
 	{
 		return m_goalState;
 	}
+
+	float transition_cost(const transition_t & trans) const
+	{
+		return m_floatPart.transition_cost(trans.float_part);
+	}
 	
 private:
 	boolvar_system_base m_boolPart;
