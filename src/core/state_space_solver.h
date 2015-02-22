@@ -106,10 +106,12 @@ private:
 		std::vector<state_t> path;
 
 		auto start_tp = high_resolution_clock::now();
+		
+		float plan_cost = 0.0f;
 
 		bool found = search_engine(graph, m_initialState, [&](const state_t & state){
 			return m_goalChecker(state);
-		}, path);
+		}, path, &plan_cost);
 
 		auto end_tp = high_resolution_clock::now();
 		double search_timecost = duration_cast<microseconds>(end_tp - start_tp).count() * 1e-6;
@@ -117,7 +119,8 @@ private:
 		if (found)
 		{
 			auto plan = m_system.build_transition_path(path.begin(), path.end());
-			m_outStream << "Solution found (length " << plan.size() << ")" << std::endl;
+		
+			m_outStream << "Solution found (length " << plan.size() << ", cost " << plan_cost << ")" << std::endl;
 
 			m_outStream << "Plan: ";
 			print_range(m_outStream, plan.begin(), plan.end(), '\n');

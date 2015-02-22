@@ -42,7 +42,7 @@ int  bitScan (const U64 bb)
 
 struct ULTRA_CORE_API bit_vector
 {
-	typedef int value_type;
+	typedef unsigned int value_type;
 	using base_value_t = value_type;
 	friend class UMaskedBitVector;
 
@@ -267,6 +267,22 @@ struct ULTRA_CORE_API bit_vector
 	Returns vector of indices of positive bits.
 	*/
 	vector<size_t> toIndices() const;
+	
+	template<typename F>
+	void for_each_true(F fun) const
+	{
+		int val_index = 0, local_bit;
+		for (base_value_t cur_val : mData)
+		{
+			for (local_bit = 0; cur_val != 0; ++local_bit)
+			{
+				if (cur_val & 1)
+					fun(val_index * sizeof(base_value_t) * 8 + local_bit);
+				cur_val = cur_val >> 1;
+			}
+			++val_index;
+		}
+	}
 
 	/*
 	Returns number of bits set to 1.

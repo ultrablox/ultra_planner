@@ -177,7 +177,9 @@ int bit_vector::trueCount() const
 
 void bit_vector::setMasked(const bit_vector & value, const bit_vector & mask)
 {
+#if _DEBUG
 	checkSizes(*this, value, mask);
+#endif
 
 	value_type * cur_ptr = mData.data();
 	const value_type * val_ptr = value.mData.data(), *mask_ptr = mask.mData.data();
@@ -193,7 +195,9 @@ void bit_vector::setMasked(const bit_vector & value, const bit_vector & mask)
 
 bool bit_vector::equalMasked(const bit_vector & value, const bit_vector & mask) const
 {
+#if _DEBUG
 	checkSizes(*this, value, mask);
+#endif
 
 	const value_type * cur_ptr = mData.data(), * val_ptr = value.mData.data(), *mask_ptr = mask.mData.data();
 

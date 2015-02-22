@@ -370,7 +370,7 @@ public:
 		return m_size;
 	}
 
-	float transition_cost(transition_t ) const
+	float transition_cost(const state_t&, transition_t) const
 	{
 		return 1.0f;
 	}

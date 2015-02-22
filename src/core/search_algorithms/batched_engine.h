@@ -38,7 +38,7 @@ public:
 	{}
 
 	template<typename GraphT, typename IsGoalFun>
-	bool operator()(GraphT & graph, const state_t & init_node, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
+	bool operator()(GraphT & graph, const state_t & init_node, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path, float * p_plan_cost = nullptr)
 	{
 		heuristic_t h_fun(graph.transition_system());
 

@@ -66,7 +66,7 @@ public:
 	{}
 
 	template<typename IsGoalFun>
-	bool operator()(const graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
+	bool operator()(const graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path, float * p_plan_cost = nullptr)
 	{
 		heuristic_t h_fun(graph.transition_system());
 		heuristic_t * p_fun = &h_fun;
@@ -84,10 +84,18 @@ public:
 			graph.forall_adj_verts(cur_node.state, [=](const state_t & adjacent_state, float transition_cost){			
 				if(this->m_database.add(adjacent_state))
 				{
-					this->enqueue(is_goal_fun, this->m_database.create_node(adjacent_state, cur_node.id, cur_node.length + transition_cost), node_estimation_t(cur_node.length + transition_cost, (*p_fun)(adjacent_state)));
+					float estimation = (*p_fun)(adjacent_state);
+#if _DEBUG
+					assert(estimation >= 0.0f);
+#endif
+					if (estimation != std::numeric_limits<float>::max())
+						this->enqueue(is_goal_fun, this->m_database.create_node(adjacent_state, cur_node.id, cur_node.length + transition_cost), node_estimation_t(cur_node.length + transition_cost, estimation));
 				}
 			});
 		}
+
+		if (!m_goalNodes.empty() && p_plan_cost)
+			*p_plan_cost = m_goalNodes[0].length;
 
 #if TRACE_SOLUTION
 		int i = 0;
@@ -114,7 +122,7 @@ public:
 	{}
 
 	template<typename IsGoalFun>
-	bool operator()(const graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path)
+	bool operator()(const graph_t & graph, const state_t & init_state, IsGoalFun is_goal_fun, std::vector<state_t> & solution_path, float * p_plan_cost = nullptr)
 	{
 		heuristic_t h_fun(graph.transition_system());
 

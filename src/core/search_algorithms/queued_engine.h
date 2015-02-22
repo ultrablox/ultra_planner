@@ -91,11 +91,15 @@ protected:
 	search_node_t dequeue(node_estimation_t * meta_data = nullptr)
 	{
 		search_node_t cur_node;
-		m_searchQueue.pop_and_call([&](const node_estimation_t & pri, const search_node_t & top_node){
+		int r = m_searchQueue.pop_and_call([&](const node_estimation_t & pri, search_node_t & top_node){
 			if (meta_data)
 				*meta_data = pri;
-			cur_node = top_node;
+			cur_node = std::move(top_node);
 		});
+
+#if _DEBUG
+		assert(r > 0);
+#endif
 
 		return cur_node;
 	}

@@ -6,23 +6,22 @@
 //#include "../transition_system/UState.h"
 #include <memory>
 #include <vector>
+#include "config.h"
 
 struct UExpressionNode;
 
 using UFloatVector = std::vector<float>;
-struct UNumericExpression
+struct ULTRA_CORE_API numeric_expression
 {
-	UNumericExpression()
-		:m_pRootNode(nullptr)
-	{
-	}
+	numeric_expression();
+	~numeric_expression();
 
 	float evaluate(const UFloatVector & float_vars) const;
 
-	static UNumericExpression * simpleValue(const float value);
-	static UNumericExpression * simpleVariable(int var_index);
+	static numeric_expression * simpleValue(const float value);
+	static numeric_expression * simpleVariable(int var_index);
 
-	UExpressionNode * m_pRootNode;
+	std::shared_ptr<UExpressionNode> m_pRootNode;
 };
 
 struct UExpressionNode
@@ -57,7 +56,5 @@ struct UVariableExpressionNode : public UExpressionNode
 
 	int m_varIndex;
 };
-
-typedef UNumericExpression numeric_expression;
 
 #endif

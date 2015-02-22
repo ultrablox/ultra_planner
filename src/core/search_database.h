@@ -49,9 +49,13 @@ public:
 	//typedef std::tuple<size_t, size_t, state_t, int> search_node_t;
 	struct search_node_t
 	{
-		search_node_t(size_t _id = std::numeric_limits<size_t>::max(), size_t _parent_id = std::numeric_limits<size_t>::max(), const state_t & _state = state_t(), int _length = -1)
+		search_node_t(size_t _id = std::numeric_limits<size_t>::max(), size_t _parent_id = std::numeric_limits<size_t>::max(), const state_t & _state = state_t(), float _length = 0.0f)
 			:id(_id), parent_id(_parent_id), state(_state), length(_length)
-		{}
+		{
+#if _DEBUG
+			assert(_length >= 0.0f);
+#endif
+		}
 
 		friend bool operator==(const search_node_t & lhs, const search_node_t & rhs)
 		{
@@ -60,14 +64,14 @@ public:
 
 		size_t id, parent_id;
 		state_t state;
-		int length;
+		float length;
 	};
 	
 	class node_streamer_t
 	{
 	public:
 		node_streamer_t(const state_streamer_t & base_streamer)
-			:m_baseStreamer(base_streamer), m_serializedSize(base_streamer.serialized_size() + sizeof(size_t)* 2 + sizeof(int))
+			:m_baseStreamer(base_streamer), m_serializedSize(base_streamer.serialized_size() + sizeof(size_t)* 2 + sizeof(float))
 		{
 		}
 
@@ -76,8 +80,8 @@ public:
 			char * cur_ptr = (char*)dst;
 			memcpy(cur_ptr, &node.id, sizeof(size_t));
 			memcpy(cur_ptr + sizeof(size_t), &node.parent_id, sizeof(size_t));
-			memcpy(cur_ptr + 2 * sizeof(size_t), &node.length, sizeof(int));
-			m_baseStreamer.serialize(cur_ptr + 2 * sizeof(size_t) + sizeof(int), node.state);
+			memcpy(cur_ptr + 2 * sizeof(size_t), &node.length, sizeof(float));
+			m_baseStreamer.serialize(cur_ptr + 2 * sizeof(size_t) + sizeof(float), node.state);
 		}
 
 		void deserialize(const void * src, search_node_t & node) const
@@ -85,10 +89,12 @@ public:
 			const char * cur_ptr = (const char*)src;
 			memcpy(&node.id, cur_ptr, sizeof(size_t));
 			memcpy(&node.parent_id, cur_ptr + sizeof(size_t), sizeof(size_t));
-			memcpy(&node.length, cur_ptr + 2 * sizeof(size_t), sizeof(int));
+			memcpy(&node.length, cur_ptr + 2 * sizeof(size_t), sizeof(float));
 
-			//node.state = m_baseStreamer.allocated_value();
-			m_baseStreamer.deserialize(cur_ptr + 2 * sizeof(size_t)+sizeof(int), node.state);
+#if _DEBUG
+			assert(node.length >= 0.0f);
+#endif
+			m_baseStreamer.deserialize(cur_ptr + 2 * sizeof(size_t)+sizeof(float), node.state);
 		}
 
 		size_t serialized_size() const
@@ -230,7 +236,7 @@ public:
 	}
 
 	//Faster, if we know path length in advance
-	search_node_t create_node(const state_t & state, size_t parent_id, int path_len)
+	search_node_t create_node(const state_t & state, size_t parent_id, float path_len)
 	{
 		search_node_t new_node(m_searchNodes.size(), parent_id, state, path_len);
 		m_searchNodes.push_back(new_node);

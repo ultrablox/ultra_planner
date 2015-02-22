@@ -411,7 +411,7 @@ void test_complex_queue()
 	auto gen = std::bind(uniform_int_distribution<int>(0, 999), default_random_engine());
 
 	//Push
-	for (int i = 0; i < 2000; ++i)
+	for (int i = 0; i < 20000; ++i)
 	{
 		int val = gen();
 		correct_queue.push(val);
@@ -419,11 +419,30 @@ void test_complex_queue()
 	}
 
 	//Pop and compare
-	for (int i = 0; i < 2000; ++i)
+	for (int i = 0; i < 20000; ++i)
 	{
-		assert_test(correct_queue.front() == cq.top(), "Complex queue front + pop");
+		assert_test(correct_queue.front() == cq.top(), "Complex queue simple front + pop");
 		correct_queue.pop();
 		cq.pop();
+	}
+
+	for (int j = 0; j < 100; ++j)
+	{
+		//Push
+		for (int i = 0; i < 1000; ++i)
+		{
+			int val = gen();
+			correct_queue.push(val);
+			cq.push(val);
+		}
+
+		//Pop and compare
+		for (int i = 0; i < 1000; ++i)
+		{
+			assert_test(correct_queue.front() == cq.top(), "Complex queue front + pop");
+			correct_queue.pop();
+			cq.pop();
+		}
 	}
 }
 

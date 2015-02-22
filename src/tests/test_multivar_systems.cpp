@@ -140,6 +140,6 @@ void test_combined_systems()
 void test_multivar_systems()
 {
 	test_boolvar_systems();
-	test_floatvar_systems();
-	test_combined_systems();
+//	test_floatvar_systems();
+//	test_combined_systems();
 }

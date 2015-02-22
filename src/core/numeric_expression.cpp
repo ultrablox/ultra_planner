@@ -1,23 +1,29 @@
 
 #include "numeric_expression.h"
 
+numeric_expression::numeric_expression()
+{
+}
 
-float UNumericExpression::evaluate(const UFloatVector & float_vars) const
+numeric_expression::~numeric_expression()
+{}
+
+float numeric_expression::evaluate(const UFloatVector & float_vars) const
 {
 	return m_pRootNode->value(float_vars);
 }
 
-UNumericExpression * UNumericExpression::simpleValue(const float value)
+numeric_expression * numeric_expression::simpleValue(const float value)
 {
-	UNumericExpression * res = new UNumericExpression;
-	res->m_pRootNode = new UValueExpressionNode(value);
+	numeric_expression * res = new numeric_expression;
+	res->m_pRootNode.reset(new UValueExpressionNode(value));
 	return res;
 }
 
-UNumericExpression * UNumericExpression::simpleVariable(int var_index)
+numeric_expression * numeric_expression::simpleVariable(int var_index)
 {
-	UNumericExpression * res = new UNumericExpression;
-	res->m_pRootNode = new UVariableExpressionNode(var_index);
+	numeric_expression * res = new numeric_expression;
+	res->m_pRootNode.reset(new UVariableExpressionNode(var_index));
 	return res;
 }
 

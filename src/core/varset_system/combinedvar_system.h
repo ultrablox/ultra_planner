@@ -213,6 +213,11 @@ public:
 		return m_boolPart;
 	}
 
+	const boolvar_system_base & bool_part() const
+	{
+		return m_boolPart;
+	}
+
 	floatvar_system_base & float_part()
 	{
 		return m_floatPart;
@@ -228,14 +233,14 @@ public:
 		m_goalState = _state;
 	}
 
-	const masked_state_t & goalState() const
+	const masked_state_t & goal_state() const
 	{
 		return m_goalState;
 	}
 
-	float transition_cost(const transition_t & trans) const
+	float transition_cost(const state_t & state, const transition_t & trans) const
 	{
-		return m_floatPart.transition_cost(trans.float_part);
+		return m_floatPart.transition_cost(state.float_part, trans.float_part);
 	}
 	
 private:

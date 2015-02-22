@@ -130,12 +130,14 @@ numeric_expression * to_numeric_expression(vector<string> & float_vars, VAL::Fas
 	{
 		string var_name = "(" + ft->getFunction()->getName() + " " + params_to_string(env, ft->getArgs()) + ")";
 		int var_index = element_index(float_vars, var_name);
+		if (var_index == float_vars.size())
+			return nullptr;
 
-		return UNumericExpression::simpleVariable(var_index);
+		return numeric_expression::simpleVariable(var_index);
 	}
 	if(auto ie = dynamic_cast<const VAL::int_expression*>(expr))
 	{
-		return UNumericExpression::simpleValue(ie->double_value());
+		return numeric_expression::simpleValue(ie->double_value());
 	}
 	else
 	{
@@ -201,6 +203,8 @@ int planning_task_converter::from_pddl_task(planning_task_t & planning_task, VAL
 
 	//Create transition system
 	planning_task.varset_system = combinedvar_system(bool_vars.size(), float_vars.size());
+	int total_cost_index = std::distance(float_vars.begin(), std::find(float_vars.begin(), float_vars.end(), "(total-cost)"));
+	planning_task.varset_system.float_part().set_transition_cost_var_index(total_cost_index);
 
 	for (int i = 0; i < bool_vars.size(); ++i)
 		planning_task.varset_system.bool_part().set_var_name(i, to_string(bool_vars[i]));
@@ -215,6 +219,7 @@ int planning_task_converter::from_pddl_task(planning_task_t & planning_task, VAL
 	int i = 0;
 	for(auto op_inst = instantiatedOp::opsBegin(); op_inst != instantiatedOp::opsEnd(); ++op_inst)
 	{
+		bool good_trans = true;
 		combinedvar_system::transition_t transition(bool_vars.size(), float_vars.size());
 		transition.name = to_string(**op_inst);
 		//auto & transition = transition_system.createTransition();
@@ -272,11 +277,14 @@ int planning_task_converter::from_pddl_task(planning_task_t & planning_task, VAL
 
 			//Expression
 			auto num_exp = to_numeric_expression(float_vars, *(*op_inst)->getEnv(), ass_eff->getExpr());
-			transition.float_part.set_effect(var_index, numeric_effect_map[ass_eff->getOp()], num_exp);
+			if (num_exp != nullptr)
+				transition.float_part.set_effect(var_index, numeric_effect_map[ass_eff->getOp()], num_exp);
+			else
+				good_trans = false;
 		}
 
-		
-		planning_task.varset_system.add_transition(transition);
+		if (good_trans)
+			planning_task.varset_system.add_transition(transition);
 	}
 
 	//=====================================================================

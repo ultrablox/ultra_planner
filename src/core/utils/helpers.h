@@ -169,6 +169,11 @@ template<typename T>
 int element_index(vector<T> & data, const T & val)
 {
 	auto it = std::find(data.begin(), data.end(), val);
+	if (it == data.end())
+	{
+		//throw runtime_error("Unable to find element in array");
+		cout << "Unable to find element " << val << std::endl;
+	}
 	return std::distance(data.begin(), it);
 }
 

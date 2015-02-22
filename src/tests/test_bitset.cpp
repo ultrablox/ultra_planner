@@ -198,7 +198,7 @@ void test_bitset()
 		assert_test(b1.equalCountMasked(bv.value, bv.mask) == 5, "equalCountMasked positive");
 	}
 
-	//Positive bits iteration
+//Positive bits iteration
 	{
 		vector<int> vals, correct_vec;
 
@@ -212,18 +212,45 @@ void test_bitset()
 		correct_vec.push_back(63);
 
 
-		bit_vector b1(36);
+		bit_vector b1(67);
 		b1.clear();
 
-		for(auto i : correct_vec)
+		for (auto i : correct_vec)
 			b1[i] = true;
-		
-		for(auto it = b1.pbegin(); it != b1.pend(); ++it)
+
+		for (auto it = b1.pbegin(); it != b1.pend(); ++it)
 		{
 			vals.push_back(it.index());
 		}
 
 		assert_test(correct_vec == vals, "positive bits iteration");
 
+	}
+
+	//For-each true
+	{
+		vector<int> vals, correct_vec;
+
+		correct_vec.push_back(2);
+		correct_vec.push_back(5);
+		correct_vec.push_back(7);
+		correct_vec.push_back(19);
+		correct_vec.push_back(29);
+		correct_vec.push_back(36);
+		correct_vec.push_back(49);
+		correct_vec.push_back(63);
+
+
+		bit_vector b1(67);
+		b1.clear();
+
+		for (auto i : correct_vec)
+			b1[i] = true;
+
+		b1.for_each_true([&](int idx){
+			vals.push_back(idx);
+		});
+
+		assert_test(correct_vec == vals, "bit_vector: foreach true");
 	}
 }

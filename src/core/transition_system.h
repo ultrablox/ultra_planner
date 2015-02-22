@@ -145,7 +145,7 @@ public:
 		this->forall_available_transitions(base_state, [&](const transition_t & transition){
 			state_t new_state(base_state);
 			_Base::apply(new_state, transition);
-			fun(new_state, this->transition_cost(transition));
+			fun(new_state, this->transition_cost(base_state, transition));
 		});
 	}
 
@@ -173,6 +173,7 @@ public:
 		os << "Final:" << std::endl;
 		this->interpet_state(os, *state_first) << std::endl;
 	}
+
 protected:
 	//state_t m_state;
 	//std::function<transition_t(const state_t &, const state_t &)> m_diffFun;
