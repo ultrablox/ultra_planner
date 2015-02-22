@@ -302,6 +302,27 @@ struct ULTRA_CORE_API bit_vector
 	void serialize(std::ofstream & os) const;
 	int deserialize(std::ifstream & is);
 
+	template<typename It>
+	void remove_indices(It first, It last)
+	{
+		std::vector<int> indices(first, last);
+		std::sort(indices.begin(), indices.end(), std::greater<int>());
+
+		std::vector<bool> data(mBitCount, false);
+		for_each_true([&](int idx){
+			data[idx] = true;
+		});
+
+		for (int idx : indices)
+			data.erase(data.begin() + idx);
+
+		resize(data.size());
+		std::fill(mData.begin(), mData.end(), 0);
+		
+		for (int i = 0; i < data.size(); ++i)
+			set(i, data[i]);
+	}
+
 
 	std::vector<base_value_t> mData;
 	size_t mBitCount;

@@ -38,6 +38,13 @@ struct ULTRA_CORE_API masked_bit_vector
 	void serialize(std::ofstream & os) const;
 	int deserialize(std::ifstream & is);
 
+	template<typename It>
+	void remove_indices(It first, It last)
+	{
+		value.remove_indices(first, last);
+		mask.remove_indices(first, last);
+	}
+
 	friend bool operator==(const masked_bit_vector & lhs, const masked_bit_vector & rhs);
 
 	//0 - negative, 1 - true

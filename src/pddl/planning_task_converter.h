@@ -10,12 +10,13 @@ namespace VAL
 	class analysis;
 };
 
-struct planning_task_t
+struct ULTRA_PDDL_API planning_task_t
 {
 	combinedvar_system varset_system;
 	combinedvar_system::state_t initial_state;
 	combinedvar_system::masked_state_t goal;
 
+	void optimize();
 };
 
 class ULTRA_PDDL_API planning_task_converter

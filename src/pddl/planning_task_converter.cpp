@@ -460,3 +460,62 @@ UBoolTask UTaskGenerator::generateBoolTask(VAL::analysis * pAnalysis)
 	return std::move(bv_task);
 }
 */
+
+void planning_task_t::optimize()
+{
+	cout << "Optimizing planning task (" << varset_system.bool_part().size() << " bool vars, " << varset_system.transitions().size() << " transitions)..." << std::endl;
+
+	cout << "Looking for const bool vars..." << std::endl;
+	std::vector<bool> bool_vars(varset_system.bool_part().size(), false);
+
+	for (auto & tr : varset_system.transitions())
+	{
+		tr.bool_part.effect.mask.for_each_true([&](int idx){
+			bool_vars[idx] = true;
+		});
+	}
+
+	std::vector<int> const_indices;
+	for (int i = 0; i < bool_vars.size(); ++i)
+	{
+		if (!bool_vars[i])
+			const_indices.push_back(i);
+	}
+
+	cout << "Found " << const_indices.size() << " const vars, removing always-false transitions..." << std::endl;
+
+	auto tr_it = varset_system.transitions().begin();
+	while (tr_it != varset_system.transitions().begin())
+	{
+		bool false_transition = false;
+		for (int var_index : const_indices)
+		{
+			if (tr_it->bool_part.condition.mask[var_index])
+			{
+				if (tr_it->bool_part.condition.value[var_index] != initial_state.bool_part[var_index])
+				{
+					false_transition = true;
+					break;
+				}
+			}
+		}
+
+		if (false_transition)
+			tr_it = varset_system.transitions().erase(tr_it);
+		else
+			++tr_it;
+	}
+
+	cout << "Left " << varset_system.transitions().size() << " transitions. Removing const bool vars..." << std::endl;
+
+	initial_state.bool_part.remove_indices(const_indices.begin(), const_indices.end());
+	for (auto & tr : varset_system.transitions())
+	{
+		tr.bool_part.effect.remove_indices(const_indices.begin(), const_indices.end());
+		tr.bool_part.condition.remove_indices(const_indices.begin(), const_indices.end());
+	}
+
+	goal.bool_part.remove_indices(const_indices.begin(), const_indices.end());
+
+	varset_system.bool_part().remove_vars(const_indices.begin(), const_indices.end());
+}

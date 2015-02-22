@@ -103,6 +103,18 @@ public:
 	{
 		return 1.0f;
 	}
+
+	template<typename It>
+	void remove_vars(It first, It last)
+	{
+		std::vector<int> indices(first, last);
+		std::sort(indices.begin(), indices.end(), std::greater<int>());
+
+		for (int idx : indices)
+			m_varNames.erase(m_varNames.begin() + idx);
+
+		m_size -= indices.size();
+	}
 private:
 	int m_size;
 	std::vector<string> m_varNames;

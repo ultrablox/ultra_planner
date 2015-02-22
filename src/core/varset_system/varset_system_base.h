@@ -93,6 +93,11 @@ public:
 		return m_transitions;
 	}
 
+	std::vector<transition_t> & transitions()
+	{
+		return m_transitions;
+	}
+
 	void to_relaxed()
 	{
 		for (auto & tr : m_transitions)
