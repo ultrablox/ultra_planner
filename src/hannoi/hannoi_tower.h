@@ -271,10 +271,10 @@ public:
 		return m_size;
 	}
 
-	float transition_cost(transition_t) const
+	/*float transition_cost(transition_t) const
 	{
 		return 1.0f;
-	}
+	}*/
 private:
 	size_description_t m_size;
 };

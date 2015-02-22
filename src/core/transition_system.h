@@ -9,7 +9,7 @@
 #include <iostream>
 #include <type_traits>
 
-template<bool B, typename T>
+template<bool B, typename T = void>
 using Enable_if = typename std::enable_if<B, T>::type;
 
 template<typename T> bool Is_class()
@@ -84,6 +84,36 @@ public:
 	/*Enable_if<Is_class<has_fast_difference_implementation>(), has_fast_difference_implementation> int test()
 	{
 		return 0;
+	}*/
+
+	//using non_uniform_transitions = typename std::is_member_function_pointer<decltype(&T::transition_cost)>::value;
+
+	/*template<typename U>
+	using non_u = std::is_member_function_pointer<decltype(&U::transition_cost)>;
+
+
+	template<typename U = T>
+	Enable_if<non_u<U>::value, float> transition_cost(const typename U::state_t & s, const typename U::transition_t & t) const
+	{
+		return U::transition_cost(s, t);
+	}
+
+	template<typename U = T>
+	Enable_if<!std::is_member_function_pointer<decltype(&U::transition_cost)>::value, float> transition_cost(const typename U::state_t &, const typename U::transition_t &) const
+	{
+		return 1.0f;
+	}
+
+	template<bool NonUniform>
+	float get_transition_cost(const state_t & s, const transition_t & t) const
+	{
+		return 1.0f;
+	}
+
+	template<typename U = T>
+	float transition_cost(const state_t & s, const transition_t & t) const
+	{
+		return get_transition_cost<non_u<U>::value>(s, t);
 	}*/
 
 	transition_t difference(const state_t & lhs, const state_t & rhs) const

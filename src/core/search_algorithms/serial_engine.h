@@ -8,7 +8,7 @@ template<typename Gr, template<typename> class Cmp, bool ExtMemory = false, hash
 class blind_engine : public queued_search_engine<Gr, Cmp, false, HT>
 {
 	using graph_t = Gr;
-	typedef queued_search_engine<Gr, Cmp, false, HT> _Base;
+	using _Base = queued_search_engine<Gr, Cmp, false, HT>;
 	using state_t = typename _Base::state_t;
 //	using comparison_t = typename _Base::comparison_t;
 	using search_node_t = typename _Base::search_node_t;
@@ -94,8 +94,8 @@ public:
 			});
 		}
 
-		if (!m_goalNodes.empty() && p_plan_cost)
-			*p_plan_cost = m_goalNodes[0].length;
+		if (p_plan_cost && !_Base::m_goalNodes.empty())
+			*p_plan_cost = _Base::m_goalNodes[0].length;
 
 #if TRACE_SOLUTION
 		int i = 0;
