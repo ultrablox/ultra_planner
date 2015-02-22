@@ -33,8 +33,8 @@ libtests.a:
 	ar cr libtests.a test_helpers.o test_block_chain.o test_avl_tree.o test_bitset.o test_block_chain.o test_cached_file.o test_complex_vector.o test_merge.o test_puzzle.o test_hannoi_tower.o test_rubik.o test_search.o test_sort.o test_explicit_graph_search.o test_multivar_systems.o test_compressed_stream.o
 
 libcore.a:
-	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_CORE_DIR)/utils/helpers.cpp $(SRC_CORE_DIR)/UExternalMemoryController.cpp $(SRC_CORE_DIR)/bit_container.cpp $(SRC_CORE_DIR)/masked_bit_vector.cpp $(SRC_CORE_DIR)/UError.cpp
-	ar cr libcore.a helpers.o bit_container.o UExternalMemoryController.o bit_container.o masked_bit_vector.o UError.o
+	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_CORE_DIR)/utils/helpers.cpp $(SRC_CORE_DIR)/UExternalMemoryController.cpp $(SRC_CORE_DIR)/bit_container.cpp $(SRC_CORE_DIR)/masked_bit_vector.cpp $(SRC_CORE_DIR)/UError.cpp $(SRC_CORE_DIR)/numeric_expression.cpp
+	ar cr libcore.a helpers.o bit_container.o UExternalMemoryController.o bit_container.o masked_bit_vector.o UError.o numeric_expression.o
 
 clean:
 	rm *.o

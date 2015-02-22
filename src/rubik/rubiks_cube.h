@@ -610,7 +610,7 @@ public:
 		return os;
 	}
 
-	float transition_cost(const state_t&, transition_t) const
+	float transition_cost(const state_t&, const transition_t&) const
 	{
 		return 1.0f;
 	}
