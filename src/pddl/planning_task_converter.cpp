@@ -464,7 +464,12 @@ UBoolTask UTaskGenerator::generateBoolTask(VAL::analysis * pAnalysis)
 void planning_task_t::optimize()
 {
 	cout << "Optimizing planning task (" << varset_system.bool_part().size() << " bool vars, " << varset_system.transitions().size() << " transitions)..." << std::endl;
+	optimize_const_floats();
+	optimize_const_bools();
+}
 
+void planning_task_t::optimize_const_bools()
+{
 	cout << "Looking for const bool vars..." << std::endl;
 	std::vector<bool> bool_vars(varset_system.bool_part().size(), false);
 
@@ -518,4 +523,51 @@ void planning_task_t::optimize()
 	goal.bool_part.remove_indices(const_indices.begin(), const_indices.end());
 
 	varset_system.bool_part().remove_vars(const_indices.begin(), const_indices.end());
+}
+
+void planning_task_t::optimize_const_floats()
+{
+	cout << "Looking for const float vars (" << varset_system.float_part().size() << " total)..." << std::endl;
+
+	std::vector<bool> float_vars(varset_system.float_part().size(), false);
+
+	for (auto & tr : varset_system.transitions())
+	{
+		for (auto & eff : tr.float_part.effect)
+			float_vars[eff.first] = true;
+	}
+
+	std::vector<int> const_indices;
+	for (int i = 0; i < float_vars.size(); ++i)
+	{
+		if (!float_vars[i])
+			const_indices.push_back(i);
+	}
+
+	cout << "Found " << const_indices.size() << " const float vars, replacing with consts..." << std::endl;
+
+	//Create old_index => new_index mapping
+	std::vector<int> indices;
+	for (int i = 0; i < varset_system.float_part().size(); ++i)
+		indices.push_back(i);
+
+	std::sort(const_indices.begin(), const_indices.end(), std::greater<int>());
+
+	for (int idx : const_indices)
+		indices.erase(indices.begin() + idx);
+
+	std::map<int, int> idx_mapping;
+	for (int i = 0; i < indices.size(); ++i)
+		idx_mapping.insert(make_pair(indices[i], i));
+
+	for (auto & tr : varset_system.transitions())
+	{
+		for (int idx : const_indices)
+			tr.float_part.replace_with_const(idx, initial_state.float_part[idx]);
+
+		tr.float_part.remap_vars(idx_mapping);
+	}
+
+	varset_system.float_part().remove_vars(const_indices.begin(), const_indices.end());
+	varset_system.float_part().set_transition_cost_var_index(idx_mapping[varset_system.float_part().cost_var_index()]);
 }

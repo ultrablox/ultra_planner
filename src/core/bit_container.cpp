@@ -40,11 +40,6 @@ bool bit_vector::BitReference::value() const
 }
 
 //========================Bitset==========================
-bit_vector::bit_vector(const size_t bit_count)
-	:mData(integer_ceil(bit_count, sizeof(base_value_t)* 8), 0), mBitCount(bit_count)
-{
-}
-
 bit_vector::bit_vector(const std::initializer_list<bool> & _value)
 {
 	resize(_value.size());
@@ -174,7 +169,7 @@ int bit_vector::trueCount() const
     return toIndices().size();
 #endif
 }
-
+/*
 void bit_vector::setMasked(const bit_vector & value, const bit_vector & mask)
 {
 #if _DEBUG
@@ -215,7 +210,7 @@ bool bit_vector::equalMasked(const bit_vector & value, const bit_vector & mask) 
 	}
 
 	return r;
-}
+}*/
 
 size_t bit_vector::equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const
 {

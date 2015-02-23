@@ -71,12 +71,12 @@ public:
 
 	bool transition_available(const state_t & state, const boolvar_transition_base & transition) const
 	{
-		return state.equalMasked(transition.condition.value, transition.condition.mask) && !(state.equalMasked(transition.effect.value, transition.effect.mask));
+		return state.equal_masked(transition.condition.value, transition.condition.mask) && !(state.equal_masked(transition.effect.value, transition.effect.mask));
 	}
 
 	void apply(state_t & state, const boolvar_transition_base & transition) const
 	{
-		state.setMasked(transition.effect.value, transition.effect.mask);
+		state.set_masked(transition.effect.value, transition.effect.mask);
 	}
 
 	std::ostream & interpet_state(std::ostream & os, const state_t & state) const

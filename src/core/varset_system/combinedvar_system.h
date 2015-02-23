@@ -225,7 +225,7 @@ public:
 
 	bool is_solved(const state_t & state) const
 	{
-		return state.bool_part.equalMasked(m_goalState.bool_part.mask, m_goalState.bool_part.value);
+		return state.bool_part.equal_masked(m_goalState.bool_part.mask, m_goalState.bool_part.value);
 	}
 
 	void set_goal_state(const masked_state_t & _state)

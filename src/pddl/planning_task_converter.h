@@ -17,6 +17,8 @@ struct ULTRA_PDDL_API planning_task_t
 	combinedvar_system::masked_state_t goal;
 
 	void optimize();
+	void optimize_const_bools();
+	void optimize_const_floats();
 };
 
 class ULTRA_PDDL_API planning_task_converter

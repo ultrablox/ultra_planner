@@ -17,6 +17,7 @@ struct ULTRA_CORE_API numeric_expression
 	~numeric_expression();
 
 	float evaluate(const UFloatVector & float_vars) const;
+	void replace_with_const(int var_index, float const_val);
 
 	static numeric_expression * simpleValue(const float value);
 	static numeric_expression * simpleVariable(int var_index);

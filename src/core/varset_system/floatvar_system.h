@@ -47,6 +47,22 @@ struct floatvar_transition_base
 		effect.insert(make_pair(index, std::move(num_eff)));
 	}
 
+	void replace_with_const(int var_index, float const_val)
+	{
+		for (auto & eff : effect)
+			eff.second.expr->replace_with_const(var_index, const_val);
+	}
+
+	template<typename M>
+	void remap_vars(M & mapping)
+	{
+		std::map<int, numeric_effect_t> new_effects;
+		for (auto & el : effect)
+			new_effects.insert(make_pair(mapping[el.first], el.second));
+
+		effect = new_effects;
+	}
+
 	//VarIndex -> effect
 	std::map<int, numeric_effect_t> effect;
 };
@@ -163,6 +179,23 @@ public:
 	void set_transition_cost_var_index(int index)
 	{
 		m_costIndex = index;
+	}
+
+	int cost_var_index() const
+	{
+		return m_costIndex;
+	}
+
+	template<typename It>
+	void remove_vars(It first, It last)
+	{
+		std::vector<int> indices(first, last);
+		std::sort(indices.begin(), indices.end(), std::greater<int>());
+
+		for (int idx : indices)
+			m_varNames.erase(m_varNames.begin() + idx);
+
+		m_size -= indices.size();
 	}
 private:
 	int m_size, m_costIndex;

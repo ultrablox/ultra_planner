@@ -9,6 +9,7 @@
 #include <fstream>
 #include "config.h"
 #include "utils/helpers.h"
+#include <cassert>
 
 using namespace std;
 using namespace Serializing;
@@ -39,6 +40,12 @@ int  bitScan (const U64 bb)
 }
 
 */
+
+template<typename It, typename CIt, typename Fun>
+void for_each_tri(It first_first, It first_last, CIt second_first, CIt third_first, Fun fun)
+{
+	for (; (first_first != first_last) && fun(*first_first, *second_first, *third_first); ++first_first, ++second_first, ++third_first);
+}
 
 struct ULTRA_CORE_API bit_vector
 {
@@ -83,7 +90,11 @@ struct ULTRA_CORE_API bit_vector
 		}
 	};
 
-	bit_vector(const size_t bit_count = 0);
+	bit_vector(const size_t bit_count = 0, bool default_value = false)
+		:mData(integer_ceil(bit_count, sizeof(base_value_t) * 8), default_value ? std::numeric_limits<base_value_t>::max() : 0), mBitCount(bit_count)
+	{
+	}
+
 	bit_vector(const std::initializer_list<bool> & _value);
 
 	positive_iterator pbegin() const;
@@ -244,12 +255,6 @@ struct ULTRA_CORE_API bit_vector
 		return std::move(result);
 	}
 
-	friend bool operator==(const bit_vector & bs1, const bit_vector & bs2)
-	{
-		return (memcmp(bs1.mData.data(), bs2.mData.data(), bs1.mData.size() * sizeof(base_value_t)) == 0);
-		//return (memcmp(bs1.mData.data(), bs2.mData.data(), integerbs1.mBitCount) == 0);
-	}
-
 	friend bit_vector operator~(const bit_vector & bc)
 	{
 		bit_vector result(bc);
@@ -290,8 +295,43 @@ struct ULTRA_CORE_API bit_vector
 	int trueCount() const;
 
 	//Main operations
-	void setMasked(const bit_vector & value, const bit_vector & mask);
-	bool equalMasked(const bit_vector & value, const bit_vector & mask) const;
+	//void setMasked(const bit_vector & value, const bit_vector & mask);
+	void set_masked(const bit_vector & value, const bit_vector & mask)
+	{
+#if _DEBUG
+		assert((this->mBitCount == value.mBitCount) && (this->mBitCount == mask.mBitCount), "Parameters sizes mismatch");
+#endif
+		for_each_tri(this->mData.begin(), this->mData.end(), value.mData.cbegin(), mask.mData.cbegin(), [&](base_value_t & this_el, const base_value_t & val_el, const base_value_t & mask_el){
+			this_el = (this_el & (~mask_el)) | (val_el & mask_el);
+			return true;
+		});
+	}
+
+	//bool equalMasked(const bit_vector & value, const bit_vector & mask) const;
+
+	bool equal_masked(const bit_vector & value, const bit_vector & mask) const
+	{
+#if _DEBUG
+		assert((this->mBitCount == value.mBitCount) && (this->mBitCount == mask.mBitCount), "Parameters sizes mismatch");
+#endif
+		bool res = true;
+		for_each_tri(this->mData.cbegin(), this->mData.cend(), value.mData.cbegin(), mask.mData.cbegin(), [&](const base_value_t & this_el, const base_value_t & val_el, const base_value_t & mask_el){
+			res = (val_el & mask_el) == (this_el & mask_el);
+			return res;
+		});
+
+		return res;
+
+		/*auto cur_first = this->mData.cbegin(), cur_last = this->mData.cend(), val_first = value.mData.cbegin(), mask_first = mask.mData.cbegin();
+		
+		bool r = true;
+
+		for (; (cur_first != cur_last) && r; ++cur_first, ++val_first, ++mask_first)
+			r = (*cur_first & *mask_first) == (*val_first & *mask_first);
+
+		return r;*/
+	}
+
 	size_t equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const;
 
 	static void checkSizes(const bit_vector & bc1, const bit_vector & bc2, const bit_vector & bc3);
@@ -323,6 +363,28 @@ struct ULTRA_CORE_API bit_vector
 			set(i, data[i]);
 	}
 
+	friend bool operator==(const bit_vector & bs1, const bit_vector & bs2)
+	{
+		return (memcmp(bs1.mData.data(), bs2.mData.data(), bs1.mData.size() * sizeof(base_value_t)) == 0);
+		//return (memcmp(bs1.mData.data(), bs2.mData.data(), integerbs1.mBitCount) == 0);
+	}
+
+	friend bool operator==(const bit_vector & lhs, const std::vector<bool> & rhs)
+	{
+		if (lhs.bitCount() != rhs.size())
+			return false;
+
+		bool r = true;
+		for (int i = 0; (i < rhs.size()) && r; ++i)
+			r = r && (lhs[i] == rhs[i]);
+		return r;
+	}
+
+	/*template<typename Container>
+	friend bool operator==(const Container & rhs, const bit_vector & lhs)
+	{
+		return (lhs == rhs);
+	}*/
 
 	std::vector<base_value_t> mData;
 	size_t mBitCount;

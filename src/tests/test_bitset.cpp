@@ -2,6 +2,9 @@
 #include "test_helpers.h"
 #include <core/bit_container.h>
 #include <core/masked_bit_vector.h>
+#include <random>
+
+using namespace std;
 
 void test_bitset()
 {
@@ -146,7 +149,7 @@ void test_bitset()
 		bv.set(4, false);
 		bv.set(5, false);
 
-		b1.setMasked(bv.value, bv.mask);
+		b1.set_masked(bv.value, bv.mask);
 		res = b1.toString();
 		assert_test(res == "0111001000", "setMasked");
 	}
@@ -167,7 +170,7 @@ void test_bitset()
 		b1[5] = true;
 		b1[7] = true;		
 
-		assert_test(b1.equalMasked(bv.value, bv.mask), "setMasked positive");
+		assert_test(b1.equal_masked(bv.value, bv.mask), "setMasked positive");
 
 		bit_vector b2(10);
 		b2.clear();
@@ -175,7 +178,7 @@ void test_bitset()
 		b2[4] = true;
 		b2[6] = true;		
 
-		bool r = b2.equalMasked(bv.value, bv.mask);
+		bool r = b2.equal_masked(bv.value, bv.mask);
 		assert_test(!r, "setMasked negative");
 	}
 
@@ -252,5 +255,62 @@ void test_bitset()
 		});
 
 		assert_test(correct_vec == vals, "bit_vector: foreach true");
+	}
+
+
+	//Remove indices (by one)
+	{
+		auto gen = std::bind(uniform_int_distribution<int>(0, 300), default_random_engine());
+		bit_vector bv(300, false);
+		std::vector<bool> correct_vec(300, false);
+
+		for (int i = 0; i < 200; ++i)
+		{
+			int index = gen();
+			bv.set(index, true);
+			correct_vec[index] = true;
+		}
+
+		for (int i = 0; i < 100; ++i)
+		{
+			int index = gen() % (correct_vec.size() - 1);
+			correct_vec.erase(correct_vec.begin() + index);
+
+			std::vector<int> indices(1, index);
+			bv.remove_indices(indices.begin(), indices.end());
+		}
+
+		assert_test(bv == correct_vec, "bit_vector: removing by one");
+	}
+
+	//Remove indices (mass)
+	{
+		auto gen = std::bind(uniform_int_distribution<int>(0, 299), default_random_engine());
+		bit_vector bv(300, false);
+		std::vector<bool> correct_vec(300, false);
+
+		for (int i = 0; i < 200; ++i)
+		{
+			int index = gen();
+			bv.set(index, true);
+			correct_vec[index] = true;
+		}
+
+		std::vector<int> indices;
+
+		for (int i = 0; i < 100; ++i)
+			indices.push_back(gen());
+
+		std::sort(indices.begin(), indices.end(), std::greater<int>());
+		auto last_it = std::unique(indices.begin(), indices.end());
+		indices.erase(last_it, indices.end());
+
+		for (int idx : indices)
+			correct_vec.erase(correct_vec.begin() + idx);
+
+		std::random_shuffle(indices.begin(), indices.end());
+		bv.remove_indices(indices.begin(), indices.end());
+
+		assert_test(bv == correct_vec, "bit_vector: removing mass");
 	}
 }

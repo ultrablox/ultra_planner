@@ -13,6 +13,16 @@ float numeric_expression::evaluate(const UFloatVector & float_vars) const
 	return m_pRootNode->value(float_vars);
 }
 
+void numeric_expression::replace_with_const(int var_index, float const_val)
+{
+	if (m_pRootNode->type == UExpressionNode::Type::Variable)
+	{
+		auto var_exp = static_cast<const UVariableExpressionNode*>(m_pRootNode.get());
+		if (var_exp->m_varIndex == var_index)
+			m_pRootNode.reset(new UValueExpressionNode(const_val));
+	}
+}
+
 numeric_expression * numeric_expression::simpleValue(const float value)
 {
 	numeric_expression * res = new numeric_expression;
