@@ -30,6 +30,7 @@ struct floatvar_transition_base
 		{
 			auto & eff = effect[get<0>(init_el)];
 			eff.type = get<1>(init_el);
+			eff.expr = numeric_expression::simpleValue(get<2>(init_el));
 			//eff.value = get<2>(init_el);
 		}
 	}

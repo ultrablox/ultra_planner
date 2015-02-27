@@ -10,6 +10,7 @@
 #include "config.h"
 #include "utils/helpers.h"
 #include <cassert>
+#include <bitset>
 
 using namespace std;
 using namespace Serializing;
@@ -266,8 +267,24 @@ struct ULTRA_CORE_API bit_vector
 	}
 
 	BitReference operator[](size_t bit_index);
-	bool operator[](size_t bit_index) const;
+	bool operator[](size_t bit_index) const
+	{
+#if _DEBUG
+		assert(bit_index < mBitCount);
+#endif
 
+#if USE_INTRINSIC
+		return check_bit<sizeof(value_type)>((void*)mData.data(), bit_index);
+#else
+		auto val_it = mData.begin() + (bit_index / 8 / sizeof(base_value_t));
+		return ((1 << (bit_index % (8 * sizeof(base_value_t)))) & *val_it) != 0;
+#endif
+	}
+
+	bool at(size_t bit_index) const
+	{
+		return operator[](bit_index);
+	}
 	/*
 	Returns vector of indices of positive bits.
 	*/
@@ -301,10 +318,15 @@ struct ULTRA_CORE_API bit_vector
 #if _DEBUG
 		assert((this->mBitCount == value.mBitCount) && (this->mBitCount == mask.mBitCount), "Parameters sizes mismatch");
 #endif
-		for_each_tri(this->mData.begin(), this->mData.end(), value.mData.cbegin(), mask.mData.cbegin(), [&](base_value_t & this_el, const base_value_t & val_el, const base_value_t & mask_el){
+	/*	for_each_tri(this->mData.begin(), this->mData.end(), value.mData.cbegin(), mask.mData.cbegin(), [&](base_value_t & this_el, const base_value_t & val_el, const base_value_t & mask_el){
 			this_el = (this_el & (~mask_el)) | (val_el & mask_el);
 			return true;
-		});
+		});*/
+
+		auto cur_first = this->mData.begin();
+		auto val_first = value.mData.cbegin(), mask_first = mask.mData.cbegin();
+		for (int i = this->mData.size(); i != 0; --i, ++cur_first, ++val_first, ++mask_first)
+			*cur_first = (*cur_first & (~*mask_first)) | (*val_first & *mask_first);
 	}
 
 	//bool equalMasked(const bit_vector & value, const bit_vector & mask) const;
@@ -314,22 +336,20 @@ struct ULTRA_CORE_API bit_vector
 #if _DEBUG
 		assert((this->mBitCount == value.mBitCount) && (this->mBitCount == mask.mBitCount), "Parameters sizes mismatch");
 #endif
-		bool res = true;
+		/*bool res = true;
 		for_each_tri(this->mData.cbegin(), this->mData.cend(), value.mData.cbegin(), mask.mData.cbegin(), [&](const base_value_t & this_el, const base_value_t & val_el, const base_value_t & mask_el){
 			res = (val_el & mask_el) == (this_el & mask_el);
 			return res;
 		});
 
 		return res;
-
-		/*auto cur_first = this->mData.cbegin(), cur_last = this->mData.cend(), val_first = value.mData.cbegin(), mask_first = mask.mData.cbegin();
-		
+*/
+		auto cur_first = this->mData.cbegin(), val_first = value.mData.cbegin(), mask_first = mask.mData.cbegin();
 		bool r = true;
+		for (int i = this->mData.size(); i != 0; --i, ++cur_first, ++val_first, ++mask_first)
+			r &= ((*cur_first & *mask_first) == (*val_first & *mask_first));
 
-		for (; (cur_first != cur_last) && r; ++cur_first, ++val_first, ++mask_first)
-			r = (*cur_first & *mask_first) == (*val_first & *mask_first);
-
-		return r;*/
+		return r;
 	}
 
 	size_t equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const;
@@ -402,7 +422,7 @@ public:
 
 	size_t operator()(const bit_vector & bv) const
 	{
-		auto * ptr = bv.mData.data();
+		/*auto * ptr = bv.mData.data();
 
 		size_t r = (*ptr);
 		for (size_t i = bv.mData.size() - 1; i > 0; --i)
@@ -413,7 +433,9 @@ public:
 
 
 		//return r;
-		return std::hash<bit_vector::value_type>()(r);
+		return std::hash<bit_vector::value_type>()(r);*/
+
+		return _Hash_seq((const unsigned char *)bv.mData.data(), bv.mData.size() * sizeof(bit_vector::base_value_t));
 	}
 };
 }

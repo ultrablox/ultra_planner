@@ -113,6 +113,8 @@ int main(int argc, const char ** argv)
 	planning_task.optimize();
 	planning_task.varset_system.set_goal_state(planning_task.goal);
 
+	planning_task.varset_system.build_transitions_index();
+
 	using problem_t = transition_system<combinedvar_system>;
 	state_space_solver<problem_t/*, planning_goal_checker*/> solver(planning_task.varset_system, cout, planning_task.initial_state);
 

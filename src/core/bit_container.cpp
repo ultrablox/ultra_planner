@@ -126,22 +126,7 @@ bool check_bit<4>(void * data, const size_t bit_index)
 }
 #endif
 
-bool bit_vector::operator[](size_t bit_index) const
-{
-#if _DEBUG
-	assert(bit_index < mBitCount);
-#endif
 
-#if USE_INTRINSIC
-	return check_bit<sizeof(value_type)>((void*)mData.data(), bit_index);
-#else
-	auto addr = getBitAddress(bit_index);
-	value_type val = 1 << addr.second;
-	value_type result = mData[addr.first] & val;
-	//const BitReference ref(mData[addr.first], addr.second);
-	return bool(result);
-#endif
-}
 
 vector<size_t> bit_vector::toIndices() const
 {

@@ -26,12 +26,21 @@ struct boolvar_transition_base
 		effect.mask = effect.value & effect.mask;
 	}
 
+	void build()
+	{
+		m_conditionVarIndices.clear();
+		condition.mask.for_each_true([&](int idx){
+			m_conditionVarIndices.push_back(idx);
+		});
+	}
+
 	friend bool operator==(const boolvar_transition_base & lhs, const boolvar_transition_base & rhs)
 	{
 		return (lhs.condition == rhs.condition) && (lhs.effect == rhs.effect);
 	}
 
 	masked_bit_vector condition, effect;
+	std::vector<int> m_conditionVarIndices;
 };
 
 class boolvar_system_base
@@ -71,7 +80,8 @@ public:
 
 	bool transition_available(const state_t & state, const boolvar_transition_base & transition) const
 	{
-		return state.equal_masked(transition.condition.value, transition.condition.mask) && !(state.equal_masked(transition.effect.value, transition.effect.mask));
+		//return state.equal_masked(transition.condition.value, transition.condition.mask) & (~state.equal_masked(transition.effect.value, transition.effect.mask));
+		return state.equal_masked(transition.condition.value, transition.condition.mask);
 	}
 
 	void apply(state_t & state, const boolvar_transition_base & transition) const

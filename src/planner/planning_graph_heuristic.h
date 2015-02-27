@@ -19,6 +19,7 @@ public:
 		m_cache.costs.resize(_system.bool_part().size());
 		m_cache.layer_costs.resize(_system.bool_part().size());
 		m_relaxedSystem.to_relaxed();
+		m_relaxedSystem.build_transitions_index();
 	}
 
 	float operator()(const state_t & state) const
@@ -31,7 +32,7 @@ public:
 			m_cache.costs[idx] = 0.0f;
 		});
 
-		for (; !(last_state == current_state); ++level_index)
+		do
 		{
 			last_state = current_state;
 			m_cache.layer_costs = m_cache.costs;
@@ -52,7 +53,8 @@ public:
 			});
 
 			m_cache.costs = m_cache.layer_costs;
-		}
+			++level_index;
+		} while (!(last_state.bool_part == current_state.bool_part));
 
 		if (!m_relaxedSystem.is_solved(current_state))
 			return std::numeric_limits<float>::max();

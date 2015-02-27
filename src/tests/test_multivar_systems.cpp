@@ -121,6 +121,8 @@ void test_combined_systems()
 	cd_trans.name = "c->d, !c, B += 0.5";
 	csystem.add_transition(cd_trans);
 
+	csystem.build_transitions_index();
+
 	//Test available transitions
 	assert_test(test_available_transitions(csystem, cvsystem_t::state_t({ 1, 0, 0, 0, 0 }, { 3.0f, 2.0f, 6.0f}), std::vector<cvsystem_t::transition_t>({ ab_trans })), "Combined Var System: available transitions");
 	assert_test(test_available_transitions(csystem, cvsystem_t::state_t({ 0, 1, 0, 0, 0 }, { 3.0f, 2.0f, 6.0f }), std::vector<cvsystem_t::transition_t>({ bc_trans })), "Combined Var System: available transitions");
@@ -140,6 +142,6 @@ void test_combined_systems()
 void test_multivar_systems()
 {
 	test_boolvar_systems();
-//	test_floatvar_systems();
-//	test_combined_systems();
+	test_floatvar_systems();
+	test_combined_systems();
 }

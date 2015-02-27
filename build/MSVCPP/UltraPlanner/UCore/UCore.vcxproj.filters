@@ -212,5 +212,8 @@
     <ClInclude Include="..\..\..\..\src\core\search_algorithms\serial_engine.h">
       <Filter>src\search_algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\varset_system\transition_index.h">
+      <Filter>src\varset_system</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

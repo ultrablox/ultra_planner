@@ -4,6 +4,7 @@
 #include "varset_system_base.h"
 #include "boolvar_system.h"
 #include "floatvar_system.h"
+#include "transition_index.h"
 
 #include "../config.h"
 #include <ostream>
@@ -249,6 +250,32 @@ private:
 	masked_state_t m_goalState;
 };
 
-typedef varset_system_base<combinedvar_system_base> combinedvar_system;
+struct combinedvar_system : public varset_system_base<combinedvar_system_base>
+{
+	using _Base = varset_system_base<combinedvar_system_base>;
+	using state_t = _Base::state_t;
+
+	combinedvar_system(int bool_count = 0, int float_count = 0)
+		:_Base(bool_count, float_count)
+	{}
+
+	void build_transitions_index()
+	{
+		for (auto & tr : m_transitions)
+			tr.bool_part.build();
+
+		m_index.build(m_transitions.begin(), m_transitions.end());
+	}
+
+	template<typename F>
+	void forall_available_transitions(const state_t & base_state, F fun) const
+	{
+		m_index.forall_available_transitions(base_state, [=](const state_t & state, const transition_t & transition){
+			return this->transition_available(state, transition);
+		}, fun);
+	}
+
+	indexing::transition_index<_Base::transition_t, state_t> m_index;
+};
 
 #endif

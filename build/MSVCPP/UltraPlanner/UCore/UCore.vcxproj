@@ -333,6 +333,7 @@
     <ClInclude Include="..\..\..\..\src\core\varset_system\boolvar_system.h" />
     <ClInclude Include="..\..\..\..\src\core\varset_system\floatvar_system.h" />
     <ClInclude Include="..\..\..\..\src\core\varset_system\combinedvar_system.h" />
+    <ClInclude Include="..\..\..\..\src\core\varset_system\transition_index.h" />
     <ClInclude Include="..\..\..\..\src\core\varset_system\varset_system_base.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
