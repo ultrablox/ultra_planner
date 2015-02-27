@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <set>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ namespace indexing
 
 	public:
 		transition_index()
-			:m_pRoot(nullptr)
+			:m_pRoot(nullptr), m_totalTransitions(0)
 		{}
 
 		/*transition_index(const transition_index & rhs) //No copy
@@ -73,11 +74,13 @@ namespace indexing
 		{
 			cout << "Building transition index node (" << std::distance(first, last) << " elements)..." << std::endl;
 
+			m_totalTransitions = std::distance(first, last);
+
 			std::vector<transition_t*> transition_ptrs(std::distance(first, last));
 			int i = 0;
 			for (auto it = first; it != last; ++it)
 				transition_ptrs[i++] = &(*it);
-			m_pRoot = build_node(transition_ptrs.begin(), transition_ptrs.end(), std::set<int>(), 12);
+			m_pRoot = build_node(transition_ptrs.begin(), transition_ptrs.end(), std::set<int>(), 2);
 		}
 
 		template<typename AF, typename F>
@@ -94,12 +97,18 @@ namespace indexing
 					cur_node = pnode->m_children[0];
 			}
 
+			int successed = 0;
 			auto p_leaf = static_cast<leaf_type*>(cur_node);
 			for (auto & p_tr : p_leaf->m_transitions)
 			{
 				if (afun(base_state, *p_tr))
+				{
 					fun(*p_tr);
+					++successed;
+				}
 			}
+
+			std::cout << "Made indexed " << p_leaf->m_transitions.size() << " comparisons, " << successed << " success, instead of " << m_totalTransitions << std::endl;
 		}
 	private:
 		template<typename It>
@@ -135,7 +144,7 @@ namespace indexing
 
 				//cout << "Best group has " << best_gr->second.size() << " elements among " << std::distance(first, last) << std::endl;
 
-				if (best_gr->second.size() > 20)
+				if (best_gr->second.size() > 10)
 				{
 					std::sort(best_gr->second.begin(), best_gr->second.end());
 
@@ -181,6 +190,7 @@ namespace indexing
 
 	private:
 		node_base_t * m_pRoot;
+		int m_totalTransitions;
 	};
 
 };

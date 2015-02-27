@@ -21,7 +21,7 @@ struct ULTRA_CORE_API masked_bit_vector
 	Returns count of bits in given bitset that are masked
 	equal to this vector.
 	*/
-	size_t equalCount(const bit_vector & bitset) const;
+	//size_t equalCount(const bit_vector & bitset) const;
 
 	//Prints vector in 2 lines
 	void print(std::ostream & stream = std::cout) const;

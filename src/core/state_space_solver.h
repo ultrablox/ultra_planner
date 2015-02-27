@@ -135,6 +135,7 @@ private:
 			std::ofstream stats_file("stats.txt");
 			stats_file << "wall_time:" << search_timecost << std::endl;
 			stats_file << "plan_length:" << plan.size() << std::endl;
+			stats_file << "plan_cost:" << plan_cost << std::endl;
 			stats_file << search_engine.get_stats();
 		}
 

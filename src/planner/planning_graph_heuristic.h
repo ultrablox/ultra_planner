@@ -5,6 +5,11 @@
 #include <vector>
 #include <numeric>
 
+class planning_graph
+{
+
+};
+
 template<typename T>
 class planning_graph_heuristic
 {
@@ -22,8 +27,12 @@ public:
 		m_relaxedSystem.build_transitions_index();
 	}
 
+	//Non-uniform version
 	float operator()(const state_t & state) const
 	{
+		for (auto & tr : m_relaxedSystem.transitions())
+			tr.m_disabled = false;
+
 		state_t current_state(state), last_state;
 		int level_index = 0;
 
@@ -37,24 +46,24 @@ public:
 			last_state = current_state;
 			m_cache.layer_costs = m_cache.costs;
 			m_relaxedSystem.forall_available_transitions(last_state, [&](const transition_t & trans){
+				trans.m_disabled = true;
+
 				float trans_cost = m_relaxedSystem.transition_cost(last_state, trans);
 				
 				float condition_cost = 0.0f;
-				trans.bool_part.condition.mask.for_each_true([&](int idx){
+				for (auto idx : trans.bool_part.m_conditionVarIndices)
 					condition_cost = max(m_cache.costs[idx], condition_cost);
-				});
 
 				//Find vars will be set with the current transition
-				trans.bool_part.effect.value.for_each_true([&](int var_index){
+				for (auto var_index : trans.bool_part.m_affectedIndices)
 					m_cache.layer_costs[var_index] = min(m_cache.layer_costs[var_index], condition_cost + trans_cost);
-				});
 
 				m_relaxedSystem.apply(current_state, trans);
 			});
 
 			m_cache.costs = m_cache.layer_costs;
 			++level_index;
-		} while (!(last_state.bool_part == current_state.bool_part));
+		} while (!(last_state.bool_part == current_state.bool_part)/* && (!m_relaxedSystem.is_solved(current_state))*/);
 
 		if (!m_relaxedSystem.is_solved(current_state))
 			return std::numeric_limits<float>::max();
@@ -75,7 +84,7 @@ public:
 		}
 	}
 private:
-	transition_system_t m_relaxedSystem;
+	mutable transition_system_t m_relaxedSystem;
 	
 	mutable struct{
 		 std::vector<float> costs, layer_costs;

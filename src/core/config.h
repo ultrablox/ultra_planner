@@ -16,7 +16,7 @@
 
 #define USE_HDD_STORAGE 1
 
-#define USE_INTRINSIC 0
+#define USE_INTRINSIC 1
 
 #define TRACE_SOLUTION 1
 

@@ -6,39 +6,6 @@
 #include <type_traits>
 #include <assert.h>
 
-//========================Bit reference===================
-bit_vector::BitReference::BitReference(value_type & data_reference, const int bit_index)
-	:mDataReference(data_reference), mBitIndex(bit_index)
-{
-}
-
-bit_vector::BitReference & bit_vector::BitReference::operator=(const bool value)
-{
-	value_type val = 1ULL << mBitIndex;
-
-	if(value)
-		mDataReference = mDataReference | val;
-	else
-		mDataReference = mDataReference & ~val;
-
-	return *this;
-}
-
-bit_vector::BitReference::operator bool() const
-{
-	return value();
-}
-
-bool bit_vector::BitReference::value() const
-{
-	value_type val = 1 << mBitIndex;
-	value_type result = mDataReference & val;
-	if(result)
-		return true;
-	else
-		return false;
-}
-
 //========================Bitset==========================
 bit_vector::bit_vector(const std::initializer_list<bool> & _value)
 {
@@ -49,47 +16,6 @@ bit_vector::bit_vector(const std::initializer_list<bool> & _value)
 		set(i++, _bit);
 }
 
-bit_vector::positive_iterator & bit_vector::positive_iterator::operator++()
-{
-	/*const int bits_per_element = sizeof(UBitContainer::value_type) * 8;
-	size_t cont_elem_index = m_bitIndex >> 64;
-	auto mask = m_container.mData[cont_elem_index];
-
-	mask = mask >> m_bitIndex;*/
-
-	do
-	{
-		++m_bitIndex;
-	}while((*this != m_container.pend()) && (!m_container[m_bitIndex]));
-
-	return *this;
-}
-
-bit_vector::positive_iterator bit_vector::pbegin() const
-{
-	//Find first set bit
-	/*unsigned long index;
-	
-	auto isNonzero = _BitScanForward64(&index, mData[0]);
-	*/
-	positive_iterator res(*this, 0);
-	while((!operator[](res.m_bitIndex)) && (res != pend()))
-		++res.m_bitIndex;
-	return res;
-}
-
-void bit_vector::set(size_t bit_index, bool value)
-{
-#if USE_INTRINSIC
-	if(value)
-		_bittestandcomplement64((long long*)mData.data(), bit_index);
-	else
-		_bittestandreset64((long long*)mData.data(), bit_index);
-#else
-	operator[](bit_index) = value;
-#endif
-}
-
 void bit_vector::setValues(const bool value)
 {
 	//T val = 0;
@@ -98,35 +24,8 @@ void bit_vector::setValues(const bool value)
 	else
 		memset(mData.data(), 0x0, sizeof(value_type) * mData.size());
 
-	clearTail();
+//	clearTail();
 }
-
-bit_vector::BitReference bit_vector::operator[](size_t bit_index)
-{
-#if _DEBUG
-	assert(bit_index < mBitCount);
-#endif
-	//Calculate address
-	auto addr = getBitAddress(bit_index);
-	return BitReference(mData[addr.first], addr.second);
-}
-
-#if USE_INTRINSIC
-
-template<int N>
-bool check_bit(void * data, const size_t bit_index)
-{
-	return _bittest64(data, bit_index);
-}
-
-template<>
-bool check_bit<4>(void * data, const size_t bit_index)
-{
-	return _bittest((const long*)data, bit_index);
-}
-#endif
-
-
 
 vector<size_t> bit_vector::toIndices() const
 {
@@ -146,8 +45,8 @@ int bit_vector::trueCount() const
 #if USE_INTRINSIC
 	int res(0);
 
-	for(auto el : mData)
-		res += __popcnt(el);
+	//for(auto el : mData)
+	//	res += __popcnt(el.m);
 
 	return res;
 #else
@@ -196,7 +95,7 @@ bool bit_vector::equalMasked(const bit_vector & value, const bit_vector & mask) 
 
 	return r;
 }*/
-
+/*
 size_t bit_vector::equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const
 {
 	const value_type * cur_ptr = mData.data(), * val_ptr = _value.mData.data(), *mask_ptr = _mask.mData.data();
@@ -219,9 +118,9 @@ size_t bit_vector::equalCountMasked(const bit_vector & _value, const bit_vector 
 		++val_ptr;
 		++mask_ptr;
 	}
-
+	
 	return sum;
-}
+}*/
 
 size_t bit_vector::serialize(void * dest) const
 {

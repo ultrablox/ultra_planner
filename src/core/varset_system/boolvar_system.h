@@ -32,6 +32,11 @@ struct boolvar_transition_base
 		condition.mask.for_each_true([&](int idx){
 			m_conditionVarIndices.push_back(idx);
 		});
+
+		effect.mask.for_each_true([&](int idx){
+			m_affectedIndices.push_back(idx);
+		});
+		
 	}
 
 	friend bool operator==(const boolvar_transition_base & lhs, const boolvar_transition_base & rhs)
@@ -40,7 +45,7 @@ struct boolvar_transition_base
 	}
 
 	masked_bit_vector condition, effect;
-	std::vector<int> m_conditionVarIndices;
+	std::vector<int> m_conditionVarIndices, m_affectedIndices;
 };
 
 class boolvar_system_base

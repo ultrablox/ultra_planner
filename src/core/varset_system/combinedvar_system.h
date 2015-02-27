@@ -199,7 +199,7 @@ public:
 
 	bool transition_available(const state_t & state, const transition_t & transition) const
 	{
-		return m_boolPart.transition_available(state.bool_part, transition.bool_part) && m_floatPart.transition_available(state.float_part, transition.float_part);
+		return (!transition.m_disabled) && m_boolPart.transition_available(state.bool_part, transition.bool_part) && m_floatPart.transition_available(state.float_part, transition.float_part);
 	}
 
 	std::ostream & interpet_state(std::ostream & os, const state_t & state) const
@@ -255,6 +255,8 @@ struct combinedvar_system : public varset_system_base<combinedvar_system_base>
 	using _Base = varset_system_base<combinedvar_system_base>;
 	using state_t = _Base::state_t;
 
+	
+
 	combinedvar_system(int bool_count = 0, int float_count = 0)
 		:_Base(bool_count, float_count)
 	{}
@@ -268,7 +270,7 @@ struct combinedvar_system : public varset_system_base<combinedvar_system_base>
 	}
 
 	template<typename F>
-	void forall_available_transitions(const state_t & base_state, F fun) const
+	void forall_available_transitions_(const state_t & base_state, F fun) const
 	{
 		m_index.forall_available_transitions(base_state, [=](const state_t & state, const transition_t & transition){
 			return this->transition_available(state, transition);

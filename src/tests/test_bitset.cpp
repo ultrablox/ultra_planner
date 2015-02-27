@@ -182,8 +182,8 @@ void test_bitset()
 		assert_test(!r, "setMasked negative");
 	}
 
-	//Equal masked
-	{
+	//Equal masked count
+/*	{
 		masked_bit_vector bv(10);
 		bv.clear();
 		bv.set(1, false);
@@ -199,7 +199,7 @@ void test_bitset()
 		b1[7] = true;		
 
 		assert_test(b1.equalCountMasked(bv.value, bv.mask) == 5, "equalCountMasked positive");
-	}
+	}*/
 
 //Positive bits iteration
 	{
@@ -221,10 +221,9 @@ void test_bitset()
 		for (auto i : correct_vec)
 			b1[i] = true;
 
-		for (auto it = b1.pbegin(); it != b1.pend(); ++it)
-		{
-			vals.push_back(it.index());
-		}
+		b1.for_each_true([&](int idx){
+			vals.push_back(idx);
+		});
 
 		assert_test(correct_vec == vals, "positive bits iteration");
 
@@ -264,12 +263,34 @@ void test_bitset()
 		bit_vector bv(300, false);
 		std::vector<bool> correct_vec(300, false);
 
+		bool fail = false;
+
+		bv.set(0, true);
+		correct_vec[0] = true;
+		if (!(bv == correct_vec))
+		{
+			cout << "Fail" << std::endl;
+		}
+
 		for (int i = 0; i < 200; ++i)
 		{
 			int index = gen();
+
+			if (index == 160)
+			{
+				int h = 9;
+			}
+
 			bv.set(index, true);
 			correct_vec[index] = true;
+
+			if (!(bv == correct_vec))
+			{
+				cout << "Fail" << std::endl;
+			}
 		}
+
+		assert_test(bv == correct_vec, "bit_vector: assignment");
 
 		for (int i = 0; i < 100; ++i)
 		{
@@ -278,6 +299,12 @@ void test_bitset()
 
 			std::vector<int> indices(1, index);
 			bv.remove_indices(indices.begin(), indices.end());
+			
+			fail = fail && !(bv == correct_vec);
+			if (!fail)
+			{
+				break;
+			}
 		}
 
 		assert_test(bv == correct_vec, "bit_vector: removing by one");

@@ -33,11 +33,11 @@ void masked_bit_vector::set(const size_t bit_index, const bool val)
 	value[bit_index] = val;
 	mask[bit_index] = true;
 }
-
+/*
 size_t masked_bit_vector::equalCount(const bit_vector & bitset) const
 {
 	return bitset.equalCountMasked(value, mask);
-}
+}*/
 
 void masked_bit_vector::print(std::ostream & stream) const
 {

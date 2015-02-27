@@ -11,6 +11,11 @@
 #include "utils/helpers.h"
 #include <cassert>
 #include <bitset>
+#include <stdint.h>
+
+#if USE_INTRINSIC
+#include <intrin.h>
+#endif
 
 using namespace std;
 using namespace Serializing;
@@ -50,60 +55,69 @@ void for_each_tri(It first_first, It first_last, CIt second_first, CIt third_fir
 
 struct ULTRA_CORE_API bit_vector
 {
-	typedef unsigned int value_type;
+#if USE_INTRINSIC
+	typedef union{
+		__m128i m;
+		unsigned __int64 ui64[2];
+	} value_type;
+#else
+	typedef uint64_t value_type;
+#endif
+	
 	using base_value_t = value_type;
 	friend class UMaskedBitVector;
 
 	struct BitReference
 	{
-		BitReference(value_type & data_reference, const int bit_index);
-		BitReference & operator=(const bool value);
-		operator bool() const;
-		bool value() const;
+		BitReference(value_type & data_reference, const int bit_index)
+			:m_dataRef(data_reference), mBitIndex(bit_index)
+		{}
 
-		value_type & mDataReference;
+		BitReference & operator=(bool value)
+		{
+#if USE_INTRINSIC
+			if (value)
+				_bittestandset64((long long *)&m_dataRef, mBitIndex);
+			else
+				_bittestandreset64((long long *)&m_dataRef, mBitIndex);
+#else
+			base_value_t val = (base_value_t)1 << mBitIndex;
+			m_dataRef = value ? (m_dataRef | val) : (m_dataRef & ~val);
+#endif
+			return *this;
+		}
+
+		operator bool() const
+		{
+#if USE_INTRINSIC
+			return _bittest64((long long *)&m_dataRef, mBitIndex);
+#else
+			value_type val = 1 << mBitIndex;
+			value_type result = m_dataRef & val;
+			if(result)
+				return true;
+			else
+				return false;
+#endif
+		}
+
+		base_value_t & m_dataRef;
 		const int mBitIndex;
 	};
 
-	class positive_iterator
-	{
-		friend class bit_vector;
-	private:
-		positive_iterator(const bit_vector & container_, size_t bit_index)
-			:m_container(container_), m_bitIndex(bit_index)
-		{
-		}
-
-		const bit_vector & m_container;
-		size_t m_bitIndex;
-
-	public:
-		size_t index() const
-		{
-			return m_bitIndex;
-		}
-
-		positive_iterator & operator++();
-
-		friend bool operator!=(const positive_iterator & i1, const positive_iterator & i2)
-		{
-			return i1.m_bitIndex != i2.m_bitIndex;
-		}
-	};
-
 	bit_vector(const size_t bit_count = 0, bool default_value = false)
-		:mData(integer_ceil(bit_count, sizeof(base_value_t) * 8), default_value ? std::numeric_limits<base_value_t>::max() : 0), mBitCount(bit_count)
+		:mBitCount(bit_count), mData(integer_ceil(bit_count, sizeof(base_value_t)* 8)
+#if !USE_INTRINSIC
+		, default_value ? std::numeric_limits<base_value_t>::max() : 0
+#endif
+		)
 	{
+#if USE_INTRINSIC
+		memset(mData.data(), default_value ? 0xff : 0x00, mData.size() * sizeof(base_value_t));
+#endif
 	}
 
 	bit_vector(const std::initializer_list<bool> & _value);
-
-	positive_iterator pbegin() const;
-
-	positive_iterator pend() const
-	{
-		return positive_iterator(*this, mData.size() * sizeof(value_type) * 8);
-	}
 
 	void clear()
 	{
@@ -111,7 +125,7 @@ struct ULTRA_CORE_API bit_vector
 	}
 
 	//Sets all last bytes to zeros for preventig errors
-	void clearTail()
+	/*void clearTail()
 	{
 		const size_t data_size = mData.size();
 		if(!data_size)
@@ -125,11 +139,15 @@ struct ULTRA_CORE_API bit_vector
 
 		value_type & res = mData[data_size - 1];
 		res = res & mask;
-	}
+	}*/
 
 	void resize(int bit_count)
 	{
+#if USE_INTRINSIC
+		mData.resize(integer_ceil(bit_count, sizeof(base_value_t)* 8));
+#else
 		mData.resize(integer_ceil(bit_count, sizeof(base_value_t)* 8), 0);
+#endif
 		mBitCount = bit_count;
 
 		/*const size_t byte_count = ceil(static_cast<double>(bit_count) / elementBitCount());
@@ -188,8 +206,6 @@ struct ULTRA_CORE_API bit_vector
 		return std::make_pair(byte_index, local_bit_index);
 	}
 
-	void set(size_t bit_index, bool value);
-
 	void setValues(const bool value);
 
 	//template<typename Stream>
@@ -218,7 +234,7 @@ struct ULTRA_CORE_API bit_vector
 	/*
 	Bitwise OR.
 	*/
-	friend bit_vector operator|(const bit_vector & bs1, const bit_vector & bs2)
+	/*friend bit_vector operator|(const bit_vector & bs1, const bit_vector & bs2)
 	{
 		bit_vector result(bs1);
 
@@ -227,7 +243,7 @@ struct ULTRA_CORE_API bit_vector
 		//result.
 
 		return std::move(result);
-	}
+	}*/
 
 	/*
 	XOR (1 if bits are different)
@@ -236,10 +252,13 @@ struct ULTRA_CORE_API bit_vector
 	{
 		bit_vector result(bs1);
 
+#if USE_INTRINSIC
+		for (size_t i = 0, sz = bs2.mData.size(); i < sz; ++i)
+			result.mData[i].m = _mm_xor_si128(result.mData[i].m, bs2.mData[i].m);
+#else
 		for(size_t i = 0; i < bs2.mData.size(); ++i)
 			result.mData[i] = result.mData[i] ^ bs2.mData[i];
-		//result.
-
+#endif
 		return std::move(result);
 	}
 
@@ -249,9 +268,13 @@ struct ULTRA_CORE_API bit_vector
 	friend bit_vector operator&(const bit_vector & bs1, const bit_vector & bs2)
 	{
 		bit_vector result(bs1);
-
+#if USE_INTRINSIC
+		for(size_t i = 0, sz = bs2.mData.size(); i < sz; ++i)
+			result.mData[i].m = _mm_and_si128(result.mData[i].m, bs2.mData[i].m);
+#else
 		for(size_t i = bs2.mData.size(); i > 0; --i)
 			result.mData[i-1] = result.mData[i-1] & bs2.mData[i-1];
+#endif
 
 		return std::move(result);
 	}
@@ -259,25 +282,55 @@ struct ULTRA_CORE_API bit_vector
 	friend bit_vector operator~(const bit_vector & bc)
 	{
 		bit_vector result(bc);
-
+#if USE_INTRINSIC
+		for (size_t i = 0, sz = bc.mData.size(); i < sz; ++i)
+		{
+			result.mData[i].ui64[0] = ~ bc.mData[i].ui64[0];
+			result.mData[i].ui64[1] = ~ bc.mData[i].ui64[1];
+		}
+#else
 		for(size_t i = 0; i < bc.mData.size(); ++i)
 			result.mData[i] = ~ bc.mData[i];
-
+#endif
 		return std::move(result);
 	}
 
-	BitReference operator[](size_t bit_index);
+	BitReference bit_vector::operator[](size_t bit_index)
+	{
+#if _DEBUG
+		assert(bit_index < mBitCount);
+#endif
+		return BitReference(mData[bit_index / 8 / sizeof(base_value_t)], bit_index % (8 * sizeof(base_value_t)));
+	}
+
 	bool operator[](size_t bit_index) const
 	{
 #if _DEBUG
 		assert(bit_index < mBitCount);
 #endif
-
+		
 #if USE_INTRINSIC
-		return check_bit<sizeof(value_type)>((void*)mData.data(), bit_index);
+		return _bittest64((const long long *)mData.data(), bit_index);
 #else
 		auto val_it = mData.begin() + (bit_index / 8 / sizeof(base_value_t));
-		return ((1 << (bit_index % (8 * sizeof(base_value_t)))) & *val_it) != 0;
+		return (((base_value_t)1 << (bit_index % (8 * sizeof(base_value_t)))) & *val_it) != 0;
+#endif
+	}
+
+	void set(size_t bit_index, bool value)
+	{
+		
+#if USE_INTRINSIC
+		if (value)
+			_bittestandset64((long long*)mData.data(), bit_index);
+		else
+			_bittestandreset64((long long*)mData.data(), bit_index);
+#else
+		auto val_it = mData.begin() + (bit_index / 8 / sizeof(base_value_t));
+		base_value_t bit_idx = (bit_index % (8 * sizeof(base_value_t)));
+
+		base_value_t mask = (base_value_t)1 << bit_idx;
+		*val_it = (*val_it & (~mask)) | (((base_value_t)value << bit_idx) & mask);
 #endif
 	}
 
@@ -293,6 +346,20 @@ struct ULTRA_CORE_API bit_vector
 	template<typename F>
 	void for_each_true(F fun) const
 	{
+#if USE_INTRINSIC
+		int val_index = 0, local_bit;
+		int sz = mData.size() * 2;
+		for (const unsigned __int64 * p_val = mData.begin()->ui64; val_index < sz; ++val_index, ++p_val)
+		{
+			auto cur_val = *p_val;
+			for (local_bit = 0; cur_val != 0; ++local_bit)
+			{
+				if (cur_val & 1)
+					fun(val_index * sizeof(unsigned __int64)* 8 + local_bit);
+				cur_val = cur_val >> 1;
+			}
+		}
+#else
 		int val_index = 0, local_bit;
 		for (base_value_t cur_val : mData)
 		{
@@ -304,6 +371,7 @@ struct ULTRA_CORE_API bit_vector
 			}
 			++val_index;
 		}
+#endif
 	}
 
 	/*
@@ -318,15 +386,15 @@ struct ULTRA_CORE_API bit_vector
 #if _DEBUG
 		assert((this->mBitCount == value.mBitCount) && (this->mBitCount == mask.mBitCount), "Parameters sizes mismatch");
 #endif
-	/*	for_each_tri(this->mData.begin(), this->mData.end(), value.mData.cbegin(), mask.mData.cbegin(), [&](base_value_t & this_el, const base_value_t & val_el, const base_value_t & mask_el){
-			this_el = (this_el & (~mask_el)) | (val_el & mask_el);
-			return true;
-		});*/
-
 		auto cur_first = this->mData.begin();
 		auto val_first = value.mData.cbegin(), mask_first = mask.mData.cbegin();
+#if USE_INTRINSIC
+		for (int i = 0, sz = this->mData.size(); i < sz; ++i, ++cur_first, ++val_first, ++mask_first)
+			cur_first->m = _mm_or_si128(_mm_andnot_si128(mask_first->m, cur_first->m), _mm_and_si128(mask_first->m, val_first->m));
+#else
 		for (int i = this->mData.size(); i != 0; --i, ++cur_first, ++val_first, ++mask_first)
 			*cur_first = (*cur_first & (~*mask_first)) | (*val_first & *mask_first);
+#endif
 	}
 
 	//bool equalMasked(const bit_vector & value, const bit_vector & mask) const;
@@ -336,23 +404,26 @@ struct ULTRA_CORE_API bit_vector
 #if _DEBUG
 		assert((this->mBitCount == value.mBitCount) && (this->mBitCount == mask.mBitCount), "Parameters sizes mismatch");
 #endif
-		/*bool res = true;
-		for_each_tri(this->mData.cbegin(), this->mData.cend(), value.mData.cbegin(), mask.mData.cbegin(), [&](const base_value_t & this_el, const base_value_t & val_el, const base_value_t & mask_el){
-			res = (val_el & mask_el) == (this_el & mask_el);
-			return res;
-		});
 
-		return res;
-*/
 		auto cur_first = this->mData.cbegin(), val_first = value.mData.cbegin(), mask_first = mask.mData.cbegin();
+#if USE_INTRINSIC
+		
+		char res = 0xff;
+
+		for (int i = 0, sz = this->mData.size(); i < sz; ++i, ++cur_first, ++val_first, ++mask_first)
+			res &= _mm_cmpeq_epi64(_mm_and_si128(cur_first->m, mask_first->m), _mm_and_si128(val_first->m, mask_first->m)).m128i_i8[0];
+
+		return (res != 0x00);
+#else
 		bool r = true;
 		for (int i = this->mData.size(); i != 0; --i, ++cur_first, ++val_first, ++mask_first)
-			r &= ((*cur_first & *mask_first) == (*val_first & *mask_first));
-
+			r &= ((*cur_first & *mask_first) == (*val_first & *mask_first));	
 		return r;
+#endif
+		
 	}
 
-	size_t equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const;
+	//size_t equalCountMasked(const bit_vector & _value, const bit_vector & _mask) const;
 
 	static void checkSizes(const bit_vector & bc1, const bit_vector & bc2, const bit_vector & bc3);
 
@@ -377,7 +448,11 @@ struct ULTRA_CORE_API bit_vector
 			data.erase(data.begin() + idx);
 
 		resize(data.size());
+
+#if USE_INTRINSIC
+#else
 		std::fill(mData.begin(), mData.end(), 0);
+#endif
 		
 		for (int i = 0; i < data.size(); ++i)
 			set(i, data[i]);
