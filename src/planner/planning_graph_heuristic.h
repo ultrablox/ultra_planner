@@ -27,13 +27,16 @@ public:
 		m_cache.layer_costs.resize(_system.bool_part().size());
 		m_relaxedSystem.to_relaxed();
 		m_relaxedSystem.build_transitions_index();
+
+		for (auto & tr : m_relaxedSystem.transitions())
+			m_cache.all_transitions.push_back(&tr);
 	}
 
 	//Non-uniform version
 	float operator()(const state_t & state) const
 	{
-		for (auto & tr : m_relaxedSystem.transitions())
-			tr.m_disabled = false;
+		//for (auto & tr : m_relaxedSystem.transitions())
+		//	tr.m_disabled = false;
 
 		state_t current_state(state), last_state;
 		int level_index = 0;
@@ -43,6 +46,9 @@ public:
 			m_cache.costs[idx] = 0.0f;
 		});
 
+		m_cache.current_transitions = m_cache.all_transitions;
+		auto last_tr_it = m_cache.current_transitions.end();
+
 #if TRACE_HEURISTIC
 		cout << "Computing PG value..." << std::endl;
 #endif
@@ -51,21 +57,32 @@ public:
 		{
 			last_state = current_state;
 			m_cache.layer_costs = m_cache.costs;
-			m_relaxedSystem.forall_available_transitions(last_state, [&](const transition_t & trans){
-				trans.m_disabled = true;
 
-				float trans_cost = m_relaxedSystem.transition_cost(last_state, trans);
-				
-				float condition_cost = 0.0f;
-				for (auto idx : trans.bool_part.m_conditionVarIndices)
-					condition_cost = max(m_cache.costs[idx], condition_cost);
+			auto it = m_cache.current_transitions.begin();
 
-				//Find vars will be set with the current transition
-				for (auto var_index : trans.bool_part.m_affectedIndices)
-					m_cache.layer_costs[var_index] = min(m_cache.layer_costs[var_index], condition_cost + trans_cost);
+			//m_relaxedSystem.forall_available_transitions(last_state, [&](const transition_t & trans){
+			while (it != last_tr_it)
+			{
+				const transition_t & trans = **it;
+				if (m_relaxedSystem.transition_available(last_state, trans))
+				{
+					float trans_cost = m_relaxedSystem.transition_cost(last_state, trans);
 
-				m_relaxedSystem.apply(current_state, trans);
-			});
+					float condition_cost = 0.0f;
+					for (auto idx : trans.bool_part.m_conditionVarIndices)
+						condition_cost = max(m_cache.costs[idx], condition_cost);
+
+					//Find vars will be set with the current transition
+					for (auto var_index : trans.bool_part.m_affectedIndices)
+						m_cache.layer_costs[var_index] = min(m_cache.layer_costs[var_index], condition_cost + trans_cost);
+
+					m_relaxedSystem.apply(current_state, trans);
+
+					*it = *(--last_tr_it);
+				}
+				else
+					++it;
+			};
 
 			m_cache.costs = m_cache.layer_costs;
 			++level_index;
@@ -98,6 +115,9 @@ private:
 	
 	mutable struct{
 		 std::vector<float> costs, layer_costs;
+		 std::vector<const transition_t*> all_transitions;
+
+		 std::vector<const transition_t*> current_transitions;
 	} m_cache;
 	
 };

@@ -17,15 +17,14 @@ public:
 
 	template<typename A, typename B>
 	varset_transition_base(const A & a, const B & b)
-		: _Base(a, b), m_disabled(false)
+		: _Base(a, b)
 	{}
 
 	varset_transition_base()
-		:m_disabled(false)
 	{}
 
 	varset_transition_base(const varset_transition_base & rhs)
-		: _Base(rhs), name(rhs.name), m_disabled(false)
+		: _Base(rhs), name(rhs.name)
 	{
 	}
 
@@ -46,7 +45,6 @@ public:
 	}
 
 	std::string name;
-	mutable bool m_disabled;
 };
 
 template<typename T>

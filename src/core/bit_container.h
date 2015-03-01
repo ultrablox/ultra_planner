@@ -418,15 +418,14 @@ struct ULTRA_CORE_API bit_vector
 #if USE_INTRINSIC
 		
 		int res = 1;
+		__m128i neq;
 		for (int i = 0, sz = this->mData.size(); i < sz; ++i, ++cur_first, ++val_first, ++mask_first)
 		{
-			__m128i neq = _mm_xor_si128(_mm_and_si128(cur_first->m, mask_first->m), _mm_and_si128(val_first->m, mask_first->m));
-			res = res & _mm_test_all_zeros(neq, neq);
-			/*tmp = _mm_cmpeq_epi64(_mm_and_si128(cur_first->m, mask_first->m), _mm_and_si128(val_first->m, mask_first->m));
-			res &= tmp.m128i_u8[0] & tmp.m128i_u8[8];*/
+			neq = _mm_xor_si128(_mm_and_si128(cur_first->m, mask_first->m), _mm_and_si128(val_first->m, mask_first->m));
+			res &= _mm_test_all_zeros(neq, neq);
 		}
 
-		return (res != 0);
+		return res;
 #else
 		bool r = true;
 		for (int i = this->mData.size(); i != 0; --i, ++cur_first, ++val_first, ++mask_first)

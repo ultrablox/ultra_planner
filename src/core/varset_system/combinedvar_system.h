@@ -199,7 +199,7 @@ public:
 
 	bool transition_available(const state_t & state, const transition_t & transition) const
 	{
-		return (!transition.m_disabled) && m_boolPart.transition_available(state.bool_part, transition.bool_part) && m_floatPart.transition_available(state.float_part, transition.float_part);
+		return m_boolPart.transition_available(state.bool_part, transition.bool_part) && m_floatPart.transition_available(state.float_part, transition.float_part);
 	}
 
 	std::ostream & interpet_state(std::ostream & os, const state_t & state) const
