@@ -19,6 +19,7 @@ public:
 	using transition_system_t = T;
 	using state_t = typename transition_system_t::state_t;
 	using transition_t = typename transition_system_t::transition_t;
+	enum class computation_state_t {Normal, Tail, Failed, Finished};
 public:
 	planning_graph_heuristic(const transition_system_t & _system)
 		:m_relaxedSystem(_system)
@@ -53,6 +54,10 @@ public:
 		cout << "Computing PG value..." << std::endl;
 #endif
 
+		computation_state_t cstate = computation_state_t::Normal;
+		int tail_size = 1;
+		bool finished = false;
+
 		do
 		{
 			last_state = current_state;
@@ -60,7 +65,7 @@ public:
 
 			auto it = m_cache.current_transitions.begin();
 
-			//m_relaxedSystem.forall_available_transitions(last_state, [&](const transition_t & trans){
+			
 			while (it != last_tr_it)
 			{
 				const transition_t & trans = **it;
@@ -84,15 +89,34 @@ public:
 					++it;
 			};
 
+			switch (cstate)
+			{
+			case computation_state_t::Normal:
+				if (m_relaxedSystem.is_solved(current_state.bool_part))
+				{
+					cstate = computation_state_t::Tail;
+				}
+				else if (last_state.bool_part == current_state.bool_part)
+				{
+					finished = true;
+					cstate = computation_state_t::Failed;
+				}
+				break;
+			case computation_state_t::Tail:
+				if (--tail_size == 0)
+					finished = true;
+				break;
+			}
+
 			m_cache.costs = m_cache.layer_costs;
 			++level_index;
-		} while (!(last_state.bool_part == current_state.bool_part)/* && (!m_relaxedSystem.is_solved(current_state))*/);
+		} while (!finished);
 
 #if TRACE_HEURISTIC
 		cout << "Total " << level_index << " layers, is_solved=" << m_relaxedSystem.is_solved(current_state) << std::endl;
 #endif
 
-		if (!m_relaxedSystem.is_solved(current_state))
+		if (cstate == computation_state_t::Failed)
 			return std::numeric_limits<float>::max();
 		else
 		{
@@ -104,12 +128,13 @@ public:
 			//return *std::max_element(m_cache.costs.begin(), m_cache.costs.end(), );
 			//return std::accumulate(m_cache.costs.begin(), m_cache.costs.end(), 0.0f);
 #if _DEBUG
-			if (goal_cost < 0.0f)
-				throw runtime_error("Impossible");
+			assert(goal_cost >= 0.0f);
 #endif
 			return goal_cost;
 		}
 	}
+
+
 private:
 	mutable transition_system_t m_relaxedSystem;
 	
