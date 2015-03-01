@@ -47,7 +47,7 @@ void masked_bit_vector::print(std::ostream & stream) const
 	cout << "M:";
 	mask.print(stream);
 }
-
+/*
 const size_t masked_bit_vector::plainDataSize() const
 {
 	return sizeof(int32_t)+value.byteCount() + sizeof(int32_t)+mask.byteCount();
@@ -82,7 +82,7 @@ int masked_bit_vector::deserialize(std::ifstream & is)
 
 	res = mask.deserialize(is);
 	return res;
-}
+}*/
 
 bool operator==(const masked_bit_vector & lhs, const masked_bit_vector & rhs)
 {

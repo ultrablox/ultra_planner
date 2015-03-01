@@ -110,7 +110,7 @@ int main(int argc, const char ** argv)
 		return 1;
 	}
 
-	//planning_task.optimize();
+	planning_task.optimize();
 	planning_task.varset_system.set_goal_state(planning_task.goal);
 
 	planning_task.varset_system.build_transitions_index();

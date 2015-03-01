@@ -144,7 +144,10 @@ struct ULTRA_CORE_API bit_vector
 	void resize(int bit_count)
 	{
 #if USE_INTRINSIC
-		mData.resize(integer_ceil(bit_count, sizeof(base_value_t)* 8));
+		base_value_t zero_val;
+		zero_val.ui64[0] = 0;
+		zero_val.ui64[1] = 0;
+		mData.resize(integer_ceil(bit_count, sizeof(base_value_t)* 8), zero_val);
 #else
 		mData.resize(integer_ceil(bit_count, sizeof(base_value_t)* 8), 0);
 #endif
@@ -177,10 +180,10 @@ struct ULTRA_CORE_API bit_vector
 	/*
 	Returns total byte count spent to bitset.
 	*/
-	size_t byteCount() const
+	/*size_t byteCount() const
 	{
 		return sizeof(value_type) * mData.size();
-	}
+	}*/
 
 	static int elementBitCount()
 	{
@@ -355,7 +358,13 @@ struct ULTRA_CORE_API bit_vector
 			for (local_bit = 0; cur_val != 0; ++local_bit)
 			{
 				if (cur_val & 1)
-					fun(val_index * sizeof(unsigned __int64)* 8 + local_bit);
+				{
+					int res_idx = val_index * sizeof(unsigned __int64)* 8 + local_bit;
+#if _DEBUG
+					assert(res_idx < mBitCount);
+#endif
+					fun(res_idx);
+				}
 				cur_val = cur_val >> 1;
 			}
 		}
@@ -408,12 +417,16 @@ struct ULTRA_CORE_API bit_vector
 		auto cur_first = this->mData.cbegin(), val_first = value.mData.cbegin(), mask_first = mask.mData.cbegin();
 #if USE_INTRINSIC
 		
-		char res = 0xff;
-
+		int res = 1;
 		for (int i = 0, sz = this->mData.size(); i < sz; ++i, ++cur_first, ++val_first, ++mask_first)
-			res &= _mm_cmpeq_epi64(_mm_and_si128(cur_first->m, mask_first->m), _mm_and_si128(val_first->m, mask_first->m)).m128i_i8[0];
+		{
+			__m128i neq = _mm_xor_si128(_mm_and_si128(cur_first->m, mask_first->m), _mm_and_si128(val_first->m, mask_first->m));
+			res = res & _mm_test_all_zeros(neq, neq);
+			/*tmp = _mm_cmpeq_epi64(_mm_and_si128(cur_first->m, mask_first->m), _mm_and_si128(val_first->m, mask_first->m));
+			res &= tmp.m128i_u8[0] & tmp.m128i_u8[8];*/
+		}
 
-		return (res != 0x00);
+		return (res != 0);
 #else
 		bool r = true;
 		for (int i = this->mData.size(); i != 0; --i, ++cur_first, ++val_first, ++mask_first)
@@ -427,11 +440,11 @@ struct ULTRA_CORE_API bit_vector
 
 	static void checkSizes(const bit_vector & bc1, const bit_vector & bc2, const bit_vector & bc3);
 
-	size_t serialize(void * dest) const;
+	/*size_t serialize(void * dest) const;
 	size_t deserialize(char * dest);
 
 	void serialize(std::ofstream & os) const;
-	int deserialize(std::ifstream & is);
+	int deserialize(std::ifstream & is);*/
 
 	template<typename It>
 	void remove_indices(It first, It last)
@@ -450,6 +463,7 @@ struct ULTRA_CORE_API bit_vector
 		resize(data.size());
 
 #if USE_INTRINSIC
+		memset(mData.data(), 0x00, mData.size() * sizeof(base_value_t));
 #else
 		std::fill(mData.begin(), mData.end(), 0);
 #endif

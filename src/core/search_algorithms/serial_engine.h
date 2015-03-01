@@ -72,7 +72,7 @@ public:
 		heuristic_t * p_fun = &h_fun;
 
 		this->enqueue(is_goal_fun, this->create_node(init_state, 0), node_estimation_t(0, h_fun(init_state)));
-		this->m_database.add(init_state, [=](const state_t & state){});
+		this->m_database.add(init_state);
 
 		float best_data = std::numeric_limits<float>::max();
 		//comparison_t current_data;

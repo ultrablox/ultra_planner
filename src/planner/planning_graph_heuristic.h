@@ -5,6 +5,8 @@
 #include <vector>
 #include <numeric>
 
+#define TRACE_HEURISTIC 0
+
 class planning_graph
 {
 
@@ -41,6 +43,10 @@ public:
 			m_cache.costs[idx] = 0.0f;
 		});
 
+#if TRACE_HEURISTIC
+		cout << "Computing PG value..." << std::endl;
+#endif
+
 		do
 		{
 			last_state = current_state;
@@ -64,6 +70,10 @@ public:
 			m_cache.costs = m_cache.layer_costs;
 			++level_index;
 		} while (!(last_state.bool_part == current_state.bool_part)/* && (!m_relaxedSystem.is_solved(current_state))*/);
+
+#if TRACE_HEURISTIC
+		cout << "Total " << level_index << " layers, is_solved=" << m_relaxedSystem.is_solved(current_state) << std::endl;
+#endif
 
 		if (!m_relaxedSystem.is_solved(current_state))
 			return std::numeric_limits<float>::max();

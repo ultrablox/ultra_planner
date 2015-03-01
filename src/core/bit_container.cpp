@@ -121,7 +121,7 @@ size_t bit_vector::equalCountMasked(const bit_vector & _value, const bit_vector 
 	
 	return sum;
 }*/
-
+/*
 size_t bit_vector::serialize(void * dest) const
 {
 	char * cdest = (char*)dest;
@@ -135,8 +135,8 @@ size_t bit_vector::serialize(void * dest) const
 	res += byteCount();
 
 	return res;
-}
-
+}*/
+/*
 size_t bit_vector::deserialize(char * dest)
 {
 	size_t r(0);
@@ -166,7 +166,7 @@ int bit_vector::deserialize(std::ifstream & is)
 	mData = deserialize_vector<vector<value_type>>(is);
 
 	return 0;
-}
+}*/
 
 void bit_vector::checkSizes(const bit_vector & bc1, const bit_vector & bc2, const bit_vector & bc3)
 {

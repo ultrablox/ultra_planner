@@ -31,12 +31,12 @@ struct ULTRA_CORE_API masked_bit_vector
 	2. plain state representation
 	3. plain mask representation
 	*/
-	const size_t plainDataSize() const;
+	/*const size_t plainDataSize() const;
 
 	size_t serialize(void * dest) const;
 	
 	void serialize(std::ofstream & os) const;
-	int deserialize(std::ifstream & is);
+	int deserialize(std::ifstream & is);*/
 
 	template<typename It>
 	void remove_indices(It first, It last)

@@ -62,14 +62,22 @@ public:
 
 	void write(const bit_vector & mbv)
 	{
-		memcpy(m_dataPtr, mbv.mData.data(), integer_ceil(mbv.bitCount(), 8));
-		m_dataPtr += mbv.byteCount();
+		//memcpy(m_dataPtr, mbv.mData.data(), integer_ceil(mbv.bitCount(), 8));
+		//m_dataPtr += mbv.byteCount();
+
+		size_t byte_count = mbv.mData.size() * sizeof(bit_vector::base_value_t);
+		memcpy(m_dataPtr, mbv.mData.data(), byte_count);
+		m_dataPtr += byte_count;
 	}
 
 	void read(bit_vector & mbv)
 	{
-		memcpy(mbv.mData.data(), m_dataPtr, integer_ceil(mbv.bitCount(), 8));
-		m_dataPtr += mbv.byteCount();
+		//memcpy(mbv.mData.data(), m_dataPtr, integer_ceil(mbv.bitCount(), 8));
+		//m_dataPtr += mbv.byteCount();
+
+		size_t byte_count = mbv.mData.size() * sizeof(bit_vector::base_value_t);
+		memcpy(mbv.mData.data(), m_dataPtr, byte_count);
+		m_dataPtr += byte_count;
 	}
 private:
 	void move_ptr(int bits_count)

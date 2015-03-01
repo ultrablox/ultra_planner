@@ -182,6 +182,21 @@ void test_bitset()
 		assert_test(!r, "setMasked negative");
 	}
 
+	//Equal masked (fail in elevators-01)
+	{
+		masked_bit_vector mv(86);
+		mv.set(64 + 3, true);
+		mv.set(64 + 8, true);
+		mv.set(64 + 15, true);
+
+		bit_vector bv(86);
+		for (int i = 0; i < 9; ++i)
+			bv[i] = true;
+		
+
+		assert_test(!bv.equal_masked(mv.value, mv.mask), "equalMasked");
+	}
+
 	//Equal masked count
 /*	{
 		masked_bit_vector bv(10);

@@ -59,7 +59,8 @@ public:
 	{
 	public:
 		state_streamer_t(const boolvar_system_base & _bsystem)
-			:streamer_base(integer_ceil(_bsystem.size(), 8)), m_bitCount(_bsystem.size())
+			//:streamer_base(integer_ceil(_bsystem.size(), 8)), m_bitCount(_bsystem.size())
+			:streamer_base(sizeof(bit_vector::base_value_t) * integer_ceil(_bsystem.size(), sizeof(bit_vector::base_value_t) * 8)), m_bitCount(_bsystem.size())
 		{}
 
 		void serialize(void * dst, const state_t & state) const
@@ -129,6 +130,11 @@ public:
 			m_varNames.erase(m_varNames.begin() + idx);
 
 		m_size -= indices.size();
+	}
+
+	const std::vector<string> & var_names() const
+	{
+		return m_varNames;
 	}
 private:
 	int m_size;

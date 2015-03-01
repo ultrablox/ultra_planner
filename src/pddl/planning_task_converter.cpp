@@ -470,6 +470,19 @@ void planning_task_t::optimize()
 
 void planning_task_t::optimize_const_bools()
 {
+	cout << "Goal before: ";
+	goal.bool_part.mask.for_each_true([&](int idx){
+		cout << varset_system.bool_part().var_names()[idx] << ',';
+	});
+	cout << std::endl;
+
+	cout << "Initial state before: ";
+	initial_state.bool_part.for_each_true([&](int idx){
+		cout << varset_system.bool_part().var_names()[idx] << std::endl;
+	});
+	cout << std::endl;
+
+
 	cout << "Looking for const bool vars..." << std::endl;
 	std::vector<bool> bool_vars(varset_system.bool_part().size(), false);
 
@@ -523,6 +536,18 @@ void planning_task_t::optimize_const_bools()
 	goal.bool_part.remove_indices(const_indices.begin(), const_indices.end());
 
 	varset_system.bool_part().remove_vars(const_indices.begin(), const_indices.end());
+
+	cout << "Goal after: ";
+	goal.bool_part.mask.for_each_true([&](int idx){
+		cout << varset_system.bool_part().var_names()[idx] << ',';
+	});
+	cout << std::endl;
+
+	cout << "Initial state after: ";
+	initial_state.bool_part.for_each_true([&](int idx){
+		cout << varset_system.bool_part().var_names()[idx] << std::endl;
+	});
+	cout << std::endl;
 }
 
 void planning_task_t::optimize_const_floats()
@@ -570,4 +595,7 @@ void planning_task_t::optimize_const_floats()
 
 	varset_system.float_part().remove_vars(const_indices.begin(), const_indices.end());
 	varset_system.float_part().set_transition_cost_var_index(idx_mapping[varset_system.float_part().cost_var_index()]);
+
+	for (auto cit : const_indices)
+		initial_state.float_part.erase(initial_state.float_part.begin() + cit);
 }
