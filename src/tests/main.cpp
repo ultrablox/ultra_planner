@@ -47,7 +47,7 @@ void test_complex_stack();
 void test_block_chain();
 void test_hannoi_tower_core();
 void test_compressed_stream();
-void test_multivar_systems();
+void test_varset_systems();
 
 int main()
 {
@@ -60,7 +60,7 @@ int main()
 	test_hannoi_tower_core();
 	test_puzzle_core();
 	test_rubik_core();
-	test_multivar_systems();
+	test_varset_systems();
 
 	test_complex_vector();
 	

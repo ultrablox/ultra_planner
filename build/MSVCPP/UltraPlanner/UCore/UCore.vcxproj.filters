@@ -215,5 +215,8 @@
     <ClInclude Include="..\..\..\..\src\core\varset_system\transition_index.h">
       <Filter>src\varset_system</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\varset_system\multivar_system.h">
+      <Filter>src\varset_system</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

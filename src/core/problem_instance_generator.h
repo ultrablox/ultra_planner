@@ -5,6 +5,7 @@
 #include <ostream>
 #include <random>
 #include <vector>
+#include <chrono>
 
 template<typename T>
 class problem_instance_generator
@@ -30,7 +31,12 @@ public:
 
 	state_t generate_state(const problem_t & problem, int permutation_count, std::vector<transition_t> * p_transitions = nullptr)
 	{
+#if 0
 		std::default_random_engine generator;
+#else
+		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		std::mt19937 generator(seed);
+#endif
 		std::uniform_int_distribution<int> distribution(0, 999);
 
 		state_t state = problem.solved_state();

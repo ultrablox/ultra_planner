@@ -33,6 +33,7 @@ struct boolvar_transition_base
 			m_conditionVarIndices.push_back(idx);
 		});
 
+		m_affectedIndices.clear();
 		effect.mask.for_each_true([&](int idx){
 			m_affectedIndices.push_back(idx);
 		});

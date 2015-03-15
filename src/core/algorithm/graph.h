@@ -31,47 +31,85 @@ public:
 Describes graph explicitely set by the
 vertices and edges.
 */
-template<typename V>
+template<typename V, typename E>
 class explicit_graph : public simple_graph<V>
 {
 public:
-	typedef V vertex_t;
+	using vertex_t = V;
+	using edge_t = E;
 	using vertex_streamer_t = base_type_streamer<vertex_t>;
 
-	template<typename Verts, typename Edges>
-	explicit_graph(const Verts & verts, const Edges & edgs)
+	struct adjacent_vertex_t
 	{
+		edge_t edge;
+		vertex_t vertex;
+	};
 
-		const int v_len = sizeof(verts) / sizeof(verts[0]);
-		for(int i = 0; i < v_len; ++i)
-			m_vertices.insert(verts[i]);
+	explicit_graph()
+	{}
 
-		const int e_len = sizeof(edgs) / sizeof(edgs[0]);
-		for(int i = 0; i < e_len; ++i)
+	explicit_graph(const std::initializer_list<vertex_t> & verts, const std::initializer_list<std::pair<vertex_t, vertex_t>> & adjacent_verts)
+	{
+		for (auto & v : verts)
+			m_vertices.insert(v);
+
+		for (auto & av : adjacent_verts)
 		{
-			m_adjacentLists[edgs[i][0]].push_back(edgs[i][1]);
-			m_adjacentLists[edgs[i][1]].push_back(edgs[i][0]);
+			adjacent_vertex_t forward_edge;
+			forward_edge.vertex = av.second;
+			m_adjacentLists[av.first].push_back(forward_edge);
+
+			adjacent_vertex_t backward_edge;
+			forward_edge.vertex = av.first;
+			m_adjacentLists[av.second].push_back(backward_edge);
 		}
 	}
 
 	template<typename F>
 	void forall_adj_verts(const vertex_t & vertex, F fun) const
 	{
-		auto it = m_vertices.find(vertex);
-		if(it == m_vertices.end())
-			throw std::runtime_error("Vertex not found in graph");
-
 		auto adj_it = m_adjacentLists.find(vertex);
-		if(adj_it != m_adjacentLists.end())
+#if _DEBUG
+		assert(m_vertices.find(vertex) != m_vertices.end());
+		assert(adj_it != m_adjacentLists.end());
+#endif
+
+		for(auto & edge : adj_it->second)
+			fun(edge.vertex, edge.edge);
+	}
+
+	void add_vertex(const vertex_t & vert)
+	{
+		m_vertices.insert(vert);
+	}
+
+	void add_edge(const vertex_t & src, const vertex_t & dst, const edge_t & edg)
+	{
+#if _DEBUG
+		assert(m_vertices.find(src) != m_vertices.end());
+		assert(m_vertices.find(dst) != m_vertices.end());
+#endif
+		adjacent_vertex_t new_edge;
+		new_edge.edge = edg;
+		new_edge.vertex = dst;
+
+		auto it = m_adjacentLists.find(src);
+		if (it == m_adjacentLists.end())
+			m_adjacentLists.insert(make_pair(src, std::list<adjacent_vertex_t>(1, new_edge)));
+		else
 		{
-			for(auto & vert : adj_it->second)
-				fun(vert, 1);
+			it->second.push_back(new_edge);
 		}
 	}
 
+	std::list<adjacent_vertex_t> & adjacent_list(const vertex_t & vertex)
+	{
+		auto it = m_adjacentLists.find(vertex);
+		return it->second;
+	}
 private:
 	std::unordered_set<vertex_t> m_vertices;
-	std::unordered_map<vertex_t, std::list<vertex_t>> m_adjacentLists;
+	std::unordered_map<vertex_t, std::list<adjacent_vertex_t>> m_adjacentLists;
 };
 
 /*

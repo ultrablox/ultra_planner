@@ -1,7 +1,7 @@
 
 #include "sliding_puzzle.h"
-#include <core/transition_system/transition_system.h>
-#include <solver/problem_instance_generator.h>
+#include <core/transition_system.h>
+#include <core/problem_instance_generator.h>
 #include <tclap/CmdLine.h>
 #include <string>
 #include <iostream>

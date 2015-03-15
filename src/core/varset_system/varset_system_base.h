@@ -20,6 +20,11 @@ public:
 		: _Base(a, b)
 	{}
 
+	template<typename A>
+	varset_transition_base(const A & a)
+		: _Base(a)
+	{}
+
 	varset_transition_base()
 	{}
 
@@ -60,6 +65,11 @@ public:
 	varset_system_base(Params... args)
 		:_Base(args...)
 	{}
+
+	/*template<typename Param>
+	varset_system_base(Param arg)
+		: _Base(arg)
+	{}*/
 
 	template<typename... Params>
 	void add_transition(Params... args)
@@ -103,6 +113,14 @@ public:
 		for (auto & tr : m_transitions)
 			tr.to_relaxed();
 	}
+
+	/*template<typename Params>
+	transition_t create_transition(const std::initializer_list<Params> & args)
+	{
+		transition_t new_trans = _Base::create_transition(args);
+		m_transitions.push_back(new_trans);
+		return new_trans;
+	}*/
 protected:
 	std::vector<transition_t> m_transitions;
 	

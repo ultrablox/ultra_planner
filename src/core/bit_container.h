@@ -337,6 +337,12 @@ struct ULTRA_CORE_API bit_vector
 #endif
 	}
 
+	void set_range(size_t first, size_t last, size_t range_val)
+	{
+		for (size_t msk = 1, i = first; i < last; ++i, msk = msk << 1ULL)
+			set(i, msk & range_val);
+	}
+
 	bool at(size_t bit_index) const
 	{
 		return operator[](bit_index);

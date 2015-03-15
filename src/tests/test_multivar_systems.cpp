@@ -2,6 +2,7 @@
 #include "transition_system_helpers.h"
 #include <core/varset_system/boolvar_system.h>
 #include <core/varset_system/floatvar_system.h>
+#include <core/varset_system/multivar_system.h>
 #include <core/varset_system/combinedvar_system.h>
 #include <core/transition_system.h>
 
@@ -103,6 +104,38 @@ void test_floatvar_systems()
 	assert_test(fsystem.difference(fvsystem_t::state_t({ 1.0, 1.0, 1.0 }), fvsystem_t::state_t({ -1.0, 1.0, 1.0 })) == decA_trans, "Floatvar System: state difference");
 }
 
+void test_multivar_systems()
+{
+	using mvsystem_t = transition_system<multivar_system>;
+	mvsystem_t msystem;// ({ "V1", "V2", "V3" });
+	msystem.add_var("V1", { "A", "B", "C" });
+	msystem.add_var("V2", { "A", "B" });
+	msystem.add_var("V3", { "A", "B", "C", "D", "E" });
+
+	msystem.build();
+
+	auto v1_trans_AB = msystem.create_transition({ make_tuple("V1", "A", "B"), make_tuple("V1", "A", "B") });
+	v1_trans_AB.name = "V1: A->B";
+	msystem.add_transition(v1_trans_AB);
+
+	auto v1_trans_AC = msystem.create_transition({ make_tuple("V1", "A", "C") });
+	v1_trans_AC.name = "V1: A->C";
+	msystem.add_transition(v1_trans_AC);
+
+	auto v2_trans_BA = msystem.create_transition({ make_tuple("V2", "B", "A") });
+	v2_trans_BA.name = "V2: B->A";
+	msystem.add_transition(v2_trans_BA);
+
+	//Test available transitions
+	assert_test(test_available_transitions(msystem, msystem.create_state({ "A", "A", "A" }), std::vector<mvsystem_t::transition_t>({ v1_trans_AB, v1_trans_AC })), "Multivar System: available transitions");
+	assert_test(test_available_transitions(msystem, msystem.create_state({ "C", "B", "A" }), std::vector<mvsystem_t::transition_t>({ v2_trans_BA })), "Multivar System: available transitions");
+
+
+	//Test applying transitions
+	assert_test(test_apply_transition(msystem, msystem.create_state({ "A", "A", "A" }), msystem.create_state({ "C", "A", "A" }), v1_trans_AC), "Multivar System: applying transition");
+	assert_test(test_apply_transition(msystem, msystem.create_state({ "C", "B", "A" }), msystem.create_state({ "C", "A", "A" }), v2_trans_BA), "Multivar System: applying transition");
+}
+
 void test_combined_systems()
 {
 	using cvsystem_t = transition_system<combinedvar_system>;
@@ -139,9 +172,10 @@ void test_combined_systems()
 	assert_test(csystem.difference(cvsystem_t::state_t({ 0, 0, 1, 0, 0 }, { 1.0f, 1.0f, 1.0f }), cvsystem_t::state_t({ 0, 0, 0, 1, 0 }, { 1.0f, 1.5f, 1.0f })) == cd_trans, "Combined Var System: state difference");
 }
 
-void test_multivar_systems()
+void test_varset_systems()
 {
 	test_boolvar_systems();
 	test_floatvar_systems();
+	test_multivar_systems();
 	test_combined_systems();
 }
