@@ -14,6 +14,10 @@ public:
 	using block_t = typename S::value_type;
 	static_assert(sizeof(block_t) % 4096 == 0, "Invalid block_t size for file!");
 
+	cached_file_wrapper(const std::string & file_name = "cached_file.dat")
+		:m_storage(file_name)
+	{}
+
 	size_t size() const
 	{
 		return m_storage.size();
@@ -306,8 +310,8 @@ class buffered_complex_hashset : public complex_hashset_base<T, S, W, H>
 	};
 	
 public:
-	buffered_complex_hashset(const S & ss)
-		:_Base(ss)
+	buffered_complex_hashset(const S & ss, const std::string & name = "default_hashset")
+		:_Base(ss, name)
 	{
 		//Create one empty block
 		size_t first_block_id = request_block();

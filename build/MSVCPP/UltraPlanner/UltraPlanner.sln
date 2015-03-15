@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RubikGenerator", "RubikGene
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RubikSolver", "RubikSolver\RubikSolver.vcxproj", "{5EDE3794-879E-4479-9F51-DD9A6D5579CD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hannoi", "hannoi", "{0F905147-3CDB-466C-8CFC-129470946764}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -340,6 +342,7 @@ Global
 		{E2A16588-286C-4CC6-A8F1-8D358758B3C7} = {F5C2D30B-FFD0-4A90-900E-D913DD6DAC2F}
 		{A2CC0A94-6301-4115-8F16-4CAC4ED82B8B} = {3BC67458-DF5D-4F3F-9FE9-0E2CF9E904CF}
 		{5EDE3794-879E-4479-9F51-DD9A6D5579CD} = {3BC67458-DF5D-4F3F-9FE9-0E2CF9E904CF}
+		{0F10E89C-7668-4A5E-8158-EE294818C6C8} = {0F905147-3CDB-466C-8CFC-129470946764}
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

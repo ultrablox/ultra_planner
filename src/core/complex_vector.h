@@ -28,6 +28,15 @@ protected:
 	typedef typename std::conditional<ExtMem, ext_base_vec_t, int_ext_base_vec_t>::type base_vec_t;
 
 public:
+
+	complex_vector_base(const std::string & file_name = "")
+	{}
+
+	/*template<typename... Args>
+	complex_vector_base(Args... args)
+		:m_data(args...)
+	{}*/
+
 	void clear()
 	{
 		m_data.clear();
@@ -44,7 +53,7 @@ protected:
 
 template<bool ExtMem, bool BlockLargerThanElement> class grained_vector_base {};
 
-#define VECTOR_BLOCK_SIZE 65536
+#define VECTOR_BLOCK_SIZE 32768
 
 template<bool ExtMem>
 class grained_vector_base<ExtMem, true> : public complex_vector_base<ExtMem, VECTOR_BLOCK_SIZE>
@@ -53,8 +62,8 @@ class grained_vector_base<ExtMem, true> : public complex_vector_base<ExtMem, VEC
 protected:
 	using block_t = typename _Base::block_t;
 public:
-	grained_vector_base(size_t serialized_value_size)
-		:m_elementsPerBlock(_Base::BlockSize / serialized_value_size), m_size(0)
+	grained_vector_base(size_t serialized_value_size, const std::string & file_name = "grained_vector.dat")
+		:_Base(file_name), m_elementsPerBlock(_Base::BlockSize / serialized_value_size), m_size(0)
 	{
 		//cout << "Creating complex vector with block_size=" << _Base::BlockSize << ", " << m_elementsPerBlock << ", " << m_elementsPerBlock << " elements per block" << std::endl;
 		m_cache.item_count = 0;
@@ -119,7 +128,7 @@ protected:
 	using _Base = complex_vector_base<ExtMem, 8>;
 	using block_t = typename _Base::block_t;
 public:
-	grained_vector_base(size_t serialized_value_size)
+	grained_vector_base(size_t serialized_value_size, const std::string & file_name = "")
 		:m_elementSize(integer_ceil(serialized_value_size, _Base::BlockSize)), m_valueTmp(m_elementSize)
 	{
 		//cout << "Creating complex vector with element_size = " << serialized_value_size << ", block_size = " << _Base::BlockSize << " (" << m_elementSize << " blocks per element)" << std::endl;
@@ -318,8 +327,8 @@ public:
 	typedef iterator_base<const _Self> const_iterator;
 	*/
 
-	complex_vector(const streamer_t & _steamer)
-		:_Base(_steamer.serialized_size()), m_streamer(_steamer)
+	complex_vector(const streamer_t & _steamer, const std::string & file_name = "vector.dat")
+		:_Base(_steamer.serialized_size(), file_name), m_streamer(_steamer)
 	{}
 
 	value_type operator[](size_t index) const

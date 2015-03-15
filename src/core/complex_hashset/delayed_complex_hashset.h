@@ -144,7 +144,7 @@ class delayed_complex_hashset: public complex_hashset_base<T, S, W, H>
 	struct merge_task
 	{
 		merge_task(delayed_complex_hashset *executor, chain_info_t & info, size_t first_block_index, typename request_container_t::iterator begin, typename request_container_t::iterator end, std::atomic<int> & new_block_counter, tbb::concurrent_vector<std::pair<size_t, chain_info_t>> & new_indices)
-		:m_exec(executor), m_chainInfo(info), m_firstBlockIndex(first_block_index), m_begin(begin), m_end(end), m_newBlockCounter(new_block_counter), m_newIndices(new_indices)
+			:m_exec(executor), m_chainInfo(info), m_firstBlockIndex(first_block_index), m_begin(begin), m_end(end), m_newBlockCounter(new_block_counter), m_newIndices(new_indices)
 		{}
 
 		void operator()()
@@ -161,7 +161,7 @@ class delayed_complex_hashset: public complex_hashset_base<T, S, W, H>
 	};
 
 public:
-	delayed_complex_hashset(const S & ss)
+	delayed_complex_hashset(const S & ss, const std::string & name = "default_hashset")
 		:_Base(ss), m_threadPool(20), m_controllerThread(&delayed_complex_hashset::merge_loop, this)
 	{
 		_Base::m_blocks.append(block_t(0));

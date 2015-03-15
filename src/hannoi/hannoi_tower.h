@@ -271,6 +271,11 @@ public:
 		return m_size;
 	}
 
+	float transition_cost(const state_t&, const transition_t&) const
+	{
+		return 1.0f;
+	}
+
 	/*float transition_cost(transition_t) const
 	{
 		return 1.0f;

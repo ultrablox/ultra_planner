@@ -108,10 +108,10 @@ public:
 
 
 	search_database(const state_streamer_t & ss)
-		:m_searchNodes(node_streamer_t(ss)), m_nodeCount(0), m_stateStreamer(ss)//, m_storages(storage_count, m_stateStreamer)
+		:m_searchNodes(node_streamer_t(ss), "search_nodes.dat"), m_nodeCount(0), m_stateStreamer(ss)//, m_storages(storage_count, m_stateStreamer)
 	{
 		for (int i = 0; i < storage_count; ++i)
-			m_storages.emplace_back(m_stateStreamer);
+			m_storages.emplace_back(m_stateStreamer, to_string("hashset_" + to_string(i) + ".dat"));
 	}
 
 	search_database(const search_database &) = delete;

@@ -9,7 +9,7 @@
 #include <vector>
 #include <functional>
 
-#define COMMENT_EVENTS 1
+#define COMMENT_EVENTS 0
 
 struct node_estimation_t
 {

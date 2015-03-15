@@ -23,7 +23,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
     <LocalDebuggerWorkingDirectory>../../../../bin/</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-a "A*" -s ext "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p01-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p01.pddl"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-a "A*" -s ext "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\openstacks-strips\p01-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\openstacks-strips\p01.pddl"</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
     <LocalDebuggerCommandArguments>-a "A*" -s ext "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p05-domain.pddl" "D:\Dropbox\Institute\Aspiranture\Dissertation\PDDL\ipc2008.DOMAINS\seq-opt\elevators-strips\p05.pddl"</LocalDebuggerCommandArguments>
