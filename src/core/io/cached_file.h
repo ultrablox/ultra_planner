@@ -2,13 +2,9 @@
 #ifndef USERDB_CACHED_FILE_H_
 #define USERDB_CACHED_FILE_H_
 
+#include "../config.h"
 #include "cache.h"
-
-#ifdef WIN32
-    #include "data_file_win.h"
-#else
-    #include "data_file_unix.h"
-#endif
+#include "data_file.h"
 
 struct cached_file_stats_t
 {
@@ -91,6 +87,10 @@ public:
 		return m_stats;
 	}
 
+	bool empty() const
+	{
+		return (m_count == 0);
+	}
 private:
     data_file<record_t> m_file;
 	cached_file_stats_t m_stats;

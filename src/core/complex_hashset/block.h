@@ -2,6 +2,8 @@
 #ifndef UltraCore_block_h
 #define UltraCore_block_h
 
+#include <limits>
+
 template<unsigned int S>
 struct hashset_block
 {

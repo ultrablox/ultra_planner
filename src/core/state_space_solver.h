@@ -69,7 +69,7 @@ public:
 		using heuristic_t = HeuristicT<transition_system_t>;
 		if (ext_mem)
 		{
-			UExternalMemoryController ext_memory_ctrl;
+			//UExternalMemoryController ext_memory_ctrl;
 			return select_memory<true, heuristic_t>(alg_name);
 		}
 		else

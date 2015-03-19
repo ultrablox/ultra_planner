@@ -6,7 +6,7 @@
 #include "../utils/helpers.h"
 #include "../algorithm/algorithm.h"
 #include "../algorithm/merge.h"
-#include "../cached_file.h"
+#include "../io/cached_file.h"
 #include <functional>
 #include <map>
 #include <stxxl.h>

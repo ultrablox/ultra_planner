@@ -2,9 +2,9 @@
 #ifndef UltraSolver_search_queue_h
 #define UltraSolver_search_queue_h
 
-#include <core/complex_vector.h>
-#include <core/complex_queue.h>
-#include <core/complex_stack.h>
+#include <core/containers/complex_vector.h>
+#include <core/containers/complex_queue.h>
+#include <core/containers/complex_stack.h>
 #include <map>
 #include <vector>
 #include <functional>
@@ -160,7 +160,7 @@ public:
 		else
 		{
 			bool res = m_primaryData.empty() ? true : m_cmp(val.first, m_primaryData.begin()->first);
-			m_primaryData.insert(make_pair(val.first, new layer_container_t(m_nodeStreamer, val)));
+			m_primaryData.insert(make_pair(val.first, new layer_container_t(m_nodeStreamer, val, "queue_layer_" + to_string(val.first))));
 
 #if COMMENT_EVENTS
 			if (res)

@@ -153,7 +153,7 @@ public:
 	using storage_t = S;
 	using block_t = typename S::value_type;
 	
-	vector_wrapper()
+	vector_wrapper(const std::string & fake_name = "any")
 	{
 		m_storage.reserve(1000);
 	}

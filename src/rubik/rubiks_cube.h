@@ -5,7 +5,7 @@
 #include <vector>
 #include <array>
 #include <core/utils/helpers.h>
-#include <core/streamer.h>
+#include <core/io/streamer.h>
 #include <core/hash.h>
 #include <core/compressed_stream.h>
 #include <numeric>

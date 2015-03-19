@@ -2,7 +2,7 @@
 #ifndef USERDB_DATA_FILE_H_
 #define USERDB_DATA_FILE_H_
 
-#include "utils/helpers.h"
+#include "../utils/helpers.h"
 #include <mutex>
 #include <iostream>
 #include <windows.h>
@@ -40,7 +40,7 @@ public:
     data_file(const std::string & file_name = "unnamed")
 		:m_fileName(file_name), m_blockCount(0), m_hFile(0), m_asyncCache(20000), m_pendingCount(0)
     {
-		cout << "Creating data file: " << m_fileName << std::endl;
+		//cout << "Creating data file: " << m_fileName << std::endl;
 		m_hFile = CreateFileW(to_wstring(file_name).c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_NO_BUFFERING, NULL);
 
 		if (m_hFile == INVALID_HANDLE_VALUE)
@@ -60,11 +60,7 @@ public:
 
     ~data_file()
     {
-		if (m_hFile != 0)
-		{
-			cout << "Deleting data file: " << m_fileName << std::endl;
-			CloseHandle(m_hFile);
-		}
+		close();
     }
 
 	/*int open(const std::string file_name)
@@ -176,6 +172,16 @@ public:
 		return res ? 0 : 1;
     }
 
+	void read_range(block_type * buf_begin, size_t first_id, size_t block_count)
+	{
+		OVERLAPPED ol = to_win_address(first_id);
+		DWORD bytes_read(0);
+		bool res = ReadFile(m_hFile, buf_begin, sizeof(block_type)* block_count, &bytes_read, &ol);
+
+		if (!res)
+			cout << "Read failed" << std::endl;
+	}
+
 	struct read_req_t
 	{
 		read_req_t()
@@ -225,6 +231,9 @@ public:
 
     void clear()
     {
+		DWORD ptr = SetFilePointer(m_hFile, 0, NULL, FILE_BEGIN);
+		bool r = SetEndOfFile(m_hFile);
+		m_blockCount = 0;
         /*int r = truncate(m_fileName.c_str(), 0);
         if(r != 0)
             cout << "Unable to truncate file!" << std::endl;*/
@@ -233,6 +242,27 @@ public:
 	int cache_size() const
 	{
 		return 0;
+	}
+
+	bool empty() const
+	{
+		return (m_blockCount == 0);
+	}
+
+	void remove()
+	{
+		close();
+		::remove(m_fileName.c_str());
+	}
+
+	void close()
+	{
+		if (m_hFile != 0)
+		{
+			//cout << "Deleting data file: " << m_fileName << std::endl;
+			CloseHandle(m_hFile);
+			m_hFile = NULL;
+		}
 	}
 private:
 	void seek(size_t index)

@@ -3,7 +3,8 @@
 #ifndef UltraCore_complex_queue_h
 #define UltraCore_complex_queue_h
 
-#include "streamer.h"
+#include "../io/streamer.h"
+#include "external_queue.h"
 #include <stxxl/queue>
 #include <stdexcept>
 
@@ -12,7 +13,6 @@ class complex_queue
 {
 	using value_type = T;
 	using streamer_t = S;
-
 
 	struct block_t
 	{
@@ -26,18 +26,18 @@ class complex_queue
 		char data[DataSize];
 	};
 
-
-	using base_container_t = typename std::conditional<ExtMem, stxxl::queue<block_t>, std::queue<block_t>>::type;
+	//using external_cont = stxxl::queue<block_t>;
+	using external_cont = external_queue<block_t>;
+	using base_container_t = typename std::conditional<ExtMem, external_cont, named_queue<block_t>>::type;
 
 public:
-	complex_queue(const streamer_t & streamer)
-		:m_streamer(streamer), m_valsPerBlock(block_t::DataSize / streamer.serialized_size()), m_size(0)
+	complex_queue(const streamer_t & streamer, const std::string & file_name)
+		:m_streamer(streamer), m_valsPerBlock(block_t::DataSize / streamer.serialized_size()), m_size(0), m_baseContainer(file_name)
 	{
-
 	}
 
-	complex_queue(const streamer_t & streamer, const value_type & first_val)
-		:m_streamer(streamer), m_valsPerBlock(block_t::DataSize / streamer.serialized_size()), m_size(0)
+	complex_queue(const streamer_t & streamer, const value_type & first_val, const std::string & file_name)
+		:m_streamer(streamer), m_valsPerBlock(block_t::DataSize / streamer.serialized_size()), m_size(0), m_baseContainer(file_name)
 	{
 		push(first_val);
 	}

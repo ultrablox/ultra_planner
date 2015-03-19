@@ -37,6 +37,12 @@
     <Filter Include="src\search_algorithms">
       <UniqueIdentifier>{18490d11-43b9-4812-9a0a-0267158e0a1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\containers">
+      <UniqueIdentifier>{2faed326-591d-44a5-a45c-b21ee8268b2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\io">
+      <UniqueIdentifier>{dd0e4f8b-e3c1-4ac2-9426-7a0feb0af3ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\core\utils\helpers.cpp">
@@ -51,9 +57,6 @@
     <ClCompile Include="..\..\..\..\src\core\UExternalMemoryController.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\core\data_file.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\core\bit_container.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -62,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\core\numeric_expression.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\core\io\data_file.cpp">
+      <Filter>src\io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,34 +95,16 @@
     <ClInclude Include="..\..\..\..\src\core\algorithm\math.h">
       <Filter>src\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\cache.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\cached_file.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\algorithm\merge.h">
       <Filter>src\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\complex_vector.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\UExternalMemoryController.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\streamer.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\complex_queue.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\avl_tree.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\byte_range.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\complex_stack.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\delayed_buffer.h">
@@ -144,9 +132,6 @@
       <Filter>src\complex_hashset</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\thread_pool.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\core\data_file_win.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\compressed_stream.h">
@@ -217,6 +202,36 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\core\varset_system\multivar_system.h">
       <Filter>src\varset_system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\containers\complex_queue.h">
+      <Filter>src\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\containers\complex_stack.h">
+      <Filter>src\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\containers\complex_vector.h">
+      <Filter>src\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\io\cache.h">
+      <Filter>src\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\io\cached_file.h">
+      <Filter>src\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\io\data_file_win.h">
+      <Filter>src\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\containers\external_vector.h">
+      <Filter>src\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\containers\external_queue.h">
+      <Filter>src\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\io\data_file.h">
+      <Filter>src\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\core\io\streamer.h">
+      <Filter>src\io</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

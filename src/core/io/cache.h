@@ -35,6 +35,7 @@ struct cached_record
 	{
 		return m_modified;
 	}
+
     //mutex mtx;
     //std::atomic<int> access_counter;
     
@@ -161,6 +162,7 @@ public:
 		m_cachedArray[cache_index].set_modified();
         m_index.insert(make_pair(key, cache_index));
     }
+
 private:
 
 

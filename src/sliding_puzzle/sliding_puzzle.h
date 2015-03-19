@@ -3,7 +3,7 @@
 #define UltraTest_sliding_puzzle_h
 
 #include <core/algorithm/math.h>
-#include <core/streamer.h>
+#include <core/io/streamer.h>
 #include <core/utils/helpers.h>
 #include <core/hash.h>
 #include <core/compressed_stream.h>

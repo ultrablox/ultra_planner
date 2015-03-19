@@ -5,7 +5,7 @@
 #include "rubiks_cube.h"
 #include <core/algorithm/math.h>
 #include <core/algorithm/graph.h>
-#include <core/streamer.h>
+#include <core/io/streamer.h>
 #include <core/search_algorithms/bfs_engine.h>
 #include <array>
 #include <iostream>

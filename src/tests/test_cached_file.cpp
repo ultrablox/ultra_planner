@@ -1,5 +1,5 @@
 
-#include <core/cached_file.h>
+#include <core/io/cached_file.h>
 #include <random>
 #include "test_helpers.h"
 

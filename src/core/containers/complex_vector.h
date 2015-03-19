@@ -2,8 +2,9 @@
 #ifndef UltraCore_complex_vector_h
 #define UltraCore_complex_vector_h
 
-#include "utils/helpers.h"
-#include "streamer.h"
+#include "../utils/helpers.h"
+#include "../io/streamer.h"
+#include "external_vector.h"
 #include <functional>
 #include <vector>
 #include <type_traits>
@@ -11,6 +12,13 @@
 
 using namespace std;
 
+template<typename T>
+class named_vector : public std::vector<T>
+{
+public:
+	named_vector(const std::string & fake_name)
+	{}
+};
 
 template<bool ExtMem, int BS>
 class complex_vector_base
@@ -23,13 +31,15 @@ protected:
 		char data[BlockSize];
 	};
 
-	typedef typename stxxl::VECTOR_GENERATOR<block_t>::result ext_base_vec_t;
-	typedef std::vector<block_t> int_ext_base_vec_t;
-	typedef typename std::conditional<ExtMem, ext_base_vec_t, int_ext_base_vec_t>::type base_vec_t;
+	//using ext_base_vec_t = typename stxxl::VECTOR_GENERATOR<block_t>::result;
+	using ext_base_vec_t = external_vector<block_t>;
+	using int_ext_base_vec_t = named_vector<block_t>;
+	using base_vec_t = typename std::conditional<ExtMem, ext_base_vec_t, int_ext_base_vec_t>::type;
 
 public:
 
 	complex_vector_base(const std::string & file_name = "")
+		:m_data(file_name)
 	{}
 
 	/*template<typename... Args>

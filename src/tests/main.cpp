@@ -48,6 +48,7 @@ void test_block_chain();
 void test_hannoi_tower_core();
 void test_compressed_stream();
 void test_varset_systems();
+void test_external_containers();
 
 int main()
 {
@@ -62,6 +63,7 @@ int main()
 	test_rubik_core();
 	test_varset_systems();
 
+	test_external_containers();
 	test_complex_vector();
 	
 	test_complex_queue();

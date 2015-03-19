@@ -3,7 +3,7 @@
 #ifndef UltraCore_complex_stack_h
 #define UltraCore_complex_stack_h
 
-#include "streamer.h"
+#include "../io/streamer.h"
 #include <stxxl/stack>
 #include <stack>
 #include <stdexcept>

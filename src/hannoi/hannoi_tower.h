@@ -2,7 +2,7 @@
 #ifndef HannoiTower_h
 #define HannoiTower_h
 
-#include <core/streamer.h>
+#include <core/io/streamer.h>
 #include <core/hash.h>
 #include <utility>
 #include <vector>

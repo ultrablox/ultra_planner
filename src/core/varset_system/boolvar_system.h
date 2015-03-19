@@ -5,7 +5,7 @@
 #include "varset_system_base.h"
 #include "../bit_container.h"
 #include "../masked_bit_vector.h"
-#include "../streamer.h"
+#include "../io/streamer.h"
 #include "../compressed_stream.h"
 
 struct boolvar_transition_base

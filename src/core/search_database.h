@@ -2,7 +2,7 @@
 #ifndef UltraSolver_search_database_h
 #define UltraSolver_search_database_h
 
-#include <core/complex_vector.h>
+#include <core/containers/complex_vector.h>
 #include <core/complex_hashset/generator.h>
 #include <utility>
 #include <unordered_set>

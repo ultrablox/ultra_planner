@@ -4,7 +4,7 @@
 
 #include "sliding_puzzle.h"
 #include <core/algorithm/math.h>
-#include <core/streamer.h>
+#include <core/io/streamer.h>
 #include <array>
 #include <iostream>
 #include <iomanip>

@@ -1,8 +1,8 @@
 
 #include "test_helpers.h"
-#include <core/complex_vector.h>
-#include <core/complex_queue.h>
-#include <core/complex_stack.h>
+#include <core/containers/complex_vector.h>
+#include <core/containers/complex_queue.h>
+#include <core/containers/complex_stack.h>
 #include <core/complex_hashset/generator.h>
 #include <random>
 #include <chrono>
@@ -404,7 +404,7 @@ void test_complex_hashmap()
 void test_complex_queue()
 {
 	complex_element_streamer streamer;
-	complex_queue<complex_element, complex_element_streamer> cq(streamer);
+	complex_queue<complex_element, complex_element_streamer> cq(streamer, "test_queue.dat");
 
 	std::queue<complex_element> correct_queue;
 

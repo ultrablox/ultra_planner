@@ -275,8 +275,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\core\data_file.cpp" />
     <ClCompile Include="..\..\..\..\src\core\bit_container.cpp" />
+    <ClCompile Include="..\..\..\..\src\core\io\data_file.cpp" />
     <ClCompile Include="..\..\..\..\src\core\masked_bit_vector.cpp" />
     <ClCompile Include="..\..\..\..\src\core\numeric_expression.cpp" />
     <ClCompile Include="..\..\..\..\src\core\UError.cpp" />
@@ -294,20 +294,24 @@
     <ClInclude Include="..\..\..\..\src\core\complex_hashset\delayed_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_hashset\direct_complex_hashset.h" />
     <ClInclude Include="..\..\..\..\src\core\complex_hashset\generator.h" />
-    <ClInclude Include="..\..\..\..\src\core\complex_queue.h" />
-    <ClInclude Include="..\..\..\..\src\core\complex_stack.h" />
-    <ClInclude Include="..\..\..\..\src\core\complex_vector.h" />
     <ClInclude Include="..\..\..\..\src\core\compressed_stream.h" />
-    <ClInclude Include="..\..\..\..\src\core\data_file_win.h" />
+    <ClInclude Include="..\..\..\..\src\core\containers\complex_queue.h" />
+    <ClInclude Include="..\..\..\..\src\core\containers\complex_stack.h" />
+    <ClInclude Include="..\..\..\..\src\core\containers\complex_vector.h" />
+    <ClInclude Include="..\..\..\..\src\core\containers\external_queue.h" />
+    <ClInclude Include="..\..\..\..\src\core\containers\external_vector.h" />
     <ClInclude Include="..\..\..\..\src\core\delayed_buffer.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\algorithm.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\graph.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\math.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\merge.h" />
     <ClInclude Include="..\..\..\..\src\core\algorithm\sort.h" />
-    <ClInclude Include="..\..\..\..\src\core\cache.h" />
-    <ClInclude Include="..\..\..\..\src\core\cached_file.h" />
     <ClInclude Include="..\..\..\..\src\core\config.h" />
+    <ClInclude Include="..\..\..\..\src\core\io\cache.h" />
+    <ClInclude Include="..\..\..\..\src\core\io\cached_file.h" />
+    <ClInclude Include="..\..\..\..\src\core\io\data_file.h" />
+    <ClInclude Include="..\..\..\..\src\core\io\data_file_win.h" />
+    <ClInclude Include="..\..\..\..\src\core\io\streamer.h" />
     <ClInclude Include="..\..\..\..\src\core\masked_bit_vector.h" />
     <ClInclude Include="..\..\..\..\src\core\numeric_expression.h" />
     <ClInclude Include="..\..\..\..\src\core\problem_instance_generator.h" />
@@ -322,7 +326,6 @@
     <ClInclude Include="..\..\..\..\src\core\search_database.h" />
     <ClInclude Include="..\..\..\..\src\core\search_queue.h" />
     <ClInclude Include="..\..\..\..\src\core\state_space_solver.h" />
-    <ClInclude Include="..\..\..\..\src\core\streamer.h" />
     <ClInclude Include="..\..\..\..\src\core\thread_pool.h" />
     <ClInclude Include="..\..\..\..\src\core\transition_system.h" />
     <ClInclude Include="..\..\..\..\src\core\bit_container.h" />
