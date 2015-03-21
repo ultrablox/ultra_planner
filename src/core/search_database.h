@@ -62,9 +62,12 @@ public:
 			return (lhs.state == rhs.state);
 		}
 
-		size_t id, parent_id;
+		//struct{
+			size_t id, parent_id;
+			float length;
+		//} meta;
+		
 		state_t state;
-		float length;
 	};
 	
 	class node_streamer_t
@@ -282,6 +285,11 @@ public:
 	{
 		for (auto & storage : m_storages)
 			storage.get_merged();
+	}
+
+	size_t nodes_dump_size() const
+	{
+		return m_searchNodes.dump_size();
 	}
 public:
 	//std::function<void(void*, const search_node_t&)> m_nodeSerializeFun;

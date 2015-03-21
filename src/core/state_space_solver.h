@@ -48,7 +48,7 @@ class state_space_solver
 public:
 
 	state_space_solver(std::istream & in_stream, std::ostream & out_stream)
-		:m_system(transition_system_t::deserialize_problem_size(in_stream)), m_initialState(m_system.size()), m_outStream(out_stream), m_goalChecker(m_system), m_detailedPlan(true)
+		:m_system(transition_system_t::deserialize_problem_size(in_stream)), m_initialState(m_system.size()), m_outStream(out_stream), m_goalChecker(m_system), m_detailedPlan(false)
 	{
 		m_system.deserialize_state(in_stream, m_initialState);
 

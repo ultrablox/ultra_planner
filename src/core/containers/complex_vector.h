@@ -18,6 +18,11 @@ class named_vector : public std::vector<T>
 public:
 	named_vector(const std::string & fake_name)
 	{}
+
+	size_t dump_size() const
+	{
+		return 0;
+	}
 };
 
 template<bool ExtMem, int BS>
@@ -55,6 +60,11 @@ public:
 	bool empty() const
 	{
 		return m_data.empty();
+	}
+
+	size_t dump_size() const
+	{
+		return m_data.dump_size();
 	}
 
 protected:

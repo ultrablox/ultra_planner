@@ -44,6 +44,11 @@ public:
 			return const_cast<base_container_t&>(m_cachedFile)[index];
 		}
 	}
+
+	size_t dump_size() const
+	{
+		return m_cachedFile.file().mem_size();
+	}
 private:
 	base_container_t m_cachedFile;
 };

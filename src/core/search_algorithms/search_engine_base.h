@@ -27,6 +27,7 @@ public:
 	{
 		size_t state_count;
 		std::vector<hashset_stats_t> storage_stats;
+		size_t nodes_dump_size;
 	};
 
 	//enum class state_state_t {Unknown, Discovered, Expanded};
@@ -104,6 +105,7 @@ public:
 		StatsT res;
 		res.state_count = m_database.state_count();
 		res.storage_stats = m_database.storages_stats();
+		res.nodes_dump_size = m_database.nodes_dump_size();
 		return res;
 	}
 
@@ -112,6 +114,7 @@ public:
 		os << "node_count: " << stats.state_count << std::endl;
 		//os << "Database hashset block count: " << stats.database_block_count << std::endl;
 		//os << "Database density: " << stats.database_density << std::endl;
+		os << "nodes_dump_size: " << stats.nodes_dump_size << std::endl;
 		os << stats.storage_stats[0];
 		return os;
 	}

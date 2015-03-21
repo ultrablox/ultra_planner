@@ -263,6 +263,13 @@ public:
 			m_hFile = NULL;
 		}
 	}
+
+	size_t mem_size() const
+	{
+		LARGE_INTEGER lFileSize;
+		bool res = GetFileSizeEx(m_hFile, &lFileSize);
+		return static_cast<size_t>(lFileSize.QuadPart);
+	}
 private:
 	void seek(size_t index)
 	{

@@ -91,6 +91,11 @@ public:
 	{
 		return (m_count == 0);
 	}
+
+	const data_file<record_t> & file() const
+	{
+		return m_file;
+	}
 private:
     data_file<record_t> m_file;
 	cached_file_stats_t m_stats;
