@@ -125,8 +125,7 @@ public:
 	void write_range(block_type * buf_begin, size_t first_id, size_t block_count)
 	{
 		//cout << "Writing sequence of " << block_count << std::endl;
-		OVERLAPPED ol = { 0 };
-		ol.Offset = first_id * sizeof(block_type);
+		OVERLAPPED ol = to_win_address(first_id);
 		bool r = WriteFile(m_hFile, buf_begin, sizeof(block_type)* block_count, &m_bytesWritten, &ol);
 		m_blockCount = max(m_blockCount, first_id + block_count);
 	}
