@@ -2,7 +2,7 @@
 #ifndef USERDB_DATA_FILE_H_
 #define USERDB_DATA_FILE_H_
 
-#include "utils/helpers.h"
+#include "../utils/helpers.h"
 #include <mutex>
 #include <iostream>
 #include <list>
@@ -44,7 +44,7 @@ public:
     data_file(const std::string & file_name = "unnamed")
 		:m_fileName(file_name), m_blockCount(0)
     {
-		cout << "Creating data file: " << m_fileName << std::endl;
+		//cout << "Creating data file: " << m_fileName << std::endl;
         m_fileDescriptor = ::open(file_name.c_str(), O_RDWR | O_CREAT, 0644);
         if(m_fileDescriptor == -1)
             throw runtime_error("Unable to open file with unix API");
@@ -67,14 +67,18 @@ public:
         if(n_write == -1)
             cout << "Write failed: " << strerror(errno) << std::endl;
 
+        m_blockCount = max(m_blockCount, index + 1);
+
         return (n_write != sizeof(block_type));
     }
 
 	void write_range(block_type * buf_begin, size_t first_id, size_t block_count)
 	{
-        int n_write = pwrite(m_fileDescriptor, buf_begin, sizeof(block_type) * block_count, sizeof(block_type) * first_id);
+        /*int n_write = pwrite(m_fileDescriptor, buf_begin, sizeof(block_type) * block_count, sizeof(block_type) * first_id);
         if(n_write == -1)
-            cout << "Write failed: " << strerror(errno) << std::endl;
+            cout << "Write failed: " << strerror(errno) << std::endl;*/
+        for(int i = 0; i < block_count; ++i)
+            set(first_id + i, *(buf_begin + i));
 	}
 
     void write_range_async(block_type * buf_begin, size_t first_id, size_t block_count)
@@ -149,6 +153,20 @@ public:
         return (n_read != sizeof(block_type));
     }
 
+    //http://en.wikipedia.org/wiki/Vectored_I/O
+    void read_range(block_type * buf_begin, size_t first_id, size_t block_count)
+    {
+        /*int n_read = pread(m_fileDescriptor, buf_begin, sizeof(block_type)*block_count, sizeof(block_type)*first_id);
+        if(n_read == -1)
+        {
+            cout << "Read range failed (index=" << first_id << ", count=" << block_count << "): " << strerror(errno) << std::endl;
+            throw runtime_error("I/O failed");
+        }*/
+
+        for(int i = 0; i < block_count; ++i)
+            get(first_id + i, *(buf_begin + i));
+    }
+
 	struct read_req_t
 	{
 		read_req_t()
@@ -180,15 +198,29 @@ public:
 
     void clear()
     {
-        /*int r = truncate(m_fileName.c_str(), 0);
+        int r = truncate(m_fileName.c_str(), 0);
+        m_blockCount = 0;
         if(r != 0)
-            cout << "Unable to truncate file!" << std::endl;*/
+            cout << "Unable to truncate file!" << std::endl;
     }
 
 	int cache_size() const
 	{
 		return 0;
 	}
+
+    void remove()
+    {
+        close(m_fileDescriptor);
+        ::remove(m_fileName.c_str());
+    }
+
+    size_t mem_size() const
+    {
+        struct stat stat_buf;
+        int rc = fstat(m_fileDescriptor, &stat_buf);
+        return rc == 0 ? stat_buf.st_size : 0;
+    }
 private:
     std::string m_fileName;
 	size_t m_blockCount;

@@ -10,13 +10,17 @@
     #else
     	#define ULTRA_CORE_API 
     #endif
+
+    #define USE_INTRINSIC 1
 #else
     #define ULTRA_CORE_API 
+
+    #define USE_INTRINSIC 0
 #endif
 
 #define USE_HDD_STORAGE 1
 
-#define USE_INTRINSIC 1
+
 
 #define TRACE_SOLUTION 1
 

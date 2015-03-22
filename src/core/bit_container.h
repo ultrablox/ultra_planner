@@ -14,7 +14,8 @@
 #include <stdint.h>
 
 #if USE_INTRINSIC
-#include <intrin.h>
+//#include <intrin.h>
+#include <emmintrin.h>
 #endif
 
 using namespace std;
@@ -298,7 +299,7 @@ struct ULTRA_CORE_API bit_vector
 		return std::move(result);
 	}
 
-	BitReference bit_vector::operator[](size_t bit_index)
+	BitReference operator[](size_t bit_index)
 	{
 #if _DEBUG
 		assert(bit_index < mBitCount);
@@ -512,6 +513,7 @@ namespace std {
 template<>
 class hash<bit_vector>
 {
+
 public:
 
 	size_t operator()(const bit_vector & bv) const
@@ -529,7 +531,23 @@ public:
 		//return r;
 		return std::hash<bit_vector::value_type>()(r);*/
 
-		return _Hash_seq((const unsigned char *)bv.mData.data(), bv.mData.size() * sizeof(bit_vector::base_value_t));
+		//return _Hash_seq((const unsigned char *)bv.mData.data(), bv.mData.size() * sizeof(bit_vector::base_value_t));
+
+		auto __bits_per_word = sizeof(bit_vector::base_value_t) * 8;
+
+		size_t __h = 0;
+	    // do middle whole words
+	    size_t __n = bv.mBitCount;
+	    const bit_vector::base_value_t * __p = bv.mData.data();
+	    for (; __n >= __bits_per_word; ++__p, __n -= __bits_per_word)
+	        __h ^= *__p;
+	    // do last partial word
+	    if (__n > 0)
+	    {
+	        const bit_vector::base_value_t __m = ~bit_vector::base_value_t(0) >> (__bits_per_word - __n);
+	        __h ^= *__p & __m;
+	    }
+	    return __h;
 	}
 };
 }
