@@ -39,11 +39,14 @@ using std::insert_iterator;
 using std::unary_function;
 using std::for_each;
 
+namespace VAL
+{
 class operator_;
 class problem;
 class TypeChecker;
 class pddl_type;
 class const_symbol;
+};
 
 using std::vector;
 using std::map;
