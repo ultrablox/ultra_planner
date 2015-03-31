@@ -8,6 +8,8 @@ using namespace std;
 
 void test_bitset()
 {
+	cout << "Testing bitsets..." << std::endl;
+	
 	string res;
 	//Check that clear works fine
 	bit_vector bs(10);

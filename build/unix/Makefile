@@ -34,8 +34,8 @@ tests: libtests.a libcore.a
 	cp tests $(OUT_DIR)/tests
 
 libpddl.a:
-	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_DIR)/pddl/planning_task_converter.cpp $(SRC_DIR)/pddl/val_parser.cpp $(SRC_VAL_DIR)/FastEnvironment.cpp $(SRC_VAL_DIR)/SimpleEval.cpp $(SRC_VAL_DIR)/SASActions.cpp $(SRC_VAL_DIR)/ptree.cpp $(SRC_VAL_DIR)/pddl+.cpp $(SRC_VAL_DIR)/TypedAnalyser.cpp $(SRC_VAL_DIR)/typecheck.cpp $(SRC_VAL_DIR)/TimSupport.cpp $(SRC_VAL_DIR)/TIM.cpp $(SRC_VAL_DIR)/FuncAnalysis.cpp $(SRC_VAL_DIR)/instantiation.cpp $(SRC_VAL_DIR)/DebugWriteController.cpp $(SRC_VAL_DIR)/ToFunction.cpp
-	ar cr libpddl.a planning_task_converter.o val_parser.o FastEnvironment.o SimpleEval.o SASActions.o ptree.o pddl+.o TypedAnalyser.o typecheck.o TimSupport.o TIM.o FuncAnalysis.o instantiation.o DebugWriteController.o ToFunction.o
+	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_DIR)/pddl/planning_task_converter.cpp $(SRC_DIR)/pddl/val_parser.cpp $(SRC_VAL_DIR)/DebugWriteController.cpp $(SRC_VAL_DIR)/FuncAnalysis.cpp $(SRC_VAL_DIR)/instantiation.cpp $(SRC_VAL_DIR)/pddl+.cpp $(SRC_VAL_DIR)/ptree.cpp $(SRC_VAL_DIR)/SASActions.cpp $(SRC_VAL_DIR)/SimpleEval.cpp $(SRC_VAL_DIR)/TIM.cpp $(SRC_VAL_DIR)/TimSupport.cpp $(SRC_VAL_DIR)/typecheck.cpp $(SRC_VAL_DIR)/TypedAnalyser.cpp 
+	ar cr libpddl.a planning_task_converter.o val_parser.o DebugWriteController.o FuncAnalysis.o instantiation.o pddl+.o SimpleEval.o SASActions.o ptree.o TIM.o TimSupport.o typecheck.o TypedAnalyser.o
 
 libtests.a: 
 	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $(SRC_TESTS_DIR)/test_helpers.cpp $(SRC_TESTS_DIR)/test_avl_tree.cpp $(SRC_TESTS_DIR)/test_bitset.cpp $(SRC_TESTS_DIR)/test_block_chain.cpp $(SRC_TESTS_DIR)/test_cached_file.cpp $(SRC_TESTS_DIR)/test_complex_vector.cpp $(SRC_TESTS_DIR)/test_merge.cpp $(SRC_TESTS_DIR)/test_puzzle.cpp $(SRC_TESTS_DIR)/test_hannoi_tower.cpp $(SRC_TESTS_DIR)/test_rubik.cpp $(SRC_TESTS_DIR)/test_explicit_graph_search.cpp $(SRC_TESTS_DIR)/test_search.cpp $(SRC_TESTS_DIR)/test_sort.cpp $(SRC_TESTS_DIR)/test_multivar_systems.cpp $(SRC_TESTS_DIR)/test_compressed_stream.cpp $(SRC_TESTS_DIR)/test_external_containers.cpp

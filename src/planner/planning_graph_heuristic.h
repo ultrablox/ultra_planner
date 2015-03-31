@@ -261,6 +261,8 @@ public:
 				if (--tail_size == 0)
 					finished = true;
 				break;
+			default:
+				break;
 			}
 
 			m_cache.costs = m_cache.layer_costs;

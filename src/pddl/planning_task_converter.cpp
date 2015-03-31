@@ -163,15 +163,15 @@ int planning_task_converter::from_pddl_task(planning_task_t & planning_task, VAL
 
 	for(auto os : *(current_analysis->the_domain->ops))
     {
-    	//cout << os->name->getName() << "\n";
+    	cout << os->name->getName() << std::endl;
     	instantiatedOp::instantiate(os, current_analysis->the_problem,*theTC);
-    	//cout << instantiatedOp::howMany() << " so far\n";
+    	cout << instantiatedOp::howMany() << " so far" << std::endl;
     }
 
-	//cout << instantiatedOp::howMany() << "\n";
+	cout << instantiatedOp::howMany() << std::endl;
 	instantiatedOp::createAllLiterals(current_analysis->the_problem, theTC);
     instantiatedOp::filterOps(theTC);
-    //cout << instantiatedOp::howMany() << "\n";
+    cout << "Instantiated " << instantiatedOp::howMany() << " operators" << std::endl;
     //instantiatedOp::writeAll(cout);
 
 	//cout << "\nList of all literals:\n";
@@ -219,6 +219,7 @@ int planning_task_converter::from_pddl_task(planning_task_t & planning_task, VAL
 	int i = 0;
 	for(auto op_inst = instantiatedOp::opsBegin(); op_inst != instantiatedOp::opsEnd(); ++op_inst)
 	{
+		//cout << "Creating transition..." << std::endl;
 		bool good_trans = true;
 		combinedvar_system::transition_t transition(bool_vars.size(), float_vars.size());
 		transition.name = to_string(**op_inst);
@@ -470,7 +471,7 @@ void planning_task_t::optimize()
 
 void planning_task_t::optimize_const_bools()
 {
-	cout << "Goal before: ";
+	/*cout << "Goal before: ";
 	goal.bool_part.mask.for_each_true([&](int idx){
 		cout << varset_system.bool_part().var_names()[idx] << ',';
 	});
@@ -480,10 +481,10 @@ void planning_task_t::optimize_const_bools()
 	initial_state.bool_part.for_each_true([&](int idx){
 		cout << varset_system.bool_part().var_names()[idx] << std::endl;
 	});
-	cout << std::endl;
+	cout << std::endl;*/
 
 
-	cout << "Looking for const bool vars..." << std::endl;
+	cout << "Looking for const bool vars (" <<  varset_system.bool_part().size() << " total)..." << std::endl;
 	std::vector<bool> bool_vars(varset_system.bool_part().size(), false);
 
 	for (auto & tr : varset_system.transitions())

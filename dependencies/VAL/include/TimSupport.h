@@ -1210,7 +1210,7 @@ public:
 //			cout << "Mutex for " << i->first << " " << **(getIx(sa,i->first)) << " and " << i->second
 //					<< " " << **(getIx(sb,i->second)) << " " << i->one << " " << i->other << " " << 3*(i->one?i->one:1)+(i->other?i->other:1)
 //					<< "\n";
-				ms |= 1 << 3*(i->one?i->one-1:0)+(i->other?i->other-1:0);
+				ms |= (1 << 3*(i->one?i->one-1:0))+(i->other?i->other-1:0);
 			};
 		};
 		return ms;
