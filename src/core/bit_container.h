@@ -531,8 +531,9 @@ public:
 		//return r;
 		return std::hash<bit_vector::value_type>()(r);*/
 
-		//return _Hash_seq((const unsigned char *)bv.mData.data(), bv.mData.size() * sizeof(bit_vector::base_value_t));
-
+#ifdef WIN32
+		return _Hash_seq((const unsigned char *)bv.mData.data(), bv.mData.size() * sizeof(bit_vector::base_value_t));
+#else
 		auto __bits_per_word = sizeof(bit_vector::base_value_t) * 8;
 
 		size_t __h = 0;
@@ -548,6 +549,7 @@ public:
 	        __h ^= *__p & __m;
 	    }
 	    return __h;
+#endif
 	}
 };
 }

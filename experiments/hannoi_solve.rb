@@ -1,4 +1,7 @@
 
+require 'fileutils'
+include FileUtils
+
 SOLVER_PATH = ARGV[0]
 DOMAINS_DIR = ARGV[1]
 
@@ -32,6 +35,10 @@ def solve(domain_name, algorithm_name)
 		stats[parts[0]] = parts[1]
 	end
 	stats_file.close
+	
+	FileUtils.copy_file("stats.txt", domain_name + "_stats.txt")
+	FileUtils.copy_file("monitoring_data.csv", domain_name + "_monitoring_data.csv")
+	
 	File.delete("stats.txt")
 	
 	return stats

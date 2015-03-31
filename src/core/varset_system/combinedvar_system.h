@@ -266,7 +266,7 @@ struct combinedvar_system : public varset_system_base<combinedvar_system_base>
 		for (auto & tr : m_transitions)
 			tr.bool_part.build();
 
-		m_index.build(m_transitions.begin(), m_transitions.end());
+		//m_index.build(m_transitions.begin(), m_transitions.end());
 	}
 
 	template<typename F>
