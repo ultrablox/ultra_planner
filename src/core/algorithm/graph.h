@@ -107,6 +107,11 @@ public:
 		auto it = m_adjacentLists.find(vertex);
 		return it->second;
 	}
+
+	const std::unordered_set<vertex_t> get_vertices() const
+	{
+		return m_vertices;
+	}
 private:
 	std::unordered_set<vertex_t> m_vertices;
 	std::unordered_map<vertex_t, std::list<adjacent_vertex_t>> m_adjacentLists;
