@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <vector>
 #include <random>
+#include <queue>
+#include <map>
 #include "core/algorithm/graph.h"
 
 #define STATE_COMPRESSION 1
@@ -32,7 +34,28 @@ struct edfd_element
 	id_t id;
 	string name;
 	type_t type;
+
+	bool operator == (const edfd_element& rhs) const
+	{
+		return id == rhs.id && name == rhs.name && type == rhs.type;
+	}
 };
+
+namespace std
+{
+	template<>
+	struct hash<edfd_element>
+	{
+		std::size_t operator()(const edfd_element& vert) const
+		{
+			return id_hasher(vert.id) + name_hasher(vert.name) + type_hasher(vert.type);
+		}
+
+		std::hash<edfd_element::id_t> id_hasher;
+		std::hash<string> name_hasher;
+		std::hash<edfd_element::type_t> type_hasher;
+	};
+}
 
 struct edfd_connection
 {
@@ -75,6 +98,7 @@ public:
 	vector<transition_t> generate_transitions_from_state(const state_t & base_state) const
 	{
 		//for each sdp from available set try to find sdp-like subgraph in current state source graph
+		vector<transition_t> result;
 		const auto& source_vertices = base_state.src_graph.get_vertices();
 		for (size_t i = 0; i < sdps.size(); ++i)
 		{
@@ -90,27 +114,42 @@ public:
 						transition.new_sdp_instances = { i };
 
 						queue<edfd_element> elements_to_check;
-						set<edfd_element> used;
+						unordered_map<edfd_element, edfd_element> used; //maps sdp vertices to src_graph vertices
 						elements_to_check.push(sdp_vertex);
-						const auto& adj_vertices_in_source_graph = base_state.src_graph.adjacent_list(source_vertex);
-						while (!elements_to_check.empty())
+						bool fail = false;
+						while (!elements_to_check.empty() && !fail)
 						{
-							sdp.forall_adj_verts(elements_to_check.front(), [&elements_to_check, &adj_vertices_in_source_graph, &used](const edfd_element& vert)
+							auto curVertInSdp = elements_to_check.front();
+							auto curVertInSrcGraph = used[curVertInSdp];
+							
+							sdp.forall_adj_verts(curVertInSdp, [&](const edfd_element& vert, const edfd_connection& edge)
 							{
-								for (const auto& adj_vert_of_source_graph : adj_vertices_in_source_graph)
+								bool found = false;
+								base_state.src_graph.forall_adj_verts(curVertInSrcGraph, [&](const edfd_element& src_vert, const edfd_connection& src_edge)
 								{
-									if (vert.type == adj_vert_of_source_graph.vertex.type &&
-										(used.find(adj_vert_of_source_graph.vertex) == used.end())) //checking only types for now
+									if (vert.type == src_vert.type &&
+										(used.find(vert) == used.end())) //checking only types for now
 									{
-										used.insert(adj_vert_of_source_graph.vertex);
+										used[vert] = src_vert;
+										elements_to_check.push(vert);
+										found = true;
 									}
-								}
+								});
+								if (!found)
+									fail = true;
 							});
+						}
+						if (!fail)
+						{
+							for (const auto& vert : used)
+								transition.cover_difference[vert.second.id] = i;
+							result.push_back(transition);
 						}
 					}
 				}
 			}
 		}
+		return result;
 	}
 
 	template<typename F>
