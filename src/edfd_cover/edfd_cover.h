@@ -35,9 +35,9 @@ struct edfd_element
 	string name;
 	type_t type;
 
-	bool operator == (const edfd_element& rhs) const
+	friend bool operator == (const edfd_element& lhs, const edfd_element& rhs)
 	{
-		return id == rhs.id && name == rhs.name && type == rhs.type;
+		return lhs.id == rhs.id && lhs.name == rhs.name && lhs.type == rhs.type;
 	}
 };
 
@@ -71,16 +71,27 @@ struct edfd_cover_state
 	vector<size_t> cover; //what SDP instance is used to cover i-th edfd_element in source graph
 };
 
+struct edfd_cover_transition
+{
+	std::unordered_map<edfd_element::id_t, size_t> cover_difference; //new values for edfd_cover_state::cover fields
+	vector<size_t> new_sdp_instances; //values to append to edfd_cover_state::sdp_instances vector
+
+	friend bool operator < (const edfd_cover_transition& lhs, const edfd_cover_transition& rhs)
+	{
+		return *(int*)&lhs < *(int*)&rhs; //tmp implementation just for compile test
+	}
+	
+	friend bool operator == (const edfd_cover_transition& lhs, const edfd_cover_transition& rhs)
+	{
+		return lhs.cover_difference == rhs.cover_difference && lhs.new_sdp_instances == rhs.new_sdp_instances; //tmp implementation just for compile test
+	}
+};
+
 class edfd_cover
 {
 public:
 	typedef edfd_cover_state state_t;
-
-	struct transition_t
-	{
-		std::unordered_map<edfd_element::id_t, size_t> cover_difference; //new values for edfd_cover_state::cover fields
-		vector<size_t> new_sdp_instances; //values to append to edfd_cover_state::sdp_instances vector
-	};
+	typedef edfd_cover_transition transition_t;
 
 	edfd_cover()
 	{
@@ -156,8 +167,8 @@ public:
 	void forall_available_transitions(const state_t & base_state, F fun) const
 	{
 		vector<transition_t> available_transitions = generate_transitions_from_state(base_state);
-		for (const auto& transition : available_transitions)
-			F(transition);
+		for (const transition_t& transition : available_transitions)
+			fun(transition);
 	}
 protected:
 	vector<edfd_graph> sdps; //available set of SDPs to cover source graph

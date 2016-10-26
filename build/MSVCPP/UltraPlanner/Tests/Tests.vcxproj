@@ -283,6 +283,7 @@
     <ClCompile Include="..\..\..\..\src\tests\test_block_chain.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_complex_vector.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_compressed_stream.cpp" />
+    <ClCompile Include="..\..\..\..\src\tests\test_edfd_cover.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_explicit_graph_search.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_external_containers.cpp" />
     <ClCompile Include="..\..\..\..\src\tests\test_hannoi_tower.cpp" />

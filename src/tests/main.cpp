@@ -50,6 +50,8 @@ void test_compressed_stream();
 void test_varset_systems();
 void test_external_containers();
 
+void test_edfd_cover();
+
 int main()
 {
 	test_bitset();
@@ -70,14 +72,16 @@ int main()
 	test_complex_stack();
 
 	test_block_chain();
-	test_complex_hashmap();
-	test_cached_file();
+	//test_complex_hashmap();
+	//test_cached_file();
 
 	//test_matrix();
 
 	//test_sorting();
-	test_explicit_graph_search();
-	test_search();
+	//test_explicit_graph_search();
+	//test_search();
+
+	test_edfd_cover();
 
 	return 0;
 }
