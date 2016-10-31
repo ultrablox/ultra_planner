@@ -95,7 +95,11 @@ public:
 
 	edfd_cover()
 	{
+	}
 
+	edfd_cover(vector<edfd_graph> sdps) :
+		sdps(sdps)
+	{
 	}
 
 	void apply(state_t & state, transition_t cover_diff) const
@@ -126,15 +130,22 @@ public:
 
 						queue<edfd_element> elements_to_check;
 						unordered_map<edfd_element, edfd_element> used; //maps sdp vertices to src_graph vertices
+						unordered_set<edfd_element> visited; //sdp vertices already visited
+						used[sdp_vertex] = source_vertex;
 						elements_to_check.push(sdp_vertex);
 						bool fail = false;
 						while (!elements_to_check.empty() && !fail)
 						{
 							auto curVertInSdp = elements_to_check.front();
 							auto curVertInSrcGraph = used[curVertInSdp];
+							elements_to_check.pop();
 							
 							sdp.forall_adj_verts(curVertInSdp, [&](const edfd_element& vert, const edfd_connection& edge)
 							{
+								if (visited.find(vert) != visited.end()) //we have already visited this vertex
+									return;
+								visited.insert(vert);
+
 								bool found = false;
 								base_state.src_graph.forall_adj_verts(curVertInSrcGraph, [&](const edfd_element& src_vert, const edfd_connection& src_edge)
 								{
