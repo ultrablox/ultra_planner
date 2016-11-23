@@ -130,7 +130,8 @@ public:
 
 						queue<edfd_element> elements_to_check;
 						unordered_map<edfd_element, edfd_element> used; //maps sdp vertices to src_graph vertices
-						unordered_set<edfd_element> visited; //sdp vertices already visited
+						unordered_set<edfd_element> sdp_visited; //sdp vertices already visited
+						unordered_set<edfd_element> source_used; //source vertices already used
 						used[sdp_vertex] = source_vertex;
 						elements_to_check.push(sdp_vertex);
 						bool fail = false;
@@ -139,22 +140,31 @@ public:
 							auto curVertInSdp = elements_to_check.front();
 							auto curVertInSrcGraph = used[curVertInSdp];
 							elements_to_check.pop();
-							
+
+							std::cout << "Start walk from SDP vertex " << curVertInSdp.id << " - " << curVertInSdp.name << std::endl;
 							sdp.forall_adj_verts(curVertInSdp, [&](const edfd_element& vert, const edfd_connection& edge)
 							{
-								if (visited.find(vert) != visited.end()) //we have already visited this vertex
+								std::cout << "In SDP vertex " << vert.id << " - " << vert.name << std::endl;
+								if (sdp_visited.find(vert) != sdp_visited.end()) //we have already visited this vertex
 									return;
-								visited.insert(vert);
+								sdp_visited.insert(vert);
 
 								bool found = false;
+								std::cout << "\tStart walk from source vertex " << curVertInSrcGraph.id << " - " << curVertInSrcGraph.name << std::endl;
 								base_state.src_graph.forall_adj_verts(curVertInSrcGraph, [&](const edfd_element& src_vert, const edfd_connection& src_edge)
 								{
-									if (vert.type == src_vert.type &&
-										(used.find(vert) == used.end())) //checking only types for now
+									if (used.find(vert) == used.end())
 									{
-										used[vert] = src_vert;
-										elements_to_check.push(vert);
-										found = true;
+										std::cout << "\tIn source vertex " << src_vert.id << " - " << src_vert.name << std::endl;
+										if (source_used.find(src_vert) == source_used.end() &&
+											vert.type == src_vert.type) //checking only types for now
+										{
+											used[vert] = src_vert;
+											source_used.insert(src_vert);
+											elements_to_check.push(vert);
+											std::cout << "\t\tUsing source vertex" << src_vert.id << " as SDP vertex " << vert.id << std::endl;
+											found = true;
+										}
 									}
 								});
 								if (!found)

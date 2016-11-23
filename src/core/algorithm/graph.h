@@ -60,7 +60,7 @@ public:
 			m_adjacentLists[av.first].push_back(forward_edge);
 
 			adjacent_vertex_t backward_edge;
-			forward_edge.vertex = av.first;
+			backward_edge.vertex = av.first;
 			m_adjacentLists[av.second].push_back(backward_edge);
 		}
 	}
