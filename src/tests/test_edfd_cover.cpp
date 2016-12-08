@@ -5,6 +5,58 @@
 #include <core/transition_system.h>
 #include <sstream>
 
+void test_is_solved()
+{
+	edfd_element one{ 1, "one", edfd_element::type_t::entity };
+	edfd_element two{ 2, "two", edfd_element::type_t::entity };
+	edfd_element three{ 3, "three", edfd_element::type_t::entity };
+	edfd_graph source_graph(
+	{ one, two, three },
+	{ { one, two }, { one, three }, { two, three } }
+	);
+
+	transition_system<edfd_cover> ts({});
+
+	edfd_cover_state state{ source_graph };
+
+	edfd_cover_state final_state = state;
+	final_state.sdp_instances.push_back(0);
+	final_state.cover[1] = 0;
+	final_state.cover[2] = 0;
+	final_state.cover[3] = 0;
+
+	assert_test(ts.is_solved(state) == false, "test_is_solved, state is not solved yet");
+	assert_test(ts.is_solved(final_state), "test_is_solved, final_state is solved");
+}
+
+void test_apply_transition()
+{
+	edfd_element one{ 1, "one", edfd_element::type_t::entity };
+	edfd_element two{ 2, "two", edfd_element::type_t::entity };
+	edfd_element three{ 3, "three", edfd_element::type_t::entity };
+	edfd_graph source_graph(
+	{ one, two, three },
+	{ { one, two }, { one, three }, { two, three } }
+	);
+	vector<edfd_graph> sdps{ source_graph };
+	transition_system<edfd_cover> ts(sdps);
+
+	edfd_cover_state state{ source_graph };
+
+	edfd_cover_state final_state = state;
+	final_state.sdp_instances.push_back(0);
+	final_state.cover[1] = 0;
+	final_state.cover[2] = 0;
+	final_state.cover[3] = 0;
+
+	transition_system<edfd_cover>::transition_t tr;
+	tr.new_sdp_instance = 0;
+	tr.cover_difference = { 1, 2, 3 }; //all vertices are covered with 0'th sdp instance
+
+	bool result = test_apply_transition(ts, state, final_state, tr);
+	assert_test(result, "test_apply_transition");
+}
+
 //! source graph is empty
 //! available SDP set is empty
 //! expected result: no available transitions
@@ -12,8 +64,7 @@ void test_empty()
 {
 	transition_system<edfd_cover> ts;
 
-	edfd_cover_state state;
-	state.src_graph = edfd_graph({}, {});
+	edfd_cover_state state{ edfd_graph({}, {}) };
 	bool result = test_available_transitions(ts, state, {});
 	assert_test(result, "test_empty");
 }
@@ -33,8 +84,7 @@ void test_equal_graph()
 	vector<edfd_graph> sdps{ source_graph };
 	transition_system<edfd_cover> ts(sdps);
 
-	edfd_cover_state state;
-	state.src_graph = source_graph;
+	edfd_cover_state state{ source_graph };
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
@@ -75,8 +125,7 @@ void test_graph_with_two_subgraphs()
 	vector<edfd_graph> sdps{ sdp };
 	transition_system<edfd_cover> ts(sdps);
 
-	edfd_cover_state state;
-	state.src_graph = source_graph;
+	edfd_cover_state state{ source_graph };
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
@@ -123,8 +172,7 @@ void test_graph_with_two_connected_subgraphs()
 	vector<edfd_graph> sdps{ sdp };
 	transition_system<edfd_cover> ts(sdps);
 
-	edfd_cover_state state;
-	state.src_graph = source_graph;
+	edfd_cover_state state{ source_graph };
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
@@ -171,8 +219,7 @@ void test_graph_with_included_subgraphs()
 	vector<edfd_graph> sdps{ sdp1, sdp2 };
 	transition_system<edfd_cover> ts(sdps);
 
-	edfd_cover_state state;
-	state.src_graph = source_graph;
+	edfd_cover_state state{ source_graph };
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
@@ -202,4 +249,8 @@ void test_edfd_cover()
 	test_graph_with_two_subgraphs();
 	test_graph_with_two_connected_subgraphs();
 	test_graph_with_included_subgraphs();
+
+	test_apply_transition();
+
+	test_is_solved();
 }

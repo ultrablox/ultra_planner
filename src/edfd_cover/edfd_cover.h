@@ -67,9 +67,20 @@ typedef explicit_graph<edfd_element, edfd_connection> edfd_graph;
 
 struct edfd_cover_state
 {
-	edfd_graph src_graph;
+	const edfd_graph src_graph;
 	vector<size_t> sdp_instances; //map SDP instance id(index in vector) to SDP type(index in sdps vector in edfd_cover class)
-	vector<size_t> cover; //what SDP instance is used to cover i-th edfd_element in source graph
+	unordered_map<edfd_graph::vertex_t::id_t, size_t> cover; //what SDP instance is used to cover i-th edfd_element in source graph
+
+	edfd_cover_state(const edfd_graph& src_graph) :
+		src_graph(src_graph)
+	{}
+
+	bool operator == (const edfd_cover_state& rhs) const
+	{
+		return //src_graph == rhs.sdp_instances && //not checking source graph equality because during one problem solving it cannot be changed
+			sdp_instances == rhs.sdp_instances &&
+			cover == rhs.cover;
+	}
 };
 
 struct edfd_cover_transition
@@ -220,6 +231,23 @@ public:
 		for (const transition_t& transition : available_transitions)
 			fun(transition);
 	}
+
+	bool is_solved(const state_t & cur_state) const
+	{
+		for (auto& vert : cur_state.src_graph.get_vertices())
+		{
+			auto it = cur_state.cover.find(vert.id); //looking for cover of each vertex
+			if (it == cur_state.cover.end()) //if this vertex hasn't been covered
+				return false; //problem is not yet solved
+		}
+		return true; //if we have found a cover for each vertex, the problem is solved
+	}
+
+	float transition_cost(const state_t&, transition_t transition) const
+	{
+		return 1.0f; //all transitions have one cost
+	}
+
 protected:
 	vector<edfd_graph> sdps; //available set of SDPs to cover source graph
 };
