@@ -1,6 +1,6 @@
 
-#ifndef SlidingPuzzle_heuristic_h
-#define SlidingPuzzle_heuristic_h
+#ifndef EDFDCover_heuristic_h
+#define EDFDCover_heuristic_h
 
 #include "edfd_cover.h"
 #include <core/transition_system.h>

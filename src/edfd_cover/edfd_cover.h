@@ -1,6 +1,6 @@
 
-#ifndef UltraTest_edfd_cover_h
-#define UltraTest_edfd_cover_h
+#ifndef EDFDCover_edfd_cover_h
+#define EDFDCover_edfd_cover_h
 
 #include <core/algorithm/math.h>
 #include <core/io/streamer.h>

@@ -242,6 +242,9 @@ void test_graph_with_included_subgraphs()
 	assert_test(result, "test_graph_with_included_subgraphs");
 }
 
+//! source graph is equal to one SDP graph
+//! available SDP set contains one graph
+//! expected result: one transition - cover source graph with only SDP
 void test_planning()
 {
 	edfd_element one{ 1, "one", edfd_element::type_t::entity };
