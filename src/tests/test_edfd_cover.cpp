@@ -11,13 +11,13 @@ void test_is_solved()
 	edfd_element two{ 2, "two", edfd_element::type_t::entity };
 	edfd_element three{ 3, "three", edfd_element::type_t::entity };
 	edfd_graph source_graph(
-	{ one, two, three },
-	{ { one, two }, { one, three }, { two, three } }
+		{ one, two, three },
+		{ { one, two }, { one, three }, { two, three } }
 	);
 
-	transition_system<edfd_cover> ts({});
+	transition_system<edfd_cover> ts(source_graph, vector<edfd_graph>{});
 
-	edfd_cover_state state{ source_graph };
+	edfd_cover_state state;
 
 	edfd_cover_state final_state = state;
 	final_state.sdp_instances.push_back(0);
@@ -39,9 +39,9 @@ void test_apply_transition()
 	{ { one, two }, { one, three }, { two, three } }
 	);
 	vector<edfd_graph> sdps{ source_graph };
-	transition_system<edfd_cover> ts(sdps);
+	transition_system<edfd_cover> ts(source_graph, sdps);
 
-	edfd_cover_state state{ source_graph };
+	edfd_cover_state state;
 
 	edfd_cover_state final_state = state;
 	final_state.sdp_instances.push_back(0);
@@ -62,9 +62,9 @@ void test_apply_transition()
 //! expected result: no available transitions
 void test_empty()
 {
-	transition_system<edfd_cover> ts;
+	transition_system<edfd_cover> ts(edfd_graph({}, {}), vector<edfd_graph>{});
+	edfd_cover_state state;
 
-	edfd_cover_state state{ edfd_graph({}, {}) };
 	bool result = test_available_transitions(ts, state, {});
 	assert_test(result, "test_empty");
 }
@@ -82,9 +82,9 @@ void test_equal_graph()
 		{ { one, two }, { one, three }, {two, three} }
 	);
 	vector<edfd_graph> sdps{ source_graph };
-	transition_system<edfd_cover> ts(sdps);
+	transition_system<edfd_cover> ts(source_graph, sdps);
 
-	edfd_cover_state state{ source_graph };
+	edfd_cover_state state;
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
@@ -123,9 +123,9 @@ void test_graph_with_two_subgraphs()
 		{ { one, two }, { one, three }, { two, three } }
 	);
 	vector<edfd_graph> sdps{ sdp };
-	transition_system<edfd_cover> ts(sdps);
+	transition_system<edfd_cover> ts(source_graph, sdps);
 
-	edfd_cover_state state{ source_graph };
+	edfd_cover_state state;
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
@@ -170,9 +170,9 @@ void test_graph_with_two_connected_subgraphs()
 		{ { one, two }, { one, three }, { two, three } }
 	);
 	vector<edfd_graph> sdps{ sdp };
-	transition_system<edfd_cover> ts(sdps);
+	transition_system<edfd_cover> ts(source_graph, sdps);
 
-	edfd_cover_state state{ source_graph };
+	edfd_cover_state state;
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
@@ -217,9 +217,9 @@ void test_graph_with_included_subgraphs()
 	edfd_graph sdp2{ source_graph };
 
 	vector<edfd_graph> sdps{ sdp1, sdp2 };
-	transition_system<edfd_cover> ts(sdps);
+	transition_system<edfd_cover> ts(source_graph, sdps);
 
-	edfd_cover_state state{ source_graph };
+	edfd_cover_state state;
 
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
