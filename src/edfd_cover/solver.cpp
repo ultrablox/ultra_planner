@@ -51,10 +51,11 @@ int main(int argc, const char ** argv)
 	//Read size
 	
 	using edfd_t = transition_system<edfd_cover>;
+	edfd_t ts();
 	std::ofstream plan_file("plan.txt");
-	state_space_solver<edfd_t> solver(in_file, plan_file);
+	state_space_solver<edfd_t> solver(ts, plan_file, edfd_t::state_t());
 
-	bool r = solver.solve<simple_heuristic>(storage_type.getValue() == "ext", algorithm_name.getValue());
+	bool r = solver.solve<simple_heuristic>(false, algorithm_name.getValue());
 	if (!r)
 		cout << "Solution not found!" << std::endl;
 

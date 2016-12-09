@@ -1,8 +1,10 @@
 
 #include "test_helpers.h"
 #include "transition_system_helpers.h"
-#include <edfd_cover/edfd_cover.h>
 #include <core/transition_system.h>
+#include <core/state_space_solver.h>
+#include <edfd_cover/edfd_cover.h>
+#include <edfd_cover/heuristic.h>
 #include <sstream>
 
 void test_is_solved()
@@ -240,6 +242,26 @@ void test_graph_with_included_subgraphs()
 	assert_test(result, "test_graph_with_included_subgraphs");
 }
 
+void test_planning()
+{
+	edfd_element one{ 1, "one", edfd_element::type_t::entity };
+	edfd_element two{ 2, "two", edfd_element::type_t::entity };
+	edfd_element three{ 3, "three", edfd_element::type_t::entity };
+	edfd_graph source_graph(
+	{ one, two, three },
+	{ { one, two }, { one, three }, { two, three } }
+	);
+	vector<edfd_graph> sdps{ source_graph };
+	transition_system<edfd_cover> ts(source_graph, sdps);
+
+	edfd_cover_state state;
+
+	state_space_solver<transition_system<edfd_cover>> solver(ts, cout, state);
+
+	bool result = solver.solve<simple_heuristic>(false, "A*");
+	assert_test(result, "test_planning");
+}
+
 void test_edfd_cover()
 {
 	cout << "Testing edfd cover" << endl;
@@ -253,4 +275,6 @@ void test_edfd_cover()
 	test_apply_transition();
 
 	test_is_solved();
+
+	test_planning();
 }
