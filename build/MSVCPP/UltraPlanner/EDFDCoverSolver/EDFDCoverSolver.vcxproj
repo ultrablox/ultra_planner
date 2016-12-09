@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\edfd_cover\edfd_cover.h" />
+    <ClInclude Include="..\..\..\..\src\edfd_cover\heuristic.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\edfd_cover\solver.cpp" />

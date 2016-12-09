@@ -9,6 +9,9 @@
     <ClInclude Include="..\..\..\..\src\edfd_cover\edfd_cover.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\edfd_cover\heuristic.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\edfd_cover\solver.cpp">
