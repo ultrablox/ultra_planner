@@ -65,17 +65,32 @@ public:
 		}
 	}
 
+	explicit_graph(const std::initializer_list<vertex_t> & verts, const std::initializer_list<std::tuple<vertex_t, vertex_t, edge_t>> & edges)
+	{
+		for (auto & v : verts)
+			m_vertices.insert(v);
+
+		for (auto & edge : edges)
+		{
+			adjacent_vertex_t forward_edge;
+			forward_edge.vertex = std::get<1>(edge);
+			forward_edge.edge = std::get<2>(edge);
+			m_adjacentLists[std::get<0>(edge)].push_back(forward_edge);
+		}
+	}
+
 	template<typename F>
 	void forall_adj_verts(const vertex_t & vertex, F fun) const
 	{
 		auto adj_it = m_adjacentLists.find(vertex);
 #if _DEBUG
 		assert(m_vertices.find(vertex) != m_vertices.end());
-		assert(adj_it != m_adjacentLists.end());
+		//assert(adj_it != m_adjacentLists.end());
+		//commented out this assert because it's normal when there are no adjacent vertices for given vertex
 #endif
-
-		for(auto & edge : adj_it->second)
-			fun(edge.vertex, edge.edge);
+		if (adj_it != m_adjacentLists.end())
+			for(auto & edge : adj_it->second)
+				fun(edge.vertex, edge.edge);
 	}
 
 	void add_vertex(const vertex_t & vert)

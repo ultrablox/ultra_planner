@@ -64,7 +64,7 @@ void test_apply_transition()
 //! expected result: no available transitions
 void test_empty()
 {
-	transition_system<edfd_cover> ts(edfd_graph({}, {}), vector<edfd_graph>{});
+	transition_system<edfd_cover> ts;
 	edfd_cover_state state;
 
 	bool result = test_available_transitions(ts, state, {});
@@ -242,10 +242,25 @@ void test_graph_with_included_subgraphs()
 	assert_test(result, "test_graph_with_included_subgraphs");
 }
 
+void test_planning_helper(const edfd_graph & source_graph, const vector<edfd_graph> sdps, const string & test_name)
+{
+	transition_system<edfd_cover> ts(source_graph, sdps);
+	edfd_cover_state state;
+	state_space_solver<transition_system<edfd_cover>> solver(ts, cout, state);
+
+	for (auto& alg_name : { "A*", /*"BA*",*/ "GBFS" })
+		for (bool ext_mem : {false, true})
+		{
+			string test_full_name = test_name + " with ext_mem=" + (ext_mem ? "true" : "false") + ", alg_name=" + alg_name;
+			cout << test_full_name << endl;
+			assert_test(solver.solve<simple_heuristic>(ext_mem, alg_name), test_full_name);
+		}
+}
+
 //! source graph is equal to one SDP graph
 //! available SDP set contains one graph
 //! expected result: one transition - cover source graph with only SDP
-void test_planning()
+void test_planning_simple()
 {
 	edfd_element one{ 1, "one", edfd_element::type_t::entity };
 	edfd_element two{ 2, "two", edfd_element::type_t::entity };
@@ -255,14 +270,121 @@ void test_planning()
 	{ { one, two }, { one, three }, { two, three } }
 	);
 	vector<edfd_graph> sdps{ source_graph };
-	transition_system<edfd_cover> ts(source_graph, sdps);
+	test_planning_helper(source_graph, sdps, "test_planning");
+}
 
-	edfd_cover_state state;
+//! source graph contains two subgraphs which are equal to one SDP graph
+//! this subgraphs are not connected
+//! available SDP set contains one graph
+//! expected result: two transitions - cover each source subgraph with only SDP
+void test_planning_with_two_subgraphs()
+{
+	edfd_element one{ 1, "one", edfd_element::type_t::entity };
+	edfd_element two{ 2, "two", edfd_element::type_t::entity };
+	edfd_element three{ 3, "three", edfd_element::type_t::entity };
 
-	state_space_solver<transition_system<edfd_cover>> solver(ts, cout, state);
+	edfd_element four{ 4, "four", edfd_element::type_t::entity };
+	edfd_element five{ 5, "five", edfd_element::type_t::entity };
+	edfd_element six{ 6, "six", edfd_element::type_t::entity };
 
-	bool result = solver.solve<simple_heuristic>(false, "A*");
-	assert_test(result, "test_planning");
+	edfd_graph source_graph(
+	{ one, two, three, four, five, six },
+	{
+		{ one, two }, { one, three }, { two, three },
+		{ four, five }, { four, six }, { five, six }
+	}
+	);
+
+	edfd_graph sdp(
+	{ one, two, three },
+	{ { one, two }, { one, three }, { two, three } }
+	);
+	vector<edfd_graph> sdps{ sdp };
+
+	test_planning_helper(source_graph, sdps, "test_planning_with_two_subgraphs");
+}
+
+//! source graph contains three subgraphs each of them is equal to one SDP graph
+//! two subgraphs is equal to each other and are part of third graph
+//! available SDP set contains two graphs
+//! one graph is part of another
+//! expected result: three transitions - cover each source subgraph with corresponding SDP
+void test_planning_with_included_subgraphs()
+{
+	edfd_element one{ 1, "one", edfd_element::type_t::entity };
+	edfd_element two{ 2, "two", edfd_element::type_t::entity };
+	edfd_element three{ 3, "three", edfd_element::type_t::entity };
+	edfd_element four{ 4, "four", edfd_element::type_t::entity };
+
+	edfd_graph source_graph(
+	{ one, two, three, four },
+	{
+		{ one, two }, { one, three }, { two, three },
+		{ four, one }, { four, two }
+	}
+	);
+
+	edfd_graph sdp1(
+	{ one, two, three },
+	{ { one, two }, { one, three }, { two, three } }
+	);
+
+	edfd_graph sdp2{ source_graph };
+
+	vector<edfd_graph> sdps{ sdp1, sdp2 };
+
+	test_planning_helper(source_graph, sdps, "test_planning_with_included_subgraphs");
+}
+
+void test_planning_real_sdps()
+{
+	using edge_tup = std::tuple < edfd_element, edfd_element, edfd_connection > ;
+
+	edfd_element db{ 1, "Database", edfd_element::type_t::entity };
+	edfd_element receive_data{ 2, "Receive data", edfd_element::type_t::process };
+
+	edfd_graph db_integration_sdp(
+		{ db, receive_data },
+		{ edge_tup{ db, receive_data, "data" } }
+	);
+
+	edfd_element app{ 3, "Application package", edfd_element::type_t::entity };
+	edfd_element calc{ 4, "Do calculation", edfd_element::type_t::process };
+
+	edfd_graph app_integration_sdp(
+		{ app, calc },
+		{
+			edge_tup{ app, calc, "result" },
+			edge_tup{ calc, app, "data" }
+		}
+	);
+
+	edfd_element nf_operation{ 5, "NF operation", edfd_element::type_t::nf_process };
+	edfd_element setup_situation{ 6, "Setup initial situation", edfd_element::type_t::process };
+	edfd_element show_recommendations{ 7, "Show recommendations", edfd_element::type_t::process };
+
+	edfd_graph main_part_sdp(
+		{nf_operation, setup_situation, show_recommendations},
+		{
+			edge_tup{ setup_situation, nf_operation, "facts" },
+			edge_tup{ nf_operation, show_recommendations, "result of solving" },
+		}
+	);
+
+	edfd_graph source_graph(
+		{db, receive_data, app, calc, nf_operation, setup_situation, show_recommendations},
+		{
+			edge_tup{ db, receive_data, "data" },
+			edge_tup{ app, calc, "result" },
+			edge_tup{ calc, app, "data" },
+			edge_tup{ setup_situation, nf_operation, "facts" },
+			edge_tup{ nf_operation, show_recommendations, "result of solving" },
+		}
+	);
+
+	vector<edfd_graph> sdps {db_integration_sdp, app_integration_sdp, main_part_sdp};
+
+	test_planning_helper(source_graph, sdps, "test_planning_real_sdps");
 }
 
 void test_edfd_cover()
@@ -279,5 +401,8 @@ void test_edfd_cover()
 
 	test_is_solved();
 
-	test_planning();
+	test_planning_simple();
+	test_planning_with_two_subgraphs();
+	test_planning_with_included_subgraphs();
+	test_planning_real_sdps();
 }

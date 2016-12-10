@@ -42,10 +42,7 @@ struct edfd_element
 	}
 };
 
-struct edfd_connection
-{
-	string name; //name is required for every connection in edfd
-};
+typedef string edfd_connection; //connection name is the only parameter of a connection
 
 namespace std
 {
