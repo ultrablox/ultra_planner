@@ -242,6 +242,50 @@ void test_graph_with_included_subgraphs()
 	assert_test(result, "test_graph_with_included_subgraphs");
 }
 
+void test_graph_with_two_suitable_sdps()
+{
+	using edge_tup = std::tuple < edfd_element, edfd_element, edfd_connection >;
+
+	edfd_element db{ 1, "Database", edfd_element::type_t::entity };
+	edfd_element receive_data{ 2, "Receive data", edfd_element::type_t::process };
+
+	edfd_graph db_integration_sdp(
+		{ db, receive_data },
+		{ edge_tup{ db, receive_data, "data" } }
+	);
+
+	edfd_element app{ 3, "Application package", edfd_element::type_t::entity };
+	edfd_element calc{ 4, "Do calculation", edfd_element::type_t::process };
+
+	edfd_graph app_integration_sdp(
+		{ app, calc },
+		{
+			edge_tup{ app, calc, "result" },
+			edge_tup{ calc, app, "data" }
+		}
+	);
+
+	vector<edfd_graph> sdps = { db_integration_sdp, app_integration_sdp };
+	edfd_graph source_graph = app_integration_sdp;
+
+	transition_system<edfd_cover> ts(source_graph, sdps);
+	edfd_cover_state state;
+
+	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
+	transition_system<edfd_cover>::transition_t tr;
+
+	tr.new_sdp_instance = 0;
+	tr.cover_difference = { 3, 4 };
+	available_transitions.push_back(tr);
+
+	tr.new_sdp_instance = 1;
+	tr.cover_difference = { 3, 4 };
+	available_transitions.push_back(tr);
+
+	bool result = test_available_transitions(ts, state, available_transitions);
+	assert_test(result, "test_graph_with_two_suitable_sdps");
+}
+
 void test_planning_helper(const edfd_graph & source_graph, const vector<edfd_graph> sdps, const string & test_name)
 {
 	transition_system<edfd_cover> ts(source_graph, sdps);
