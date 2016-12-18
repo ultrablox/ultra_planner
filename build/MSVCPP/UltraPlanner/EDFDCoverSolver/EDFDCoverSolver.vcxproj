@@ -41,6 +41,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\edfd_cover\solver.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{914E9075-393F-4120-8582-CE43BB465013}</ProjectGuid>
     <RootNamespace>PuzzleSolver</RootNamespace>
