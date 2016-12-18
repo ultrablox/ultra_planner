@@ -108,9 +108,9 @@ void test_graph_with_two_subgraphs()
 	edfd_element two  { 2, "two", edfd_element::type_t::entity };
 	edfd_element three{ 3, "three", edfd_element::type_t::entity };
 
-	edfd_element four{ 4, "four", edfd_element::type_t::entity };
-	edfd_element five{ 5, "five", edfd_element::type_t::entity };
-	edfd_element six { 6, "six" , edfd_element::type_t::entity };
+	edfd_element four{ 4, "one", edfd_element::type_t::entity };
+	edfd_element five{ 5, "two", edfd_element::type_t::entity };
+	edfd_element six { 6, "three" , edfd_element::type_t::entity };
 
 	edfd_graph source_graph(
 		{ one, two, three, four, five, six },
@@ -154,9 +154,9 @@ void test_graph_with_two_connected_subgraphs()
 	edfd_element two  { 2, "two", edfd_element::type_t::entity };
 	edfd_element three{ 3, "three", edfd_element::type_t::entity };
 
-	edfd_element four{ 4, "four", edfd_element::type_t::entity };
-	edfd_element five{ 5, "five", edfd_element::type_t::entity };
-	edfd_element six { 6, "six", edfd_element::type_t::entity };
+	edfd_element four{ 4, "one", edfd_element::type_t::entity };
+	edfd_element five{ 5, "two", edfd_element::type_t::entity };
+	edfd_element six { 6, "three", edfd_element::type_t::entity };
 
 	edfd_graph source_graph(
 		{ one, two, three, four, five, six },
@@ -274,10 +274,6 @@ void test_graph_with_two_suitable_sdps()
 	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
 	transition_system<edfd_cover>::transition_t tr;
 
-	tr.new_sdp_instance = 0;
-	tr.cover_difference = { 3, 4 };
-	available_transitions.push_back(tr);
-
 	tr.new_sdp_instance = 1;
 	tr.cover_difference = { 3, 4 };
 	available_transitions.push_back(tr);
@@ -286,14 +282,84 @@ void test_graph_with_two_suitable_sdps()
 	assert_test(result, "test_graph_with_two_suitable_sdps");
 }
 
+void test_real_sdps()
+{
+	using edge_tup = std::tuple < edfd_element, edfd_element, edfd_connection >;
+
+	edfd_element db{ 1, "Database", edfd_element::type_t::entity };
+	edfd_element receive_data{ 2, "Receive data", edfd_element::type_t::process };
+
+	edfd_graph db_integration_sdp(
+	{ db, receive_data },
+	{ edge_tup{ db, receive_data, "data" } }
+	);
+
+	edfd_element app{ 3, "Application package", edfd_element::type_t::entity };
+	edfd_element calc{ 4, "Do calculation", edfd_element::type_t::process };
+
+	edfd_graph app_integration_sdp(
+	{ app, calc },
+	{
+		edge_tup{ app, calc, "result" },
+		edge_tup{ calc, app, "data" }
+	}
+	);
+
+	edfd_element nf_operation{ 5, "NF operation", edfd_element::type_t::nf_process };
+	edfd_element setup_situation{ 6, "Setup initial situation", edfd_element::type_t::process };
+	edfd_element show_recommendations{ 7, "Show recommendations", edfd_element::type_t::process };
+
+	edfd_graph main_part_sdp(
+	{ nf_operation, setup_situation, show_recommendations },
+	{
+		edge_tup{ setup_situation, nf_operation, "facts" },
+		edge_tup{ nf_operation, show_recommendations, "result of solving" },
+	}
+	);
+
+	edfd_graph source_graph(
+	{ db, receive_data, app, calc, nf_operation, setup_situation, show_recommendations },
+	{
+		edge_tup{ db, receive_data, "data" },
+		edge_tup{ app, calc, "result" },
+		edge_tup{ calc, app, "data" },
+		edge_tup{ setup_situation, nf_operation, "facts" },
+		edge_tup{ nf_operation, show_recommendations, "result of solving" },
+	}
+	);
+
+	vector<edfd_graph> sdps{ db_integration_sdp, app_integration_sdp, main_part_sdp };
+
+	transition_system<edfd_cover> ts(source_graph, sdps);
+	edfd_cover_state state;
+
+	vector<typename transition_system<edfd_cover>::transition_t> available_transitions;
+	transition_system<edfd_cover>::transition_t tr;
+
+	tr.new_sdp_instance = 0;
+	tr.cover_difference = { 1, 2 };
+	available_transitions.push_back(tr);
+	
+	tr.new_sdp_instance = 1;
+	tr.cover_difference = { 3, 4 };
+	available_transitions.push_back(tr);
+
+	tr.new_sdp_instance = 2;
+	tr.cover_difference = { 5, 6, 7 };
+	available_transitions.push_back(tr);
+
+	bool result = test_available_transitions(ts, state, available_transitions);
+	assert_test(result, "test_real_sdps");
+}
+
 void test_planning_helper(const edfd_graph & source_graph, const vector<edfd_graph> sdps, const string & test_name)
 {
 	transition_system<edfd_cover> ts(source_graph, sdps);
 	edfd_cover_state state;
 	state_space_solver<transition_system<edfd_cover>> solver(ts, cout, state);
 
-	for (auto& alg_name : { "A*", /*"BA*",*/ "GBFS" })
-		for (bool ext_mem : {false, true})
+	for (auto& alg_name : { "A*", /*"BA*",*/ /*"GBFS"*/ })
+		for (bool ext_mem : {false/*, true*/})
 		{
 			string test_full_name = test_name + " with ext_mem=" + (ext_mem ? "true" : "false") + ", alg_name=" + alg_name;
 			cout << test_full_name << endl;
@@ -327,9 +393,9 @@ void test_planning_with_two_subgraphs()
 	edfd_element two{ 2, "two", edfd_element::type_t::entity };
 	edfd_element three{ 3, "three", edfd_element::type_t::entity };
 
-	edfd_element four{ 4, "four", edfd_element::type_t::entity };
-	edfd_element five{ 5, "five", edfd_element::type_t::entity };
-	edfd_element six{ 6, "six", edfd_element::type_t::entity };
+	edfd_element four{ 4, "one", edfd_element::type_t::entity };
+	edfd_element five{ 5, "two", edfd_element::type_t::entity };
+	edfd_element six{ 6, "three", edfd_element::type_t::entity };
 
 	edfd_graph source_graph(
 	{ one, two, three, four, five, six },
@@ -440,6 +506,8 @@ void test_edfd_cover()
 	test_graph_with_two_subgraphs();
 	test_graph_with_two_connected_subgraphs();
 	test_graph_with_included_subgraphs();
+	test_graph_with_two_suitable_sdps();
+	test_real_sdps();
 
 	test_apply_transition();
 

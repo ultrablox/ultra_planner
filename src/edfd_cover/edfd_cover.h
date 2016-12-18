@@ -40,6 +40,13 @@ struct edfd_element
 	{
 		return lhs.id == rhs.id && lhs.name == rhs.name && lhs.type == rhs.type;
 	}
+
+	//! comparison for generating transitions
+	//! checking types and names for now
+	friend bool compare(const edfd_element& lhs, const edfd_element& rhs)
+	{
+		return lhs.name == rhs.name && lhs.type == rhs.type;
+	}
 };
 
 typedef string edfd_connection; //connection name is the only parameter of a connection
@@ -67,9 +74,10 @@ struct edfd_cover_state
 	vector<size_t> sdp_instances; //map SDP instance id(index in vector) to SDP type(index in sdps vector in edfd_cover class)
 	unordered_map<edfd_graph::vertex_t::id_t, size_t> cover; //what SDP instance is used to cover i-th edfd_element in source graph
 
-	edfd_cover_state() = default;
-	explicit edfd_cover_state(size_t problem_size)
-	{}
+	bool isCovered(edfd_graph::vertex_t::id_t vertexId) const
+	{
+		return cover.find(vertexId) != cover.end();
+	}
 
 	bool operator == (const edfd_cover_state& rhs) const
 	{
@@ -313,7 +321,7 @@ public:
 
 	std::ostream & interpret_transition(std::ostream & os, const state_t & state, const transition_t & transition) const
 	{
-		return os << "dummy output";
+		return os << transition;
 	}
 
 	std::ostream & interpet_state(std::ostream & os, const state_t & state) const
@@ -355,7 +363,8 @@ private:
 			{
 				for (const edfd_element& source_vertex : source_vertices)
 				{
-					if (source_vertex.type == sdp_vertex.type)
+					if (!base_state.isCovered(source_vertex.id) &&
+						compare(source_vertex, sdp_vertex))
 					{
 						transition_t transition;
 						transition.new_sdp_instance = i;
@@ -391,7 +400,8 @@ private:
 									{
 										//std::cout << "\tIn source vertex " << src_vert.id << " - " << src_vert.name << std::endl;
 										if (source_used.find(src_vert) == source_used.end() &&
-											vert.type == src_vert.type) //checking only types for now
+											!base_state.isCovered(source_vertex.id) &&
+											compare(vert, src_vert))
 										{
 											used[vert] = src_vert;
 											source_used.insert(src_vert);
@@ -405,6 +415,8 @@ private:
 									fail = true;
 							});
 						}
+						if (sdp_visited.size() != sdp_vertices.size()) // we haven't check all sdp vertices
+							fail = true;
 						if (!fail)
 						{
 							for (const auto& vert : used)
