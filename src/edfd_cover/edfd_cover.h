@@ -300,13 +300,17 @@ public:
 
 	bool is_solved(const state_t & cur_state) const
 	{
-		for (auto& vert : src_graph.get_vertices())
-		{
-			auto it = cur_state.cover.find(vert.id); //looking for cover of each vertex
-			if (it == cur_state.cover.end()) //if this vertex hasn't been covered
-				return false; //problem is not yet solved
-		}
-		return true; //if we have found a cover for each vertex, the problem is solved
+		//for (auto& vert : src_graph.get_vertices())
+		//{
+		//	auto it = cur_state.cover.find(vert.id); //looking for cover of each vertex
+		//	if (it == cur_state.cover.end()) //if this vertex hasn't been covered
+		//		return false; //problem is not yet solved
+		//}
+		//return true; //if we have found a cover for each vertex, the problem is solved
+
+		//just check whether we cannot cover more vertices from this state
+		//rough cover cannot cover all graph
+		return generate_transitions_from_state(cur_state).size() == 0;
 	}
 
 	float transition_cost(const state_t&, transition_t) const

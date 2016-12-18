@@ -414,11 +414,6 @@ void test_planning_with_two_subgraphs()
 	test_planning_helper(source_graph, sdps, "test_planning_with_two_subgraphs");
 }
 
-//! source graph contains three subgraphs each of them is equal to one SDP graph
-//! two subgraphs is equal to each other and are part of third graph
-//! available SDP set contains two graphs
-//! one graph is part of another
-//! expected result: three transitions - cover each source subgraph with corresponding SDP
 void test_planning_with_included_subgraphs()
 {
 	edfd_element one{ 1, "one", edfd_element::type_t::entity };
@@ -497,6 +492,70 @@ void test_planning_real_sdps()
 	test_planning_helper(source_graph, sdps, "test_planning_real_sdps");
 }
 
+void test_full_problem()
+{
+	using edge_tup = std::tuple < edfd_element, edfd_element, edfd_connection >;
+
+	edfd_element db{ 1, "Database", edfd_element::type_t::entity };
+	edfd_element receive_data{ 2, "Receive data", edfd_element::type_t::process };
+
+	edfd_graph db_integration_sdp(
+	{ db, receive_data },
+	{ edge_tup{ db, receive_data, "data" } }
+	);
+
+	edfd_element app{ 3, "Application package", edfd_element::type_t::entity };
+	edfd_element calc{ 4, "Do calculation", edfd_element::type_t::process };
+
+	edfd_graph app_integration_sdp(
+	{ app, calc },
+	{
+		edge_tup{ app, calc, "result" },
+		edge_tup{ calc, app, "data" }
+	}
+	);
+
+	edfd_element nf_operation{ 5, "NF operation", edfd_element::type_t::nf_process };
+	edfd_element setup_situation{ 6, "Setup initial situation", edfd_element::type_t::process };
+	edfd_element show_recommendations{ 7, "Show recommendations", edfd_element::type_t::process };
+
+	edfd_graph main_part_sdp(
+	{ nf_operation, setup_situation, show_recommendations },
+	{
+		edge_tup{ setup_situation, nf_operation, "facts" },
+		edge_tup{ nf_operation, show_recommendations, "result of solving" },
+	}
+	);
+
+	edfd_graph source_graph(
+	{ db, receive_data, app, calc, nf_operation, setup_situation, show_recommendations },
+	{
+		edge_tup{ db, receive_data, "data" },
+		edge_tup{ app, calc, "result" },
+		edge_tup{ calc, app, "data" },
+		edge_tup{ setup_situation, nf_operation, "facts" },
+		edge_tup{ nf_operation, show_recommendations, "result of solving" },
+	}
+	);
+
+	vector<edfd_graph> optional_sdps{ db_integration_sdp, app_integration_sdp};
+	
+	transition_system<edfd_cover> rough_cover(source_graph, vector<edfd_graph>{ main_part_sdp });
+	edfd_cover_state state, rough_covered_state;
+	state_space_solver<transition_system<edfd_cover>> rough_solver(rough_cover, cout, state);
+	bool solved = rough_solver.solve<simple_heuristic>(false, "A*", rough_covered_state);
+	
+	assert_test(solved, "rough cover");
+	cout << "Rough cover done" << endl;
+
+	transition_system<edfd_cover> precise_cover(source_graph, optional_sdps);
+	state_space_solver<transition_system<edfd_cover>> precise_solver(precise_cover, cout, rough_covered_state);
+	solved = precise_solver.solve<simple_heuristic>(false, "A*");
+
+	assert_test(solved, "precise cover");
+	cout << "Precise cover done" << endl;
+}
+
 void test_edfd_cover()
 {
 	cout << "Testing edfd cover" << endl;
@@ -517,4 +576,6 @@ void test_edfd_cover()
 	test_planning_with_two_subgraphs();
 	test_planning_with_included_subgraphs();
 	test_planning_real_sdps();
+
+	test_full_problem();
 }
