@@ -527,14 +527,19 @@ void test_full_problem()
 	}
 	);
 
+	edfd_element additional_element{ 8, "Do specific operation", edfd_element::type_t::process };
+
 	edfd_graph source_graph(
-	{ db, receive_data, app, calc, nf_operation, setup_situation, show_recommendations },
+	{ db, receive_data, app, calc, nf_operation, setup_situation, show_recommendations, additional_element },
 	{
 		edge_tup{ db, receive_data, "data" },
+		edge_tup{ receive_data, additional_element, "data" },
+		edge_tup{ additional_element, nf_operation, "data" },
+		edge_tup{ nf_operation, additional_element, "requests" },
 		edge_tup{ app, calc, "result" },
 		edge_tup{ calc, app, "data" },
 		edge_tup{ setup_situation, nf_operation, "facts" },
-		edge_tup{ nf_operation, show_recommendations, "result of solving" },
+		edge_tup{ nf_operation, show_recommendations, "result" },
 	}
 	);
 
