@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraPlanner", "UltraPlanner\UltraPlanner.vcxproj", "{75F4D7AC-9447-43AD-B89D-CCE29CA038AC}"
 EndProject
@@ -44,6 +44,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RubikSolver", "RubikSolver\RubikSolver.vcxproj", "{5EDE3794-879E-4479-9F51-DD9A6D5579CD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hannoi", "hannoi", "{0F905147-3CDB-466C-8CFC-129470946764}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EDFDCoverSolver", "EDFDCoverSolver\EDFDCoverSolver.vcxproj", "{914E9075-393F-4120-8582-CE43BB465013}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "edfd", "edfd", "{CC6DDC28-F330-45D6-9839-8C0463D643A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -212,7 +216,6 @@ Global
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.DebugStatic|Win32.ActiveCfg = Debug|Win32
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.DebugStatic|Win32.Build.0 = Debug|Win32
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.DebugStatic|x64.ActiveCfg = Debug|x64
-		{B12702AD-ABFB-343A-A199-8E24837244A3}.DebugStatic|x64.Build.0 = Debug|x64
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|Win32.ActiveCfg = Release|Win32
@@ -333,18 +336,37 @@ Global
 		{5EDE3794-879E-4479-9F51-DD9A6D5579CD}.ReleaseStatic|Win32.Build.0 = Release|Win32
 		{5EDE3794-879E-4479-9F51-DD9A6D5579CD}.ReleaseStatic|x64.ActiveCfg = ReleaseStatic|x64
 		{5EDE3794-879E-4479-9F51-DD9A6D5579CD}.ReleaseStatic|x64.Build.0 = ReleaseStatic|x64
+		{914E9075-393F-4120-8582-CE43BB465013}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Debug|Win32.ActiveCfg = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Debug|Win32.Build.0 = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Debug|x64.ActiveCfg = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.DebugStatic|Mixed Platforms.ActiveCfg = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.DebugStatic|Mixed Platforms.Build.0 = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.DebugStatic|Win32.ActiveCfg = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.DebugStatic|Win32.Build.0 = Debug|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.DebugStatic|x64.ActiveCfg = DebugStatic|x64
+		{914E9075-393F-4120-8582-CE43BB465013}.DebugStatic|x64.Build.0 = DebugStatic|x64
+		{914E9075-393F-4120-8582-CE43BB465013}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Release|Win32.ActiveCfg = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Release|Win32.Build.0 = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.Release|x64.ActiveCfg = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.ReleaseStatic|Mixed Platforms.ActiveCfg = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.ReleaseStatic|Mixed Platforms.Build.0 = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.ReleaseStatic|Win32.ActiveCfg = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.ReleaseStatic|Win32.Build.0 = Release|Win32
+		{914E9075-393F-4120-8582-CE43BB465013}.ReleaseStatic|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F8D0AC52-8234-494B-8B34-7665983C5C14} = {F5C2D30B-FFD0-4A90-900E-D913DD6DAC2F}
+		{0F10E89C-7668-4A5E-8158-EE294818C6C8} = {0F905147-3CDB-466C-8CFC-129470946764}
 		{E2A16588-286C-4CC6-A8F1-8D358758B3C7} = {F5C2D30B-FFD0-4A90-900E-D913DD6DAC2F}
 		{A2CC0A94-6301-4115-8F16-4CAC4ED82B8B} = {3BC67458-DF5D-4F3F-9FE9-0E2CF9E904CF}
 		{5EDE3794-879E-4479-9F51-DD9A6D5579CD} = {3BC67458-DF5D-4F3F-9FE9-0E2CF9E904CF}
-		{0F10E89C-7668-4A5E-8158-EE294818C6C8} = {0F905147-3CDB-466C-8CFC-129470946764}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
+		{914E9075-393F-4120-8582-CE43BB465013} = {CC6DDC28-F330-45D6-9839-8C0463D643A4}
 	EndGlobalSection
 EndGlobal

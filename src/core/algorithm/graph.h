@@ -60,8 +60,22 @@ public:
 			m_adjacentLists[av.first].push_back(forward_edge);
 
 			adjacent_vertex_t backward_edge;
-			forward_edge.vertex = av.first;
+			backward_edge.vertex = av.first;
 			m_adjacentLists[av.second].push_back(backward_edge);
+		}
+	}
+
+	explicit_graph(const std::initializer_list<vertex_t> & verts, const std::initializer_list<std::tuple<vertex_t, vertex_t, edge_t>> & edges)
+	{
+		for (auto & v : verts)
+			m_vertices.insert(v);
+
+		for (auto & edge : edges)
+		{
+			adjacent_vertex_t forward_edge;
+			forward_edge.vertex = std::get<1>(edge);
+			forward_edge.edge = std::get<2>(edge);
+			m_adjacentLists[std::get<0>(edge)].push_back(forward_edge);
 		}
 	}
 
@@ -71,11 +85,12 @@ public:
 		auto adj_it = m_adjacentLists.find(vertex);
 #if _DEBUG
 		assert(m_vertices.find(vertex) != m_vertices.end());
-		assert(adj_it != m_adjacentLists.end());
+		//assert(adj_it != m_adjacentLists.end());
+		//commented out this assert because it's normal when there are no adjacent vertices for given vertex
 #endif
-
-		for(auto & edge : adj_it->second)
-			fun(edge.vertex, edge.edge);
+		if (adj_it != m_adjacentLists.end())
+			for(auto & edge : adj_it->second)
+				fun(edge.vertex, edge.edge);
 	}
 
 	void add_vertex(const vertex_t & vert)
@@ -102,10 +117,15 @@ public:
 		}
 	}
 
-	std::list<adjacent_vertex_t> & adjacent_list(const vertex_t & vertex)
+	std::list<adjacent_vertex_t> & adjacent_list(const vertex_t & vertex) const
 	{
 		auto it = m_adjacentLists.find(vertex);
 		return it->second;
+	}
+
+	const std::unordered_set<vertex_t> & get_vertices() const
+	{
+		return m_vertices;
 	}
 private:
 	std::unordered_set<vertex_t> m_vertices;

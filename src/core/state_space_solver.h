@@ -66,31 +66,38 @@ public:
 	template<template<typename> class HeuristicT>
 	bool solve(bool ext_mem, const std::string & alg_name)
 	{
+		state_t result_state; //dummy variable
+		return solve<HeuristicT>(ext_mem, alg_name, result_state);
+	}
+
+	template<template<typename> class HeuristicT>
+	bool solve(bool ext_mem, const std::string & alg_name, state_t& result_state)
+	{
 		using heuristic_t = HeuristicT<transition_system_t>;
 		if (ext_mem)
 		{
 			//UExternalMemoryController ext_memory_ctrl;
-			return select_memory<true, heuristic_t>(alg_name);
+			return select_memory<true, heuristic_t>(alg_name, result_state);
 		}
 		else
-			return select_memory<false, heuristic_t>(alg_name);
+			return select_memory<false, heuristic_t>(alg_name, result_state);
 	}
 private:
 	template<bool ExtMem, typename HeuristicT>
-	bool select_memory(const std::string & alg_name)
+	bool select_memory(const std::string & alg_name, state_t& result_state)
 	{
 		if (alg_name == "A*")
-			return select_engine<astar_engine<graph_t, HeuristicT, ExtMem>>();
+			return select_engine<astar_engine<graph_t, HeuristicT, ExtMem>>(result_state);
 		else if (alg_name == "BA*")
-			return select_engine<batched_engine<graph_t, HeuristicT, ExtMem>>();
+			return select_engine<batched_engine<graph_t, HeuristicT, ExtMem>>(result_state);
 		else if (alg_name == "GBFS")
-			return select_engine<greedy_bfs_engine<graph_t, HeuristicT, ExtMem>>();
+			return select_engine<greedy_bfs_engine<graph_t, HeuristicT, ExtMem>>(result_state);
 		else
 			return false;
 	}
 
 	template<typename EngType>
-	bool select_engine()
+	bool select_engine(state_t& result_state)
 	{
 		graph_t graph(m_system);
 
@@ -118,6 +125,7 @@ private:
 
 		if (found)
 		{
+			result_state = path.back();
 			auto plan = m_system.build_transition_path(path.begin(), path.end());
 		
 			m_outStream << "Solution found (length " << plan.size() << ", cost " << plan_cost << ")" << std::endl;

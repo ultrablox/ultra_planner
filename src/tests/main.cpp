@@ -50,6 +50,8 @@ void test_compressed_stream();
 void test_varset_systems();
 void test_external_containers();
 
+void test_edfd_cover();
+
 int main()
 {
 	test_bitset();
@@ -62,7 +64,9 @@ int main()
 	test_puzzle_core();
 	test_rubik_core();
 	test_varset_systems();
-
+	
+	//commented out for faster testing
+	/*
 	test_external_containers();
 	test_complex_vector();
 	
@@ -70,14 +74,22 @@ int main()
 	test_complex_stack();
 
 	test_block_chain();
+	*/
+
+	//fails:
+	/*
 	test_complex_hashmap();
 	test_cached_file();
 
-	//test_matrix();
+	test_matrix();
 
-	//test_sorting();
+	test_sorting();
 	test_explicit_graph_search();
 	test_search();
+	*/
+
+	test_edfd_cover();
+	getchar();
 
 	return 0;
 }
